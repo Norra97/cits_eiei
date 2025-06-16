@@ -125,7 +125,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/cancel-asset-request/${reqId}`, { // เปลี่ยนเส้นทางเป็น reqId
+                    fetch(`/cancel-asset-request/${reqId}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
@@ -134,8 +134,30 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                Swal.fire('Cancelled!', 'The asset request has been cancelled.', 'success');
-                                fetchPendingAssets(); // Refresh the pending assets
+                                // Notify dashboard about the status change
+                                fetch('/update-dashboard-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        status: 'Pending',
+                                        action: 'cancel'
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(dashboardData => {
+                                    if (dashboardData.success) {
+                                        Swal.fire('Cancelled!', 'The asset request has been cancelled.', 'success');
+                                        fetchPendingAssets(); // Refresh the pending assets
+                                    } else {
+                                        throw new Error('Failed to update dashboard');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Dashboard update error:', error);
+                                    Swal.fire('Warning', 'Request cancelled but dashboard update failed', 'warning');
+                                });
                             } else {
                                 throw new Error('Cancellation failed');
                             }
@@ -160,7 +182,7 @@
                 <b>Asset Code    :</b> ${item.Assetcode || 'N/A'} <br>
                 <b>Asset Detail  :</b> ${item.Assetdetail || 'N/A'} <br>
                 <b>Asset Location:</b> ${item.Assetlocation || 'N/A'} <br>
-                <b>Activity:</b> ${item.Activity || 'N/A'} <br>
+                <b>Activity:</b> ${item.Activity} <br>
                 <b>UsageType:</b> ${item.UsageType || 'N/A'} <br>
                 <b>Borrow Date   :</b> ${item.Borrowdate || 'N/A'} <br>
                 <b>Return Date   :</b> ${item.ReturnDate || 'N/A'} <br>
