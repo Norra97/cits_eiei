@@ -1,0 +1,124 @@
+body {
+    background-color: #FFF3E8;
+}
+
+#NamePage{
+    color: #000;
+}
+
+/* ========================= nav ========================= */
+.logo {
+    width: 35px;
+}
+
+.btn-noti {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #929292;
+}
+
+.btn-noti:hover {
+    color: #FF9500;
+}
+
+.profile {
+    border-radius: 50%;
+    width: 60px;
+}
+
+/* ========================= dropdown ========================= */
+#profileMenu {
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1050;
+    transition: all 0.3s ease-in-out;
+}
+
+#profileMenu.active {
+    display: block;
+}
+
+.profile-info {
+    text-align: center;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.menu-item {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #333;
+}
+
+.menu-item i {
+    margin-right: 10px;
+}
+
+.menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* ========================= sidebar ========================= */
+.sidebar {
+    position: fixed;
+    top: 85px;
+    left: 0;
+    width: 200px;
+    height: calc(100vh - 85px);
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    padding-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.sidebar a {
+    text-decoration: none;
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+}
+
+.btn-sidebar {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #929292;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn-sidebar:hover,
+.btn-sidebar:focus {
+    color: #FF9500;
+}
+
+#search-button {
+    background-color: #ff8a65;
+    color: white;
+    border: none;
+}
+
+#search-button:hover {
+    background-color: #FF9500 
+}
+
+
+body {
+    padding-top: 85px;
+}

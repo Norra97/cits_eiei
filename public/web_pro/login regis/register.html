@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/web_pro/login regis/register.css">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <title>Register</title>
+    <style>
+        .transparent-card {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row m-5">
+            <div class="col-6"></div>
+            <div class="col-6 mt-5 d-flex justify-content-end">
+                <div class="card shadow transparent-card" style="border-radius: 40px; width: 500px; height: 700px;">
+                    <div class="card-body m-3 mt-4">
+                        <p class="card-text" style="color: #11D553">Welcome to Asset Borrowing System</p>
+                        <h1 class="card-title pb-2">Register</h1>
+                        <form id="formRegister">
+                            <label class="small pb-2">Enter your username</label>
+                            <input type="text" id="username" class="form-control" placeholder="Username" required>
+
+                            <label class="small pt-3 pb-2">Enter your Password</label>
+                            <input type="password" id="password1" class="form-control" placeholder="Password" required>
+
+                            <label class="small pt-3 pb-2">Confirm your Password</label>
+                            <input type="password" id="password2" class="form-control" placeholder="Re-Password" required>
+
+                            <label class="small pt-3 pb-2">Enter your Phone Number</label>
+                            <input type="text" id="phonenum" class="form-control" placeholder="Phone Number" required>
+
+                            <label class="small pt-3 pb-2">Your Department</label>
+                            <select id="department" class="form-control" required>
+                                <option value="" disabled selected>เลือกสำนักวิชา / หน่วยงาน</option>
+                                <optgroup label="สำนักวิชา">
+                                    <option value="สำนักวิชาศิลปศาสตร์">สำนักวิชาศิลปศาสตร์</option>
+                                    <option value="สำนักวิชาวิทยาศาสตร์">สำนักวิชาวิทยาศาสตร์</option>
+                                    <option value="สำนักวิชาการจัดการ">สำนักวิชาการจัดการ</option>
+                                    <option value="สำนักวิชาเทคโนโลยีดิจิทัลประยุกต์">สำนักวิชาเทคโนโลยีดิจิทัลประยุกต์
+                                    </option>
+                                    <option value="สำนักวิชาอุตสาหกรรมเกษตร">สำนักวิชาอุตสาหกรรมเกษตร</option>
+                                    <option value="สำนักวิชานิติศาสตร์">สำนักวิชานิติศาสตร์</option>
+                                    <option value="สำนักวิชาวิทยาศาสตร์เครื่องสำอาง">สำนักวิชาวิทยาศาสตร์เครื่องสำอาง
+                                    </option>
+                                    <option value="สำนักวิชาวิทยาศาสตร์สุขภาพ">สำนักวิชาวิทยาศาสตร์สุขภาพ</option>
+                                    <option value="สำนักวิชาพยาบาลศาสตร์">สำนักวิชาพยาบาลศาสตร์</option>
+                                    <option value="สำนักวิชาเวชศาสตร์ชะลอวัยและฟื้นฟูสุขภาพ">
+                                        สำนักวิชาเวชศาสตร์ชะลอวัยและฟื้นฟูสุขภาพ</option>
+                                    <option value="สำนักวิชาแพทยศาสตร์">สำนักวิชาแพทยศาสตร์</option>
+                                    <option value="สำนักวิชาทันตแพทยศาสตร์">สำนักวิชาทันตแพทยศาสตร์</option>
+                                    <option value="คลินิกทันตกรรม สำนักวิชาทันตแพทยศาสตร์">คลินิกทันตกรรม
+                                        สำนักวิชาทันตแพทยศาสตร์</option>
+                                    <option value="สำนักวิชานวัตกรรมสังคม">สำนักวิชานวัตกรรมสังคม</option>
+                                    <option value="สำนักวิชาจีนวิทยา">สำนักวิชาจีนวิทยา</option>
+                                    <option value="สำนักวิชาการแพทย์บูรณาการ">สำนักวิชาการแพทย์บูรณาการ</option>
+                                </optgroup>
+                                <optgroup label="ศูนย์">
+                                    <option value="ศูนย์เครื่องมือวิทยาศาสตร์และเทคโนโลยี">
+                                        ศูนย์เครื่องมือวิทยาศาสตร์และเทคโนโลยี</option>
+                                        <option value="ศูนย์เทคโนโลยีสารสนเทศ">
+                                            ศูนย์เทคโนโลยีสารสนเทศ</option>
+                                    <option value="ศูนย์บรรณสารและสื่อการศึกษา">ศูนย์บรรณสารและสื่อการศึกษา</option>
+                                    <option value="ศูนย์บริการวิชาการ">ศูนย์บริการวิชาการ</option>
+                                    <option value="ศูนย์การแพทย์มหาวิทยาลัยแม่ฟ้าหลวง">
+                                        ศูนย์การแพทย์มหาวิทยาลัยแม่ฟ้าหลวง</option>
+                                    <option value="สำนักงานเลขานุการศูนย์การแพทย์มหาวิทยาลัยแม่ฟ้าหลวง">
+                                        สำนักงานเลขานุการศูนย์การแพทย์มหาวิทยาลัยแม่ฟ้าหลวง</option>
+                                    <option value="โรงพยาบาลศูนย์การแพทย์มหาวิทยาลัยแม่ฟ้าหลวง">
+                                        โรงพยาบาลศูนย์การแพทย์มหาวิทยาลัยแม่ฟ้าหลวง</option>
+                                </optgroup>
+                                <optgroup label="สถาบัน">
+                                    <option value="สถาบันวิจัยและนวัตกรรมแห่งมหาวิทยาลัยแม่ฟ้าหลวง">
+                                        สถาบันวิจัยและนวัตกรรมแห่งมหาวิทยาลัยแม่ฟ้าหลวง</option>
+                                    <option value="สถาบันศิลปวัฒนธรรมและอารยธรรมลุ่มน้ำโขง">
+                                        สถาบันศิลปวัฒนธรรมและอารยธรรมลุ่มน้ำโขง</option>
+                                </optgroup>
+                                <optgroup label="สำนักงานวิชาการ">
+                                    <option value="ส่วนทะเบียนและประมวลผล">ส่วนทะเบียนและประมวลผล</option>
+                                    <option value="ส่วนพัฒนานักศึกษา">ส่วนพัฒนานักศึกษา</option>
+                                    <option value="ส่วนพัฒนาความสัมพันธ์ระหว่างประเทศ">
+                                        ส่วนพัฒนาความสัมพันธ์ระหว่างประเทศ</option>
+                                    <option value="ส่วนประกันคุณภาพการศึกษาและพัฒนาหลักสูตร">
+                                        ส่วนประกันคุณภาพการศึกษาและพัฒนาหลักสูตร</option>
+                                </optgroup>
+                                <optgroup label="สำนักงานบริหารกลาง">
+                                    <option value="ส่วนสารบรรณและอำนวยการ">ส่วนสารบรรณและอำนวยการ</option>
+                                    <option value="ส่วนการเจ้าหน้าที่">ส่วนการเจ้าหน้าที่</option>
+                                    <option value="ส่วนการเงินและบัญชี">ส่วนการเงินและบัญชี</option>
+                                    <option value="ส่วนพัสดุ">ส่วนพัสดุ</option>
+                                </optgroup>
+                                <optgroup label="หน่วยงานพิเศษ">
+                                    <option value="ศูนย์ภาษาและวัฒนธรรมจีนสิรินธร">ศูนย์ภาษาและวัฒนธรรมจีนสิรินธร
+                                    </option>
+                                    <option value="ศูนย์ความเป็นเลิศทางด้านการวิจัยเชื้อรา">
+                                        ศูนย์ความเป็นเลิศทางด้านการวิจัยเชื้อรา</option>
+                                </optgroup>
+                            </select>
+
+                            <label class="small pt-3 pb-2">Enter your MFU Email Address</label>
+                            <input type="email" id="useremail" class="form-control" placeholder="xxxx@lamduan.mfu.ac.th" required>
+                        
+                            </select>
+
+    
+                            <div class="d-flex justify-content-center pt-3">
+                                <button type="submit" class="form-control text-white border-0" style="width: 180px; background-color: #779341;">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const formRegister = document.getElementById('formRegister');
+        formRegister.onsubmit = async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password1 = document.getElementById("password1").value;
+            const password2 = document.getElementById("password2").value;
+            const phonenum = document.getElementById("phonenum").value;
+            const department = document.getElementById("department").value;
+            const useremail = document.getElementById("useremail").value;
+            const role = 1;
+
+            if (password1 !== password2) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username, password: password1, role, phonenum, department, useremail
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Successfully registered! Please login.");
+                    window.location.href = "/";
+                } else {
+                    const errorMessage = await response.text();
+                    alert(errorMessage);
+                }
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        };
+    </script>
+</body>
+
+</html>

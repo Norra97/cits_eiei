@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Icon -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+
+    <link rel="stylesheet" href="/public/css/Admin/AddEdit.css">
+    <link rel="stylesheet" href="/public/css/Head.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Add edit delete</title>
+</head>
+
+
+<body>
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 pt-3">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                    <a href="/"
+                        class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <i class="fas fa-home me-2" style="color: #11D553; font-size: 1.5rem;"></i>
+                        <span class="fs-5 d-none d-sm-inline" style="color: #11D553;">Asset borrowing</span>
+                    </a>
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start"
+                        id="menu">
+
+                        <li>
+                            <a href="/staff" class="nav-link px-0 align-middle ">
+                                <i class="fas fa-tachometer-alt me-2" style="color:#5F6165;"></i>
+                                <!-- Dashboard Icon -->
+                                <span class="ms-1 d-none d-sm-inline "
+                                    style="color:#5F6165;border-bottom: 2px solid;">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/staff/Edit-Asset" class="nav-link px-0 align-middle">
+                                <i class="fas fa-box me-2" style="color:#5F6165;"></i> <!-- Asset Icon -->
+                                <span class="ms-1 d-none d-sm-inline" style="color:#5F6165;">Edit Asset</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/staff/History" class="nav-link px-0 align-middle">
+                                <i class="fas fa-check-circle me-2" style="color:#5F6165;"></i>
+                                <span class="ms-1 d-none d-sm-inline" style="color:#5F6165;">History</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/staff/Returning" class="nav-link px-0 align-middle">
+                                <i class="far fa-calendar me-2" style="color:#5F6165;"></i> <!-- Calendar Icon -->
+                                <span class="ms-1 d-none d-sm-inline" style="color:#5F6165;">Returning</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <hr>
+                    <div class="dropdown pb-5">
+                        <a href="" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://github.com/mdo.png" alt="avatar" width="30" height="30"
+                                class="rounded-circle">
+                            <span id="displayUsername" class="d-none d-sm-inline p-2" style="color:#000000;"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                            <li><a class="dropdown-item" href="/settings/stf"><i class="fas fa-cog me-2"></i>Settings</a>
+                            </li>
+                            <li><a class="dropdown-item" id="logout-link" href="/logout"><i
+                                        class="fas fa-sign-out-alt me-2"></i>Sign
+                                    out</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col bg-light">
+                <div class="row bg-white py-2">
+                    <div class="col">
+                        <div class="input-group" style="width: 350px;">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
+                                id="searchInput">
+                            <button class="btn" id="search-button"onclick="searchAssets()">Search</button>
+                             <button class="btn btn-success" onclick="addAsset()">Add</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>NameAsset</th>
+                <th>StaffID</th>
+                <th>Status</th>
+                <th>Edit</th>
+                <th>delete</th>
+            </tr>
+        </thead>
+        <tbody id="tblAsset">
+        </tbody>
+    </table>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="assetModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Add/Edit product</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <!-- Inside the form in the modal-body -->
+<!-- เพิ่มฟิลด์ใหม่ในฟอร์มสำหรับรายละเอียด, รหัส, และตำแหน่ง -->
+<form id="formAsset">
+    <label class="form-label">Name</label>
+    <input type="text" name="Assetname" class="form-control mb-2" placeholder="Asset Name" required>
+    
+    <label class="form-label">Detail</label>
+    <textarea name="Assetdetail" class="form-control mb-2" placeholder="Asset Detail" required></textarea>
+    
+    <label class="form-label">Code</label>
+    <input type="text" name="Assetcode" class="form-control mb-2" placeholder="Asset Code" required>
+    
+    <label class="form-label">Location</label>
+    <input type="text" name="Assetlocation" class="form-control mb-2" placeholder="Asset Location" required>
+    
+    <label class="form-label">Image</label>
+    <input type="file" name="Assetimg" class="form-control mb-2" accept="image/*" required>
+
+    <button type="submit" class="btn btn-primary">OK</button>
+</form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+    <script>
+        // add or edit methods
+        var action = 'add';
+        // edit product ID
+        var editID = 0;
+        // get all products
+
+        // add modal
+        const assetModal = new bootstrap.Modal(document.querySelector('#assetModal'));
+
+        function displayAssets(data) {
+    let rows = '';
+    data.forEach(asset => {
+        rows += `<tr><td>${asset.Assetid}</td>`;
+        if (asset.Assetimg == "") {
+            rows += `<td><img class="asset-image" src="/public/assets/" alt="Asset Image"/></td>`;
+        } else {
+            rows += `<td><img class="card-img-top asset-image" src="/public/assets/${asset.Assetimg}" alt="product"></td>`;
+        }
+      
+
+        rows += `<td>${asset.Assetname}</td>`;
+        rows += `<td>${asset.Staffaddid}</td>`;
+        rows += `<td>${asset.Assetstatus}</td>`;
+        rows += `<td><button class="btn btn-warning" onclick=editAsset(${JSON.stringify(asset)})>Edit</button></td>`;
+        rows += `<td><button class="btn btn-danger" onclick=deleteAsset(${asset.Assetid})>Delete</button></td>`;
+        
+        // แสดงปุ่มตามสถานะ
+        if (asset.Assetstatus === 'Available') {
+            rows += `<td><button class="btn btn-outline-danger" onclick="toggleAssetStatus(${asset.Assetid}, 'Disabled')">Disable</button></td>`;
+        } else if (asset.Assetstatus === 'Disabled') {
+            rows += `<td><button class="btn btn-outline-info" onclick="toggleAssetStatus(${asset.Assetid}, 'Available')">Enable</button></td>`;
+        } else if (asset.Assetstatus === 'Pending') {
+            rows += `<td><span class="badge bg-warning">Pending</span></td>`;
+        } else if (asset.Assetstatus === 'Borrowing') {
+            rows += `<td><span class="badge bg-primary">Borrowing</span></td>`;
+        }
+
+        rows += `</tr>`;
+    });
+    document.querySelector("#tblAsset").innerHTML = rows;
+}
+function toggleAssetStatus(assetId, newStatus) {
+    fetch(`/assets/toggle-status/${assetId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newStatus: newStatus })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        getAssets(); // Refresh the asset list
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function getAssets() {
+    fetch('/assets')
+        .then(response => response.json())
+        .then(data => {
+            displayAssets(data);
+        })
+        .catch(err => console.error(err));
+}
+
+
+        function deleteAsset(id) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: "Sure to delete this asset?",
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    fetch(`/assets/${id}`, { method: 'DELETE' })
+                        .then(function (response) {
+                            if (response.ok) {
+                                getAssets();
+                            }
+                        })
+                        .catch(function (err) {
+                            console.error(err);
+                            alert(err);
+                        });
+                }
+            });
+        }
+        const formAsset = document.getElementById('formAsset');
+        formAsset.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(formAsset);
+    const imgValue = formData.get('Assetimg'); // รับรูปภาพจากฟอร์ม
+
+    // เก็บข้อมูลลงใน object
+    const asset = {
+        Assetname: formData.get('Assetname'),
+        Assetdetail: formData.get('Assetdetail'),
+        Assetcode: formData.get('Assetcode'),
+        Assetlocation: formData.get('Assetlocation'),
+        Assetimg: imgValue.name, // รับชื่อไฟล์รูปภาพ
+        Assetstatus: "Available",
+        Staffaddid: localStorage.getItem('userid') // ดึง Staff ID จาก localStorage
+    };
+
+    let url = '/assets';
+    let httpMethod = (action === 'edit') ? 'PUT' : 'POST';
+    if (action === 'edit') {
+        url += `/${editID}`;
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: httpMethod,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(asset)
+        });
+
+        if (!response.ok) throw new Error('Bad response from the server.');
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Asset saved successfully'
+        });
+
+        getAssets(); // Refresh the list of assets
+    } catch (err) {
+        console.error(err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.toString()
+        });
+    } finally {
+        assetModal.hide(); // Hide the modal whether there was an error or not
+    }
+});
+
+
+
+        function addAsset() {
+            action = 'add';
+            formAsset.reset();
+            document.querySelector('h4.modal-title').innerText = 'Add new asset';
+            assetModal.show();
+        }
+
+        function editAsset(asset) {
+    action = 'edit';
+    editID = asset.Assetid;
+
+    document.querySelector('h4.modal-title').innerText = 'Edit asset';
+    document.querySelector('input[name="Assetname"]').value = asset.Assetname;
+    
+    // Set the value for the select field
+    document.querySelector('select[name="img"]').value = asset.Assetimg.split('.')[0];
+    
+    // If Assetstatus was an input field:
+    // document.querySelector('input[name="Assetstatus"]').value = asset.Assetstatus;
+    
+    
+
+    assetModal.show();
+}
+
+function searchAssets() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    fetch('/assets')
+        .then(response => response.json())
+        .then(data => {
+            const filteredAssets = data.filter(asset => asset.Assetname.toLowerCase().includes(searchTerm));
+            displayAssets(filteredAssets);
+        })
+        .catch(err => console.error(err));
+}
+
+
+getAssets();
+
+window.onload = function () {
+
+
+    const userid = localStorage.getItem('userid');
+const username = localStorage.getItem('username');
+if (username) {
+document.getElementById('displayUsername').textContent = ' '+username;
+document.getElementById('displayUserid').textContent = 'ID: '+userid;
+} else {
+
+document.getElementById('displayUsername').textContent = 'Guest';
+document.getElementById('displayUserid').textContent = 'ID';
+}}
+    </script>
+</body>
+
+</html>

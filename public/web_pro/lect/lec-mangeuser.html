@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Icon -->
+    <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dashboard</title>
+</head>
+
+<style>
+    /* ลดขนาดตัวอักษรและ padding */
+    .btn-outline {
+        height: 50px;
+        /* ความสูงเท่ากับ Input */
+        width: 50px;
+        /* ปรับให้เป็นปุ่มวงกลม */
+        font-size: 0.9rem;
+        /* ขนาดตัวอักษรหรือไอคอน */
+        padding: 0;
+        /* ไม่มี Padding */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: #FF9500;
+    }
+
+
+
+    .fa-filter {
+        font-size: 2rem;
+        /* ขนาดไอคอน */
+    }
+
+    /* ตาราง */
+    .table-responsive {
+        max-width: 1200px;
+        max-height: 1000px;
+        /* จำกัดความสูงของตาราง */
+        overflow-y: auto;
+        overflow-x: auto;
+        /* เพิ่มการเลื่อนแนวตั้งเฉพาะตาราง */
+    }
+
+    table {
+        width: 100%;
+        /* ใช้พื้นที่เต็มหน้าจอ */
+        border-collapse: collapse;
+        /* ลดช่องว่างในตาราง */
+        border-radius: 10px;
+        /* มุมโค้ง */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        /* เพิ่มเงา */
+        background-color: #fffdf7;
+        /* สีพื้นหลัง */
+
+    }
+
+    th,
+    td {
+        text-align: center;
+        padding: 1px;
+        /* ลด Padding */
+    }
+
+    th {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        /* เพิ่มสีพื้นหลังให้หัวข้อ */
+        padding: 12px 15px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #fdd4c1;
+    }
+
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .table thead tr {
+        background-color: #ff8a65;
+        /* สีพื้นหลัง */
+        color: #fff;
+        /* สีตัวอักษร */
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .table tbody td {
+        padding: 12px 15px;
+        text-align: center;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* ปุ่มในตาราง */
+    .table tbody .btn {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: #fff;
+    }
+</style>
+
+
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 ">
+                <div class="sidebar">
+                    <a href="/lecturer">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i>Dashboard</button>
+                    </a>
+
+                    <a href="/lecturer/MangeUser">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Manage Role</button>
+                    </a>
+
+                    <!-- <a href="/lecturer/Borrowing-requests">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i> Asset Assept</button>
+                    </a> -->
+
+                    <a href="/lecturer/history">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Report_CSV</button>
+                    </a>
+                    <a href="/lecturer/AddAsset">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Add Asset</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="container mt-5">
+                <h1 class="text-center">Manage Users</h1>
+
+                <!-- Filter Section -->
+                <div class="row mb-3 mt-3">
+                    <div class="filter-section d-flex align-items-center">
+                        <div class="me-2">
+                            <label for="roleFilter" class="form-label mb-0">Filter by Role</label>
+                            <select id="roleFilter" class="form-select">
+                                <option value="">All Roles</option>
+                                <option value="1">User</option>
+                                <option value="2">Admin</option>
+                                <option value="3">Superadmin</option>
+                            </select>
+                        </div>
+                        <div class="me-2">
+                            <label for="searchInput" class="form-label mb-0">Search by Username</label>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Enter username">
+                        </div>
+                        <div>
+                            <!-- เปลี่ยนปุ่ม Filter เป็นไอคอน -->
+                            <button class="btn btn-outline d-flex align-items-center justify-content-center"
+                                onclick="filterUsers()">
+                                <i class="fa fa-filter"></i> <!-- ไอคอน Filter -->
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- User Table -->
+                <div class="table-responsive">
+                    <table id="userTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Phone Number</th>
+                                <th>Department</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ข้อมูลจะถูกเพิ่มที่นี่ -->
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+
+            <!-- Edit Role Modal -->
+            <div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Role</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editRoleForm">
+                                <input type="hidden" id="editRoleUserId">
+                                <div class="mb-3">
+                                    <label for="editRoleSelect" class="form-label">Role</label>
+                                    <select id="editRoleSelect" class="form-select" required>
+                                        <option value="1">User</option>
+                                        <option value="2">Admin</option>
+                                        <option value="3">Superadmin</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Save Role</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Password Modal -->
+            <div class="modal fade" id="editPasswordModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Change Password</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editPasswordForm">
+                                <input type="hidden" id="editPasswordUserId">
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <input type="password" id="newPassword" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <input type="password" id="confirmPassword" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Change Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Other Info Modal -->
+            <div class="modal fade" id="editOtherModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit User Info</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editOtherForm">
+                                <input type="hidden" id="editOtherUserId">
+                                <div class="mb-3">
+                                    <label for="editUsername" class="form-label">Username</label>
+                                    <input type="text" id="editUsername" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editPhone" class="form-label">Phone Number</label>
+                                    <input type="text" id="editPhone" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editDepartment" class="form-label">Department</label>
+                                    <input type="text" id="editDepartment" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editEmail" class="form-label">Email</label>
+                                    <input type="email" id="editEmail" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+        let allUsers = []; // Store all users for filtering
+
+        // Load users into the table
+        function loadUsers() {
+            fetch("/users")
+                .then(response => response.json())
+                .then(users => {
+                    allUsers = users; // Store users for later filtering
+                    displayUsers(users);
+                });
+        }
+
+        // Display users in the table
+        function displayUsers(users) {
+            const tableBody = document.querySelector("#userTable tbody");
+            tableBody.innerHTML = "";
+            users.forEach(user => {
+                const row = `
+            <tr>
+                <td>${user.userid}</td>
+                <td>${user.username}</td>
+                <td>${user.role}</td>
+                <td>${user.phonenum}</td>
+                <td>${user.department}</td>
+                <td>${user.useremail}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="openEditRoleModal(${user.userid})">Edit Role</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openEditPasswordModal(${user.userid})">Change Password</button>
+                    <button class="btn btn-primary btn-sm" onclick="openEditOtherModal(${user.userid})">Edit Info</button>
+                </td>
+            </tr>
+        `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Filter users by role and search term
+        function filterUsers() {
+            const role = document.getElementById("roleFilter").value;
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+            const filteredUsers = allUsers.filter(user => {
+                const matchesRole = role === "" || user.role.toString() === role;
+                const matchesSearch = user.username.toLowerCase().includes(searchTerm);
+                return matchesRole && matchesSearch;
+            });
+
+            displayUsers(filteredUsers);
+        }
+
+        // Open Edit Role Modal
+        function openEditRoleModal(userId) {
+            document.getElementById("editRoleUserId").value = userId;
+            const editRoleModal = new bootstrap.Modal(document.getElementById("editRoleModal"));
+            editRoleModal.show();
+        }
+
+        // Handle Role Edit Form
+        document.getElementById("editRoleForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const userId = document.getElementById("editRoleUserId").value;
+            const newRole = document.getElementById("editRoleSelect").value;
+            fetch(`/users/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ role: newRole })
+            }).then(() => {
+                loadUsers();
+                const editRoleModal = bootstrap.Modal.getInstance(document.getElementById("editRoleModal"));
+                editRoleModal.hide();
+            });
+        });
+
+        // Open Edit Password Modal
+        function openEditPasswordModal(userId) {
+            document.getElementById("editPasswordUserId").value = userId;
+            const editPasswordModal = new bootstrap.Modal(document.getElementById("editPasswordModal"));
+            editPasswordModal.show();
+        }
+
+        // Handle Password Edit Form
+        document.getElementById("editPasswordForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const userId = document.getElementById("editPasswordUserId").value;
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (newPassword !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            fetch(`/users/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password: newPassword })
+            }).then(() => {
+                loadUsers();
+                const editPasswordModal = bootstrap.Modal.getInstance(document.getElementById("editPasswordModal"));
+                editPasswordModal.hide();
+            });
+        });
+
+        // Open Edit Other Info Modal
+        function openEditOtherModal(userId) {
+            fetch(`/users/${userId}`)
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById("editOtherUserId").value = user.userid;
+                    document.getElementById("editUsername").value = user.username;
+                    document.getElementById("editPhone").value = user.phonenum;
+                    document.getElementById("editDepartment").value = user.department;
+                    document.getElementById("editEmail").value = user.useremail;
+
+                    const editOtherModal = new bootstrap.Modal(document.getElementById("editOtherModal"));
+                    editOtherModal.show();
+                });
+        }
+
+        // Handle Other Info Edit Form
+        document.getElementById("editOtherForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const userId = document.getElementById("editOtherUserId").value;
+            const updatedUser = {
+                username: document.getElementById("editUsername").value,
+                phonenum: document.getElementById("editPhone").value,
+                department: document.getElementById("editDepartment").value,
+                useremail: document.getElementById("editEmail").value
+            };
+
+            fetch(`/users/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedUser)
+            }).then(() => {
+                loadUsers();
+                const editOtherModal = bootstrap.Modal.getInstance(document.getElementById("editOtherModal"));
+                editOtherModal.hide();
+            });
+        });
+
+        // Initial Load
+        loadUsers();
+
+        window.onload = function () {
+
+
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+
+
+    </script>
+    <script src="/public/js/bootstrap.min.js"></script>
+    <script src="calendar.js"></script>
+    </script>
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- setting -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/lec';
+        }
+    </script>
+</body>
+
+</html>

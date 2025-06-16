@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icon -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/public/css/std-dash.css">
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+    <link rel="stylesheet" href="/public/CSS/Admin/stf-history.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="/public/js/notiflix-aio-3.2.6.min.js"></script>
+    <title>lec_history</title>
+</head>
+<style>
+    .asset-image {
+        width: 100px;
+        height: auto;
+    }
+
+    .table-container {
+        max-height: 400px;
+        /* Adjust this value as needed */
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+        /* Remove bottom margin */
+    }
+</style>
+
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="col">
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
+                            id="search-input">
+                        <button class="btn btn-primary" id="search-button">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 ">
+                <div class="sidebar">
+                    <a href="/staff">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/staff/Edit-Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
+                    </a>
+
+                    <a href="/lecturer/Borrowing-requests">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
+                    </a>
+
+                    <a href="/staff/History">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Asset History</button>
+                    </a>
+
+                    <a href="/staff/Returning">
+                        <button class="btn-sidebar"><i class="fa fa-history"> </i>Borrow Return</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col ">
+
+                <div class="row p-3 rounded mx-auto mt-3">
+
+                    <div>
+                        <div class="p-3">
+                            <h1 id="NamePage">History</h1>
+                        </div>
+                        <div class="col-btn">
+                            <a href="/staff/History">
+                                <button id="btn-Approve" class="btn-f"><i> </i> Approve</button>
+                            </a>
+                            <a href="/staff/History-Re">
+                                <button id="btn-Return" class="btn-f"><i> </i> Return</button>
+                            </a>
+                        </div>
+
+                        <div id="pending-assets-body" class="d-flex flex-column">
+                            <!-- Cards will be appended here -->
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <script src="/public/web_pro/student/logout.js"></script>
+
+
+        <!-- ==================== Drop Down ==================== -->
+        <script>
+            function toggleMenu() {
+                const menu = document.getElementById('profileMenu');
+                menu.classList.toggle('active');
+
+                if (menu.classList.contains('active')) {
+                    const menuRect = menu.getBoundingClientRect();
+                    const viewportWidth = window.innerWidth;
+
+                    if (menuRect.right > viewportWidth) {
+                        const offset = menuRect.right - viewportWidth + 10;
+                        menu.style.right = `${offset}px`;
+                    } else {
+                        menu.style.right = '10px';
+                    }
+                }
+            }
+
+            window.addEventListener('click', function (e) {
+                const menu = document.getElementById('profileMenu');
+                const profileImage = document.querySelector('.profile');
+
+                if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+        </script>
+
+        <!-- ==================== status Approved ==================== -->
+        <script>
+            async function fetchHistory(status, username) {
+                try {
+                    const response = await fetch(`/get-history?status=${status}&username=${username}`); // แก้ไขส่วนพารามิเตอร์
+                    if (response.ok) {
+                        const data = await response.json();
+                        const container = document.getElementById('pending-assets-body');
+                        container.innerHTML = ''; // ล้างข้อมูลเก่า
+
+                        data.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = "card card-horizontal shadow-sm";
+                            card.innerHTML = `
+                    <div class="d-flex" style="justify-content: flex-start">
+                        <img class="asset-image" src="/public/Addimg/${item.Assetimg}" alt="${item.Assetname}">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.Assetname}</h5>
+                            <p class="card-text">
+                                <b>Asset Location:</b> ${item.Assetlocation || 'N/A'}<br>
+                                <b>Borrow name:</b> ${item.Borrowname || 'N/A'}<br>
+                                <b>Phone number:</b> ${item.phonenum || 'N/A'}<br>
+                                <b>Borrow Date:</b> ${item.Borrowdate || 'N/A'}<br>
+                                <b>Status:</b> ${item.Status || 'N/A'}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                            container.appendChild(card);
+                        });
+                    } else {
+                        throw new Error('Failed to fetch history data.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
+            document.addEventListener("DOMContentLoaded", function () {
+                const status = window.location.pathname.includes('History-Re') ? 'Returned' : 'Approved';
+                const username = localStorage.getItem("username"); // ดึง username จาก Local Storage
+                fetchHistory(status, username);
+            });
+
+        </script>
+
+        <!-- ==================== Display User ==================== -->
+        <script>
+            window.onload = function () {
+
+
+                const userid = localStorage.getItem('userid');
+                const username = localStorage.getItem('username');
+                if (username) {
+                    document.getElementById('displayUsername').textContent = 'Admin: ' + username;
+                    document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+                } else {
+
+                    document.getElementById('displayUsername').textContent = 'Admin';
+                    document.getElementById('displayUserid').textContent = 'ID';
+                }
+            }
+        </script>
+
+        <!-- ==================== Setting ==================== -->
+        <script>
+            function redirectToStudentSet() {
+                window.location.href = '/settings/stf';
+            }
+        </script>
+</body>
+
+</html>

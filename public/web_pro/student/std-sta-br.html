@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+    <link rel="stylesheet" href="/public/css/User/Asset-BR.css">
+
+
+    <title>Asset</title>
+</head>
+<style>
+    .body {
+        font-family: var(--bs-body-font-family) !important;
+    }
+</style>
+
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid"> <!-- Col 1 -->
+        <div class="row flex-nowrap"> <!-- Row 1 -->
+            <!-- ===== sidebar ===== -->
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
+                <div class="sidebar">
+                    <a href="/student">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/student/Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i> Asset</button>
+                    </a>
+
+                    <a href="/student/sta/pd">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i> Asset List</button>
+                    </a>
+                </div>
+            </div>
+            <!-- ===== End sidebar ===== -->
+
+            <div class="container col">
+
+                <div class="text-primary p-3">
+                    <h1 id="NamePage">Asset Pending</h1>
+                </div>
+                <div class="col">
+                    <a href="/student/sta/pd">
+                        <button id="btn-Pending" class="btn-f"><i> </i> Pending</button>
+                    </a>
+                    <a href="/student/sta/rj">
+                        <button id="btn-Reject" class="btn-f"><i> </i> Reject</button>
+                    </a>
+                    <a href="/student/sta/br">
+                        <button id="btn-Borrowing" class="btn-f"><i> </i> Borrowing</button>
+                    </a>
+                    <a href="/student/sta/rpd">
+                        <button id="btn-Repending" class="btn-f"><i> </i> Repending</button>
+                    </a>
+                    <a href="/student/sta/rt">
+                        <button id="btn-Return" class="btn-f"><i> </i> Return</button>
+                    </a>
+
+                </div>
+                <div id="pending-assets-body" class="d-flex flex-column">
+                    <!-- Cards will be appended here -->
+                </div>
+            </div>
+        </div> <!-- End Row 1 -->
+    </div> <!-- End Col 1 -->
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+        // ==================== Return Asset ====================
+        function returnAsset(reqId) {
+            Swal.fire({
+                title: 'Are you sure you want to return this asset?',
+                showCancelButton: true,
+                confirmButtonText: 'Return',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/return-asset/${reqId}`, { // เปลี่ยน URL เป็น reqId
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ newStatus: 'RePending' }) // เปลี่ยนสถานะเป็น RePending
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Returned!', 'The asset has been marked as RePending.', 'success');
+                                fetchPendingAssets(); // รีเฟรชข้อมูล
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', 'Error returning the asset: ' + error, 'error');
+                        });
+                }
+            });
+        }
+
+
+
+        // ==================== Create Card ====================
+        function createPendingCard(item) {
+            const card = document.createElement('div');
+            card.className = "card card-horizontal shadow-sm";
+
+            card.innerHTML = `
+    <img src="/public/Addimg/${item.Assetimg}" alt="${item.Assetname}">
+        <div class="card-body">
+            <h5 class="card-title">${item.Assetname}</h5>
+            <p class="card-text">
+                
+                <b>Asset Code    :</b> ${item.Assetcode || 'N/A'} <br>
+                <b>Asset Detail  :</b> ${item.Assetdetail || 'N/A'} <br>
+                <b>Asset Location:</b> ${item.Assetlocation || 'N/A'} <br>
+                <b>Activity:</b> ${item.Activity || 'N/A'} <br>
+                <b>UsageType:</b> ${item.UsageType || 'N/A'} <br>
+                <b>Borrow Date   :</b> ${item.Borrowdate || 'N/A'} <br>
+                <b>Return Date   :</b> ${item.ReturnDate || 'N/A'} <br>
+            </p>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-danger" onclick="returnAsset(${item.Reqid})">Return</button>
+   
+</div>
+
+        </div>
+    `;
+            return card;
+        }
+
+        // ==================== Asset status Borrow ====================
+        function fetchPendingAssets() {
+            const username = localStorage.getItem('username');
+            fetch(`/return-assets-requests?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const pendingAssetsBody = document.getElementById('pending-assets-body');
+                    pendingAssetsBody.innerHTML = ''; // Clear existing content
+
+                    data.forEach(item => {
+                        const card = createPendingCard(item);
+                        pendingAssetsBody.appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchPendingAssets(); // Fetch pending assets on page load
+        });
+
+        // ==================== Display User ====================
+        window.onload = function () {
+
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+    </script>
+
+    <!-- drop down -->
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/student/set';
+        }
+    </script>
+
+</body>
+
+</html>

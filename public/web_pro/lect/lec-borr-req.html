@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+    <link rel="stylesheet" href="/public/css/Head.css">
+    <link rel="stylesheet" href="/public/css/Admin/stf-ret.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <title>ฺBorrow Request</title>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="col">
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search Borrower Name"
+                            id="Search_text">
+                        <button class="btn btn-primary border-1" id="Search_btn">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
+                <div class="sidebar">
+                    <a href="/staff">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/staff/Edit-Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
+                    </a>
+
+                    <a href="/lecturer/Borrowing-requests">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
+                    </a>
+
+                    <a href="/staff/History">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Asset History</button>
+                    </a>
+
+                    <a href="/staff/Returning">
+                        <button class="btn-sidebar"><i class="fa fa-history"> </i>Borrow Return</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col">
+                <!-- Content -->
+                <div class="container mt-5">
+                    <h2>Borrowing Requests</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Req ID</th>
+                                <th>Borrower Name</th>
+                                <th>Asset Name</th>
+                                <th>Borrow Date</th>
+                                <th>Return Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBorrowReq">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchBorrowingRequests(); // Load requests when the page loads
+
+            document.getElementById('Search_btn').addEventListener('click', function () {
+                const searchText = document.getElementById('Search_text').value.toLowerCase();
+                fetchBorrowingRequests(searchText); // Filter requests by search text
+            });
+        });
+
+        function fetchBorrowingRequests(searchText = '') {
+            fetch('/borrow-assett')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tblBorrowReq = document.getElementById('tblBorrowReq');
+                    let rows = '';
+                    const filteredRequests = data.filter(req =>
+                        req.Status === 'Pending' &&
+                        (!searchText || req.Borrowname.toLowerCase().includes(searchText)));
+                    filteredRequests.forEach(req => {
+                        rows += `<tr>
+                    <td>${req.Reqid}</td>
+                    <td>${req.Borrowname}</td>
+                    <td>${req.Assetname}</td>
+                    <td>${req.Borrowdate}</td>
+                    <td>${req.ReturnDate}</td>
+                    <td>${req.Status}</td>
+                    <td>
+                        <button onclick="approveRequest(this, ${req.Reqid})" class="btn btn-success">Approve</button>
+                        <button onclick="disapproveRequest(this, ${req.Reqid})" class="btn btn-danger">Disapprove</button>
+                    </td>
+                </tr>`;
+                    });
+                    tblBorrowReq.innerHTML = rows;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Failed to load borrowing requests!', 'error');
+                });
+        }
+
+        function approveRequest(button, requestId) {
+            const username = localStorage.getItem('username') || ''; // Get username or default to empty string
+
+            Swal.fire({
+                title: 'Approve Request',
+                input: 'text',
+                inputLabel: 'Lect name',
+                inputValue: username,
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to write something!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/approve-borrow-request', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ requestId: requestId, lectname: result.value }),
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                button.closest('tr').querySelector('td:nth-last-child(2)').textContent = 'Approved';
+                                Swal.fire('Success', 'Request Approved!', 'success').then(() => {
+                                    // รีโหลดข้อมูลหลังจากอนุมัติสำเร็จ
+                                    fetchBorrowingRequests();
+                                });
+                            } else {
+                                throw new Error(data.message || 'Failed to approve request');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', error.message || 'Failed to approve request!', 'error');
+                        });
+                }
+            });
+        }
+
+        function disapproveRequest(button, requestId) {
+            const username = localStorage.getItem('username') || '';
+            Swal.fire({
+                title: 'Disapprove Request',
+                input: 'text',
+                inputLabel: 'Reason for disapproval',
+                inputPlaceholder: 'Enter the reason',
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to write something!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    fetch('/reject-borrow-request', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            requestId: requestId, 
+                            comment: result.value, 
+                            lectname: username 
+                        }),
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                button.closest('tr').querySelector('td:nth-last-child(2)').textContent = 'Rejected';
+                                Swal.fire('Success', 'Request Rejected!', 'success').then(() => {
+                                    // รีโหลดข้อมูลหลังจากปฏิเสธสำเร็จ
+                                    fetchBorrowingRequests();
+                                });
+                            } else {
+                                throw new Error(data.message || 'Failed to reject request');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', error.message || 'Failed to reject request!', 'error');
+                        });
+                }
+            });
+        }
+
+        window.onload = function () {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = ' ' + username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        };
+
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/stf';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,204 @@
+/* ========== Alert ========== */
+.asset-details {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .asset-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .asset-info {
+    flex: 1;
+  }
+  
+  .swal2-popup {
+    width: 600px !important;
+  }
+  
+  .form-label {
+    font-weight: bold;
+  }
+  
+  .swal2-confirm {
+    background-color: #ff9800 !important;
+    color: white !important;
+    border-radius: 15px;
+  }
+
+  #imageAsset {
+    width: 100px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: block; /* ทำให้เป็น block เพื่อจัดศูนย์ */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .input {
+        margin-top: 5px;
+        width: 100%; /* ให้ขยายเต็มความกว้างของ container */
+        padding: 10px; /* เพิ่ม padding ให้ดูไม่แน่นเกินไป */
+        margin-bottom: 10px; /* เพิ่มระยะห่างระหว่าง input แต่ละตัว */
+        font-size: 16px; /* ขนาดตัวอักษรที่เหมาะสม */
+        border: 1px solid #ccc; /* สีขอบที่เรียบง่าย */
+        border-radius: 5px; /* มุมมน */
+        background-color: #f9f9f9; /* เพิ่มสีพื้นหลัง */
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* เพิ่มเงาเล็กน้อยให้ดูมิติ */
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* ทำให้ transition smooth */
+    }
+    
+    .input:focus {
+        border-color: #ff8a65; /* เปลี่ยนสีขอบเมื่อโฟกัส */
+        outline: none; /* ลบขอบของ browser */
+        box-shadow: 1 1 5px #f9f9f9; /* เพิ่มเงาเมื่อโฟกัส */
+    }
+    
+    select.input {
+        background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns%3D%22http://www.w3.org/2000/svg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%23444%22 d%3D%22M2 0L0 2h4zM2 5L0 3h4z%22/%3E%3C/svg%3E');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px 10px;
+        appearance: none; /* ซ่อนลูกศรเดิมของ select */
+        cursor: pointer; /* เปลี่ยน cursor เป็น pointer */
+    }
+    
+/* ========== End Alert ========== */
+
+/* ========== card ========== */
+
+/* General styles for card */
+.card {
+    border: none; /* ลบเส้นขอบ */
+    border-radius: 10px; /* มุมมน */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+    overflow: hidden; /* ตัดส่วนที่เกิน */
+    background-color: #ffffff; /* สีพื้นหลัง */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* เพิ่ม Animation */
+    cursor: pointer; /* เปลี่ยนเป็น Pointer เมื่อ Hover */
+}
+
+/* เพิ่มเอฟเฟกต์เมื่อ Hover */
+.card:hover {
+    transform: translateY(-5px); /* ยกการ์ดขึ้น */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* เพิ่มเงา */
+}
+
+/* รูปภาพใน Card */
+.card img {
+    margin-top: 10px;
+    width: 13rem; /* ทำให้รูปภาพกว้างเต็ม Card */
+    height: 150px; /* กำหนดความสูง */
+    object-fit: cover; /* ครอบรูปภาพให้เต็ม */
+    border-radius: 10px;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ส่วนหัวของ Card */
+.card .card-title {
+    font-size: 1.2rem; /* ขนาดตัวอักษร */
+    font-weight: bold;
+    color: #333333; /* สีข้อความ */
+    margin-bottom: 8px; /* ระยะห่างจากด้านล่าง */
+}
+
+/* ข้อความใน Card */
+.card .card-text {
+    font-size: 0.9rem; /* ขนาดตัวอักษร */
+    color: #777777; /* สีข้อความ */
+    margin-bottom: 10px; /* ระยะห่างจากด้านล่าง */
+}
+
+/* ปุ่มใน Card */
+.card .btn {
+    background-color: #ff8a65; /* สีพื้นหลัง */
+    color: #ffffff; /* สีข้อความ */
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 8px; /* มุมมน */
+    transition: background-color 0.3s ease; /* เพิ่ม Animation */
+}
+
+.card .btn:hover {
+    background-color: #e57373; /* สีเมื่อ Hover */
+    color: #ffffff;
+}
+/* ========== End card ========== */
+
+/* ========== Guy ========== */
+.asset-details {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .asset-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .asset-info {
+    flex: 1;
+  }
+  
+  .swal2-popup {
+    width: 600px !important;
+  }
+  
+  .form-label {
+    font-weight: bold;
+  }
+  
+  .swal2-confirm {
+    background-color: #ff9800 !important;
+    color: white !important;
+    border-radius: 15px;
+  }
+
+  #imageAsset {
+    width: 100px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: block; /* ทำให้เป็น block เพื่อจัดศูนย์ */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .input {
+        margin-top: 5px;
+        width: 100%; /* ให้ขยายเต็มความกว้างของ container */
+        padding: 10px; /* เพิ่ม padding ให้ดูไม่แน่นเกินไป */
+        margin-bottom: 10px; /* เพิ่มระยะห่างระหว่าง input แต่ละตัว */
+        font-size: 16px; /* ขนาดตัวอักษรที่เหมาะสม */
+        border: 1px solid #ccc; /* สีขอบที่เรียบง่าย */
+        border-radius: 5px; /* มุมมน */
+        background-color: #f9f9f9; /* เพิ่มสีพื้นหลัง */
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* เพิ่มเงาเล็กน้อยให้ดูมิติ */
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* ทำให้ transition smooth */
+    }
+    
+    .input:focus {
+        border-color: #ff8a65; /* เปลี่ยนสีขอบเมื่อโฟกัส */
+        outline: none; /* ลบขอบของ browser */
+        box-shadow: 1 1 5px #f9f9f9; /* เพิ่มเงาเมื่อโฟกัส */
+    }
+    
+    select.input {
+        background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns%3D%22http://www.w3.org/2000/svg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%23444%22 d%3D%22M2 0L0 2h4zM2 5L0 3h4z%22/%3E%3C/svg%3E');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px 10px;
+        appearance: none; /* ซ่อนลูกศรเดิมของ select */
+        cursor: pointer; /* เปลี่ยน cursor เป็น pointer */
+    }

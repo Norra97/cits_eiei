@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/public/CSS/Head.css">
+  <link rel="stylesheet" href="/public/css/User/Asset-Accept.css">
+
+  <script src="/public/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>Asset</title>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img class="logo" src="/public/img/logo.png" alt="Logo">
+        <div class="col-logo text-center">
+          <div class="row">
+            <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+          </div>
+          <div class="row">
+            <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+              UNIVERSITY</span>
+          </div>
+        </div>
+      </a>
+
+      <div class="dropdown">
+        <div class="d-flex align-items-center">
+          <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+          <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+        </div>
+        <div id="profileMenu" class="dropdown-menu">
+          <div class="profile-info">
+            <img src="/public/img/profile.webp" alt="Profile Picture">
+            <p id="displayUsername">Guest</p>
+            <p id="displayUserid">ID</p>
+          </div>
+          <div class="menu-item">
+            <i class="fa fa-user"></i> Profile
+          </div>
+          <div class="menu-item" onclick="logout()">
+            <i class="fa fa-sign-out">
+            </i> Logout
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- End Navbar -->
+
+
+  <div class="container-fluid"> <!-- Container 1 -->
+    <div class="row flex-nowrap"> <!-- Row 1 -->
+      <!-- ========== sidebar ========== -->
+      <div class="col-auto col-md-3 col-xl-2 px-sm-2"> <!-- Col 1 -->
+        <div class="sidebar">
+          <a href="/student">
+            <button class="btn-sidebar"><i class="fa fa-chart-pie"></i> Dashboard</button>
+          </a>
+          <a href="/student/Asset">
+            <button class="btn-sidebar"><i class="fa fa-archive"></i> Asset</button>
+          </a>
+          <a href="/student/Asset-accept">
+            <button class="btn-sidebar"><i class="fa fa-clipboard-list"></i> Asset Request</button>
+          </a>
+          <a href="#">
+            <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"></i> Asset Return</button>
+          </a>
+          <a href="#">
+            <button class="btn-sidebar"><i class="fa fa-history"></i> History</button>
+          </a>
+        </div>
+      </div> <!-- End Col 1 -->
+      <!-- Col 2 -->
+      <div class="col bg-light">
+
+        <!-- ===== Asset Accept ===== -->
+        <div class="container bg-white border border-gray p-3 rounded mx-auto mt-3">
+          <div id="NamePage" class="p-3">
+            <h1>Asset Accept</h1>
+          </div>
+          <!-- ========== Content ========== -->
+          <div class="container">
+
+            <table class="table table-striped table-gray">
+              <thead>
+                <tr>
+                  <th scope="col">Asset ID</th>
+                  <th scope="col">Image</th>
+                  <th scope="col">AssetName</th>
+                  <th scope="col">Status</th>
+
+                  <th scope="col">Borrow Date</th>
+                  <th scope="col">Return Date</th>
+                  <th scope="col">Approved By</th>
+                  <th scope="col">Action</th>
+
+                  <!-- Add more headers as needed -->
+                </tr>
+              </thead>
+              <tbody id="table-body">
+                <!-- Data rows will be inserted here -->
+              </tbody>
+
+            </table>
+          </div>
+
+        </div>
+        <!-- ===== End Asset Accept ===== -->
+
+
+        <div class="container-fluid">
+          <div class="row">
+            <!-- Disabled Assets Table -->
+            <div class="col-md-6 bg-white border border-gray p-3 rounded mx-auto mt-3">
+              <div class="text-primary p-3">
+                <h1>Asset Reject</h1>
+              </div>
+              <table class="table table-striped table-gray ">
+                <thead>
+                  <tr>
+                    <th scope="col">Asset ID</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">AssetName</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Reason</th>
+                  </tr>
+                </thead>
+                <tbody id="disabled-assets-body">
+                  <!-- Disabled assets rows will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pending Assets Table -->
+            <div class="col-md-6 bg-white border border-gray p-3 rounded mx-auto mt-3">
+              <div class="text-primary p-3">
+                <h1>Asset Pending</h1>
+              </div>
+              <table class="table table-striped table-gray">
+                <thead>
+                  <tr>
+                    <th scope="col">Asset ID</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">AssetName</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="pending-assets-body">
+                  <!-- Disabled assets rows will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Col 2 -->
+    </div> <!-- End Row 1 -->
+  </div> <!-- End Container 1 -->
+
+  <script src="/public/web_pro/student/logout.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const username = localStorage.getItem('username');
+      fetch(`/asset-borrow-requests?username=${username}`)
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.getElementById('table-body');
+          tableBody.innerHTML = ''; // Clear existing content
+
+          // Filter data to only include assets with 'Borrowing' status
+          const borrowingAssets = data.filter(item => item.Assetstatus === 'Borrowing' || item.Assetstatus === 'RePending');
+
+          borrowingAssets.forEach(item => {
+            const row = createTableRow(item);
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    function cancelAsset(assetId) {
+      Swal.fire({
+        title: 'Are you sure you want to cancel this request?',
+        showCancelButton: true,
+        confirmButtonText: 'Cancel Request',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/cancel-asset-request/${assetId}`, {
+            method: 'DELETE'
+          })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                Swal.fire('Cancelled!', 'The asset request has been cancelled.', 'success');
+                fetchPendingAssets(); // Refresh the pending assets table
+              } else {
+                throw new Error('Cancellation failed');
+              }
+            })
+            .catch(error => {
+              Swal.fire('Error', 'Error cancelling the request: ' + error, 'error');
+            });
+        }
+      });
+    }
+
+    function createTableRow(item) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <th scope="row">${item.Assetid}</th>
+        <td><img src="/public/assets/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
+        <td>${item.Assetname}</td>
+        <td>${item.Assetstatus}</td>
+        <td>${item.Borrowdate || 'N/A'}</td>
+        <td>${item.ReturnDate || 'N/A'}</td>
+        <td>${item.lectname || 'N/A'}</td>`;
+
+      // Add Return button only if Assetstatus is 'Borrowing'
+      if (item.Assetstatus === 'Borrowing') {
+        tr.innerHTML += `<td><button class="btn btn-danger" onclick="returnAsset(${item.Assetid})">Return</button></td>`;
+      } else {
+        tr.innerHTML += `<td></td>`; // Empty cell for 'RePending' status
+      }
+
+      return tr;
+    }
+
+    function returnAsset(assetId) {
+      // Get borrowname from localStorage
+      const borrowname = localStorage.getItem('username');
+      if (!borrowname) {
+        Swal.fire('Error', 'User not logged in or username not found in localStorage', 'error');
+        return;
+      }
+      // Confirm the action with the user
+      Swal.fire({
+        title: 'Are you sure you want to return this asset?',
+        showCancelButton: true,
+        confirmButtonText: 'Return',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Call the API or server-side code to handle the return
+          fetch(`/return-asset/${assetId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ borrowname, newStatus: 'RePending' }) // Use borrowname from localStorage
+          })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                // Update the UI or refresh the data
+                Swal.fire('Returned!', 'The asset Returned!', 'success');
+                // Optionally reload the page or fetch the data again
+              } else {
+                throw new Error('Return failed');
+              }
+            })
+            .catch(error => {
+              Swal.fire('Error', 'Error returning the asset: ' + error, 'error');
+            });
+        }
+      });
+    }
+
+
+    function fetchDisabledAssets() {
+      const username = localStorage.getItem('username');
+      fetch(`/disabled-assets-requests?username=${username}`)
+        .then(response => response.json())
+        .then(data => {
+          const disabledAssetsBody = document.getElementById('disabled-assets-body');
+          disabledAssetsBody.innerHTML = ''; // Clear existing content
+
+          data.forEach(item => {
+            const row = createDisabledTableRow(item);
+            disabledAssetsBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    function createDisabledTableRow(item) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+                  <th scope="row">${item.Assetid}</th>
+                  <td><img src="/public/assets/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
+                  <td>${item.Assetname}</td>
+                  <td>${item.Status}</td>
+                 
+                  
+                  <td>${item.comment || 'No comment'}</td>
+              `;
+      return tr;
+    }
+
+    // Call the function to fetch and display disabled assets
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchDisabledAssets();
+    });
+    function fetchPendingAssets() {
+      const username = localStorage.getItem('username');
+      fetch(`/pending-assets-requests?username=${username}`)
+        .then(response => response.json())
+        .then(data => {
+          const pendingAssetsBody = document.getElementById('pending-assets-body'); // Make sure this ID matches the one in your HTML
+          pendingAssetsBody.innerHTML = ''; // Clear existing content
+
+          data.forEach(item => {
+            const row = createPendingTableRow(item);
+            pendingAssetsBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+
+    function createPendingTableRow(item) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <th scope="row">${item.Assetid}</th>
+        <td><img src="/public/assets/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
+        <td>${item.Assetname}</td>
+        <td>${item.Assetstatus}</td>
+        <td><button class="btn btn-danger" onclick="cancelAsset(${item.Assetid})">Cancel</button></td>
+    `;
+      return tr;
+    }
+
+    // Call the function to fetch and display pending assets
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchDisabledAssets();
+      fetchPendingAssets(); // Call this new function
+    });
+
+    window.onload = function () {
+
+
+      const userid = localStorage.getItem('userid');
+      const username = localStorage.getItem('username');
+      if (username) {
+        document.getElementById('displayUsername').textContent = username;
+        document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+      } else {
+
+        document.getElementById('displayUsername').textContent = 'Guest';
+        document.getElementById('displayUserid').textContent = 'ID';
+      }
+    }
+  </script>
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('profileMenu');
+      menu.classList.toggle('active');
+
+      if (menu.classList.contains('active')) {
+        const menuRect = menu.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+
+        if (menuRect.right > viewportWidth) {
+          const offset = menuRect.right - viewportWidth + 10;
+          menu.style.right = `${offset}px`;
+        } else {
+          menu.style.right = '10px';
+        }
+      }
+    }
+
+    window.addEventListener('click', function (e) {
+      const menu = document.getElementById('profileMenu');
+      const profileImage = document.querySelector('.profile');
+
+      if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+        menu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+
+</html>

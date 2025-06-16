@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+    <link rel="stylesheet" href="/public/css/User/Asset.css">
+
+
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>Asset</title>
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="col">
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
+                            id="search-input">
+                        <button class="btn btn-primary" id="search-button">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Navbar -->
+
+    <div class="container-fluid"> <!-- contariner 1 -->
+        <div class="row flex-nowrap"> <!-- row 1 -->
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 "> <!-- col 1 -->
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <a href="/student">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/student/Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i> Asset</button>
+                    </a>
+
+                    <a href="/student/sta/pd">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i> Asset List</button>
+                    </a>
+                </div>
+                <!-- End Sidebar -->
+            </div> <!-- End col 1 -->
+
+
+            <div class="col"> <!-- col 2 -->
+                <!-- Content -->
+                <div class="content-height">
+                    <div class="text-primary p-3">
+                        <h1 id="NamePage">Asset</h1>
+                    </div>
+                    <div id="main" class="container d-flex flex-wrap">
+                        <!-- Asset cards will be loaded here -->
+                    </div>
+                </div>
+            </div> <!-- End col 2 -->
+        </div> <!-- End row 1 -->
+    </div> <!-- End contariner 1 -->
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+        // ==================== Drop Down ====================
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // ==================== search ====================
+        document.addEventListener("DOMContentLoaded", function () {
+            getAssets(); // Call the function to load assets initially
+
+            // Add event listener to the search button
+            document.getElementById('search-button').addEventListener('click', function () {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                getAssets(searchTerm); // Call getAssets function with the search term
+            });
+        });
+
+        // ==================== call asset ====================
+        function getAssets(searchTerm = '') {
+            fetch('/Assetlist')
+                .then(response => response.json())
+                .then(assets => {
+                    console.log("Assets from API:", assets); // ตรวจสอบข้อมูลที่ได้รับ
+
+                    const mainContainer = document.getElementById('main');
+                    mainContainer.innerHTML = ''; // ล้างรายการก่อนโหลดใหม่
+ 
+                    // กรองสถานะสินทรัพย์เป็น Available หรือ Pending
+                    assets = assets.filter(asset =>
+                        (asset.Assetstatus === 'Available' || asset.Assetstatus === 'Pending' || asset.Assetstatus === 'Disabled' || asset.Assetstatus === 'Borrowing') &&
+                        asset.Assetname.toLowerCase().includes(searchTerm)
+                    );
+
+                    console.log("Filtered assets:", assets); // ตรวจสอบข้อมูลที่ผ่านการกรอง
+
+                    // แสดงข้อมูลสินทรัพย์
+                    assets.forEach(asset => {
+                        const card = document.createElement('div');
+                        card.className = 'card mx-1 mb-3 shadow-sm';
+                        card.style.width = '13.5rem';
+                        card.style.cursor = 'pointer'; // เปลี่ยน cursor เป็น pointer เมื่อ hover
+                        card.onclick = () => borrowAsset(asset.Assetid); // เพิ่ม event onclick ที่ card
+
+                        card.innerHTML = `
+                    <img src="/public/Addimg/${asset.Assetimg}" class="card-img-top" alt="${asset.Assetname}">
+                    <div class="card-body">
+                        <h5 class="card-title">${asset.Assetname}</h5>
+                        <p class="card-text">Status: ${asset.Assetstatus}</p>
+                       
+                    </div>
+                `;
+                        mainContainer.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching assets:', error);
+                    Swal.fire('Error', 'Unable to load assets.', 'error');
+                });
+        }
+
+        // ==================== Borrow ====================
+        function borrowAsset(assetId) {
+            fetch(`/Assetlist`)
+                .then(response => response.json())
+                .then(assets => {
+                    const asset = assets.find(a => a.Assetid === assetId);
+                    if (!asset) {
+                        throw new Error('Asset not found');
+                    }
+
+                    // ดึงวันที่ที่ไม่สามารถจองได้
+                    fetch(`/get-unavailable-dates/${assetId}`)
+                        .then(response => response.json())
+                        .then(unavailableDates => {
+                            Swal.fire({
+                                title: `${asset.Assetname}`,
+                                html: `
+                            <div style="text-align: left;">
+                                <img id="imageAsset" src="/public/Addimg/${asset.Assetimg}" alt="${asset.Assetname}">
+                                <label>Activity:</label>
+                                <input id="activity-input" class="input" placeholder="Enter activity"> <br>
+                                <label>Borrow and Return Date:</label> 
+                                <input id="date-range" class="input" placeholder="Select borrow and return dates"> <br>
+                                <label>Usage:</label>
+                                <select id="usage-input" class="input">
+                                    <option value="" disabled selected>Select usage</option>
+                                    <option value="In Site">on campus</option>
+                                    <option value="Out Site">Out Site</option>
+                                </select>
+                            </div>
+                        `,
+                                confirmButtonText: 'Submit',
+                                focusConfirm: false,
+                                didOpen: () => {
+                                    flatpickr("#date-range", {
+                                        mode: "range",
+                                        dateFormat: "Y-m-d",
+                                        minDate: "today",
+                                        disable: unavailableDates.map(date => new Date(date)),
+                                        onDayCreate: (dObj, dStr, fp, dayElem) => {
+                                            const date = dayElem.dateObj.toISOString().split('T')[0];
+                                            if (unavailableDates.includes(date)) {
+                                                dayElem.style.color = "white";
+                                                dayElem.style.pointerEvents = "none";
+                                                dayElem.style.opacity = "0.6";
+                                                dayElem.style.backgroundColor = "red";
+                                            }
+                                        }
+                                    });
+                                },
+                                preConfirm: () => {
+                                    const dateRange = document.getElementById('date-range').value;
+                                    const activity = document.getElementById('activity-input').value;
+                                    const usageType = document.getElementById('usage-input').value;
+
+                                    if (!dateRange || !activity || !usageType) {
+                                        Swal.showValidationMessage("กรุณากรอกข้อมูลให้ครบถ้วน");
+                                        return false;
+                                    }
+
+                                    return { dateRange, activity, usageType };
+                                }
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const [borrowDate, returnDate] = result.value.dateRange.split(" to ");
+                                    const activity = result.value.activity;
+                                    const usageType = result.value.usageType;
+                                    const username = localStorage.getItem('username') || 'Guest';
+
+                                    // ส่ง request ไปยัง API
+                                    fetch('/borrow-asset', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            assetId: assetId,
+                                            borrowDate: borrowDate,
+                                            returnDate: returnDate,
+                                            username: username,
+                                            activity: activity,
+                                            usageType: usageType
+                                        }),
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            Swal.fire({
+                                                title: 'สำเร็จ!',
+                                                text: 'ส่งคำขอยืมอุปกรณ์เรียบร้อยแล้ว รอการอนุมัติจากอาจารย์',
+                                                icon: 'success'
+                                            });
+                                            getAssets(); // รีเฟรชรายการอุปกรณ์
+                                        } else {
+                                            throw new Error(data.message || 'เกิดข้อผิดพลาดในการส่งคำขอ');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        Swal.fire({
+                                            title: 'เกิดข้อผิดพลาด!',
+                                            text: error.message || 'ไม่สามารถส่งคำขอยืมอุปกรณ์ได้',
+                                            icon: 'error'
+                                        });
+                                    });
+                                }
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching unavailable dates:', error);
+                            Swal.fire('Error', 'ไม่สามารถดึงข้อมูลวันที่ไม่ว่างได้', 'error');
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching asset details:', error);
+                    Swal.fire('Error', 'ไม่สามารถดึงข้อมูลอุปกรณ์ได้', 'error');
+                });
+        }
+
+        // ==================== Display User ====================
+        window.onload = function () {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/student/set';
+        }
+    </script>
+
+
+</body>
+
+</html>

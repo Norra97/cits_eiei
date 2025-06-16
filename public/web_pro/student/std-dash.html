@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Icon -->
+
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+    <link rel="stylesheet" href="/public/css/User/Dash.css">
+    <!-- <link rel="stylesheet" href="/public/css/User/MB_dash.css"> -->
+    <title>Dashboard</title>
+</head>
+
+<style>
+    body {
+        font-family: var(--bs-body-font-family) !important;
+    }
+    
+</style>
+
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+
+            <a class="navbar-brand d-flex align-items-center" href="#">
+
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+
+                </div>
+            </a>
+
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </nav>
+
+    <div class="container-fluid"> <!-- Start Container 1 -->
+        <div class="row flex-nowrap"> <!-- row flex-nowrap 1 -->
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 "> <!-- Start Col 2 -->
+
+                <!-- ============================= sidebar ============================= -->
+                <div class="sidebar">
+                    <a href="/student">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/student/Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i> Asset</button>
+                    </a>
+
+                    <a href="/student/sta/pd">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i> Asset List</button>
+                    </a>
+                </div>
+                <!-- ============================= End sidebar ============================= -->
+
+            </div> <!-- End Col 2 -->
+
+            <div class="col "> <!-- Start Col 1 -->
+
+
+                <div class=""> <!-- Start ""1 -->
+
+                    <!-- ============================= Announcement ============================= -->
+                    <div class="row rounded mx-auto mt-3" id="Row3"> <!-- Start Row 3 -->
+                        <div class="announcement-container">
+                            <div class="announcement-slider" id="announcement-slider">
+                                <div class="announcement" id="">Announcement</div>
+                            </div>
+                        </div>
+                    </div> <!-- End Row 3 -->
+                    <!-- ============================= End Announcement ============================= -->
+
+                    <div class="row mx-auto"> <!-- Start Row 2 -->
+
+                        <!-- ============================= Calendar ============================= -->
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <button id="prev" class="nav-button">❮</button>
+                                <h2 id="month-year"></h2>
+                                <button id="next" class="nav-button">❯</button>
+                            </div>
+                            <div class="view-toggle">
+                                <div class="toggle-contariner">
+                                    <button class="view-btn active" id="month-view">Month</button>
+                                    <button class="view-btn" id="week-view">Week</button>
+                                </div>
+                            </div>
+                            <div id="month-view-container">
+                                <div class="weekdays">
+                                    <div>Mon</div>
+                                    <div>Tue</div>
+                                    <div>Wed</div>
+                                    <div>Thu</div>
+                                    <div>Fri</div>
+                                    <div>Sat</div>
+                                    <div>Sun</div>
+                                </div>
+                                <div id="days" class="days"></div>
+                            </div>
+                            <div id="week-view-container" class="week-view-container" style="display: none;">
+                                <div id="week-items"></div>
+                            </div>
+                        </div>
+                        <!-- ============================= End Calendar ============================= -->
+
+                        <!-- ============================= Table ============================= -->
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Items to be returned</th>
+                                        <th>Date</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <!-- Rows will be added dynamically via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- ============================= End Table ============================= -->
+                    </div> <!-- End Row 2 -->
+                </div> <!-- End ""1 -->
+            </div> <!-- End Col 1 -->
+        </div> <!-- End row flex-nowrap 1 -->
+        </div> <!-- End Container 1 -->
+
+            <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+            <script src="calendar.js"></script>
+
+        <!-- ==================== Script GUY  ==================== -->
+        <script>
+            window.onload = () => {
+
+                const userid = localStorage.getItem('userid');
+                const username = localStorage.getItem('username');
+                if (username) {
+                    document.getElementById('displayUsername').textContent = username;
+                    document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+                } else {
+
+                    document.getElementById('displayUsername').textContent = 'Guest';
+                    document.getElementById('displayUserid').textContent = 'ID';
+                }
+            }
+        </script>
+
+        <!-- ==================== Drop Down ==================== -->
+        <script>
+            function toggleMenu() {
+                const menu = document.getElementById('profileMenu');
+                menu.classList.toggle('active');
+
+                if (menu.classList.contains('active')) {
+                    const menuRect = menu.getBoundingClientRect();
+                    const viewportWidth = window.innerWidth;
+
+                    if (menuRect.right > viewportWidth) {
+                        const offset = menuRect.right - viewportWidth + 10;
+                        menu.style.right = `${offset}px`;
+                    } else {
+                        menu.style.right = '10px';
+                    }
+                }
+            }
+
+            window.addEventListener('click', function (e) {
+                const menu = document.getElementById('profileMenu');
+                const profileImage = document.querySelector('.profile');
+
+                if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+        </script>
+
+        <script src="/public/js/bootstrap.min.js"></script>
+        <script src="calendar.js"></script>
+
+        <script>
+            function logout() {
+                localStorage.clear(); // ล้างข้อมูลใน localStorage
+                window.location.href = "/"; // เปลี่ยนเส้นทางไปยังหน้า "/"
+            }
+        </script>
+
+        <!-- ==================== calendar ==================== -->
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => {
+                const calendarDays = document.getElementById("days");
+                const tooltip = document.createElement("div");
+                tooltip.setAttribute("id", "tooltip");
+                tooltip.style.position = "absolute";
+                tooltip.style.background = "#fff";
+                tooltip.style.border = "none";
+                tooltip.style.padding = "10px";
+                tooltip.style.borderRadius = "10px";
+                tooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.2)";
+                tooltip.style.display = "none";
+                document.body.appendChild(tooltip);
+
+
+                const username = localStorage.getItem('username'); // รับ username จาก localStorage
+
+                async function fetchCalendarData() {
+                    try {
+                        const response = await fetch(`/calendar-returns?username=${encodeURIComponent(username)}`);
+                        return await response.json();
+                    } catch (error) {
+                        console.error("Error fetching calendar data:", error);
+                        return [];
+                    }
+                }
+
+                const calendarData = await fetchCalendarData();
+                console.log("Calendar Data:", calendarData);
+
+                const renderCalendar = (month, year) => {
+                    const monthNames = [
+                        "January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"
+                    ];
+                    const monthYear = document.getElementById("month-year");
+                    monthYear.textContent = `${monthNames[month]}, ${year}`;
+
+                    const calendarDays = document.getElementById("days");
+                    calendarDays.innerHTML = ""; // ล้างวันที่เก่าในปฏิทิน
+
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const lastDate = new Date(year, month + 1, 0).getDate();
+
+                    const adjustedFirstDay = (firstDay === 0 ? 6 : firstDay - 1);
+
+                    // เติมช่องว่างก่อนวันแรกของเดือน
+                    for (let i = 0; i < adjustedFirstDay; i++) {
+                        const emptyDiv = document.createElement("div");
+                        calendarDays.appendChild(emptyDiv);
+                    }
+
+                    // สร้างวันที่
+                    for (let i = 1; i <= lastDate; i++) {
+                        const dayDiv = document.createElement("div");
+                        dayDiv.textContent = i;
+
+                        // ตรวจสอบวันที่ปัจจุบัน
+                        const currentDate = new Date(year, month, i).toISOString().split('T')[0];
+
+                        // ลด ReturnDate ลง 1 วัน
+                        const adjustedCalendarData = calendarData.map(item => {
+                            const returnDate = new Date(item.ReturnDate);
+                            return {
+                                ...item,
+                                AdjustedReturnDate: new Date(returnDate.setDate(returnDate.getDate() - 1)).toISOString().split('T')[0]
+                            };
+                        });
+
+                        const returnItems = adjustedCalendarData.filter(item => item.AdjustedReturnDate === currentDate);
+
+                        // กำหนดสีและ Tooltip หากมีรายการคืน
+                        if (returnItems.length > 0) {
+                            dayDiv.style.background = "#ff8a65";
+                            dayDiv.style.color = "#fff";
+                            dayDiv.style.borderRadius = "50%";
+                            dayDiv.style.cursor = "pointer";
+
+                            dayDiv.addEventListener("mouseover", (e) => {
+                                const details = returnItems.map(item => `<p><b>${item.Assetname}</b> - ${item.Assetlocation || "No Location"}</p>`).join("");
+                                tooltip.innerHTML = details;
+                                tooltip.style.left = `${e.pageX + 10}px`;
+                                tooltip.style.top = `${e.pageY + 10}px`;
+                                tooltip.style.display = "block";
+                            });
+
+                            dayDiv.addEventListener("mouseout", () => {
+                                tooltip.style.display = "none";
+                            });
+                        }
+
+                        calendarDays.appendChild(dayDiv);
+                    }
+                };
+
+                const weekViewButton = document.getElementById("week-view");
+                const monthViewButton = document.getElementById("month-view");
+
+                weekViewButton.addEventListener("click", () => {
+                    switchToWeekView();
+                });
+
+                monthViewButton.addEventListener("click", () => {
+                    switchToMonthView();
+                });
+
+                const today = new Date();
+                let currentMonth = today.getMonth();
+                let currentYear = today.getFullYear();
+
+                const switchToWeekView = () => {
+                    weekViewButton.classList.add("active");
+                    monthViewButton.classList.remove("active");
+
+                    document.getElementById("month-view-container").style.display = "none"; // ซ่อน Month View
+                    document.getElementById("week-view-container").style.display = "block"; // แสดง Week View
+
+                    renderWeekView(currentMonth, currentYear);
+                };
+
+                const switchToMonthView = () => {
+                    weekViewButton.classList.remove("active");
+                    monthViewButton.classList.add("active");
+
+                    document.getElementById("month-view-container").style.display = "block"; // แสดง Month View
+                    document.getElementById("week-view-container").style.display = "none"; // ซ่อน Week View
+
+                    renderCalendar(currentMonth, currentYear);
+                };
+
+
+                // week view
+                const renderWeekView = (month, year) => {
+                    const weekItemsContainer = document.getElementById("week-items");
+                    const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+                    weekItemsContainer.innerHTML = ""; // Clear previous content
+
+                    // Calculate the start of the week (Monday)
+                    const today = new Date();
+                    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+
+                    // Loop through the 7 days of the week
+                    for (let i = 0; i < 7; i++) {
+                        const currentDay = new Date(startOfWeek);
+                        currentDay.setDate(startOfWeek.getDate() + i);
+
+                        // Format the date
+                        const formattedDate = `${currentDay.getDate()}`;
+                        const currentDateString = currentDay.toISOString().split("T")[0];
+
+                        // Create the week day container
+                        const weekDayDiv = document.createElement("div");
+                        weekDayDiv.className = "week-day";
+                        weekDayDiv.style.display = "flex"; // ใช้ Flexbox
+                        weekDayDiv.style.justifyContent = "space-between"; // แยกวันที่และรายการ
+                        weekDayDiv.style.alignItems = "center"; // จัดกึ่งกลางแนวตั้ง
+                        weekDayDiv.style.marginBottom = "10px"; // เพิ่มระยะห่างระหว่างบรรทัด
+                        weekDayDiv.style.padding = "10px"; // เพิ่ม padding ภายใน
+                        weekDayDiv.style.borderRadius = "8px"; // เพิ่มมุมมน
+
+                        // Add the day and date
+                        const dayText = document.createElement("span");
+                        dayText.textContent = `${weekDays[i]} ${formattedDate}`;
+                        dayText.style.fontWeight = "bold";
+
+                        // Fetch items for the day
+                        const returnItems = calendarData.filter(item => item.ReturnDate === currentDateString);
+
+                        if (returnItems.length > 0) {
+                            // มี Items
+                            weekDayDiv.style.backgroundColor = "#ff8a65"; // Background สีส้ม
+                            dayText.style.color = "#fff"; // Text สีขาว
+                            const itemsText = document.createElement("span");
+                            itemsText.textContent = returnItems.map(item => item.Assetname).join(", ");
+                            itemsText.style.marginLeft = "20px"; // เพิ่มระยะห่างระหว่างวันที่กับรายการ
+                            itemsText.style.color = "#fff"; // Text สีขาว
+                            weekDayDiv.appendChild(dayText);
+                            weekDayDiv.appendChild(itemsText);
+                        } else {
+                            // ไม่มี Items
+                            dayText.style.color = "#C3C3C3"; // Text สีเทา
+                            weekDayDiv.appendChild(dayText);
+                            const noItemsText = document.createElement("span");
+                            noItemsText.textContent = "No items to be returned";
+                            noItemsText.style.color = "#C3C3C3"; // Text สีเทา
+                            noItemsText.style.marginLeft = "20px"; // เพิ่มระยะห่าง
+                            weekDayDiv.appendChild(noItemsText);
+                        }
+
+                        weekItemsContainer.appendChild(weekDayDiv);
+                    }
+                };
+
+                // mount view
+                renderCalendar(currentMonth, currentYear);
+
+                document.getElementById("prev").addEventListener("click", () => {
+                    currentMonth--;
+                    if (currentMonth < 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    }
+                    renderCalendar(currentMonth, currentYear);
+                });
+
+                document.getElementById("next").addEventListener("click", () => {
+                    currentMonth++;
+                    if (currentMonth > 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    }
+                    renderCalendar(currentMonth, currentYear);
+                });
+            });
+        </script>
+
+        <!-- ==================== table ==================== -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const username = localStorage.getItem('username'); // รับ username ของผู้ใช้จาก localStorage
+                if (username) {
+                    fetch(`/return-assets-requests?username=${encodeURIComponent(username)}`) // เรียก API พร้อมส่ง username
+                        .then(response => response.json())
+                        .then(data => {
+                            const tableBody = document.getElementById('table-body');
+                            tableBody.innerHTML = ''; // ล้างข้อมูลเก่าในตาราง
+
+                            if (data.length === 0) {
+                                // หากไม่มีข้อมูล แสดงข้อความแจ้ง
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td colspan="3">No items to return.</td>
+                                `;
+                                tableBody.appendChild(row);
+                            } else {
+                                data.forEach(item => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${item.Assetname}</td>
+                                        <td>${item.ReturnDate}</td>
+                                        <td>${item.Assetlocation}</td>
+                                    `;
+                                    tableBody.appendChild(row);
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error fetching return items:', error));
+                } else {
+                    console.error('No username found in localStorage.');
+                }
+            });
+        </script>
+
+        <!-- ==================== Announcements ==================== -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const slider = document.getElementById("announcement-slider");
+                const announcements = slider.children;
+                const totalAnnouncements = announcements.length;
+                let index = 0;
+
+                setInterval(() => {
+                    index = (index + 1) % totalAnnouncements;
+                    slider.style.transform = `translateX(-${index * 100}%)`;
+                    slider.style.transition = "transform 1s ease"; // เพิ่ม transition สำหรับการเลื่อน
+                }, 10000); // เลื่อนทุก ?? วินาที
+            });
+        </script>
+
+        <!-- ==================== Setting ==================== -->
+        <script>
+            function redirectToStudentSet() {
+                window.location.href = '/student/set';
+            }
+        </script>
+</body>
+
+</html>
