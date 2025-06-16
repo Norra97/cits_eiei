@@ -9,24 +9,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/public/css/std-dash.css">
     <link rel="stylesheet" href="/public/CSS/Head.css">
-    <link rel="stylesheet" href="/public/CSS/Admin/stf-history.css">
+    <link rel="stylesheet" href="/public/css/Admin/stf-history.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/public/css/bootstrap.min.css">
     <script src="/public/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="/public/js/notiflix-aio-3.2.6.min.js"></script>
-    <title>lec_history</title>
+    <title>Asset History</title>
 </head>
+
 <style>
+    body {
+        font-family: var(--bs-body-font-family) !important;
+    }
+
     .asset-image {
         width: 100px;
         height: auto;
     }
 
     .table-container {
-        max-height: 400px;
-        /* Adjust this value as needed */
+        max-height: 600px;
         overflow-y: auto;
         margin-bottom: 20px;
     }
@@ -34,7 +38,29 @@
     .table {
         width: 100%;
         margin-bottom: 0;
-        /* Remove bottom margin */
+    }
+
+    .status-approved {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .status-returned {
+        color: #17a2b8;
+        font-weight: bold;
+    }
+
+    .filter-buttons {
+        margin-bottom: 20px;
+    }
+
+    .filter-buttons button {
+        margin-right: 10px;
+    }
+
+    .filter-buttons button.active {
+        background-color: #007bff;
+        color: white;
     }
 </style>
 
@@ -89,7 +115,7 @@
 
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <div class="col-auto col-md-3 col-xl-2 px-sm-2 ">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
                 <div class="sidebar">
                     <a href="/staff">
                         <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
@@ -113,137 +139,164 @@
                 </div>
             </div>
 
-            <div class="col ">
-
-                <div class="row p-3 rounded mx-auto mt-3">
-
+            <div class="col">
+                <div class="container">
                     <div>
-                        <div class="p-3">
-                            <h1 id="NamePage">History</h1>
+                        <div class="text-primary p-3">
+                            <h1 id="NamePage">Asset History</h1>
                         </div>
-                        <div class="col-btn">
-                            <a href="/staff/History">
-                                <button id="btn-Approve" class="btn-f"><i> </i> Approve</button>
-                            </a>
-                            <a href="/staff/History-Re">
-                                <button id="btn-Return" class="btn-f"><i> </i> Return</button>
-                            </a>
+                        <div class="filter-buttons">
+                            <button class="btn btn-outline-primary active" onclick="filterHistory('all')">All History</button>
+                            <button class="btn btn-outline-success" onclick="filterHistory('Approved')">Approved History</button>
+                            <button class="btn btn-outline-info" onclick="filterHistory('Returned')">Returned History</button>
                         </div>
-
-                        <div id="pending-assets-body" class="d-flex flex-column">
-                            <!-- Cards will be appended here -->
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Asset ID</th>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Asset Name</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Borrow Date</th>
+                                        <th scope="col">Return Date</th>
+                                        <th scope="col">Borrower</th>
+                                        <th scope="col">Activity</th>
+                                        <th scope="col">Approved By</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <!-- Data rows will be inserted here -->
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
                 </div>
-
             </div>
-
         </div>
+    </div>
 
-        <script src="/public/web_pro/student/logout.js"></script>
+    <script src="/public/web_pro/student/logout.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            loadHistory('all');
+        });
 
-        <!-- ==================== Drop Down ==================== -->
-        <script>
-            function toggleMenu() {
-                const menu = document.getElementById('profileMenu');
-                menu.classList.toggle('active');
+        // Toggle menu functionality
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
 
-                if (menu.classList.contains('active')) {
-                    const menuRect = menu.getBoundingClientRect();
-                    const viewportWidth = window.innerWidth;
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
 
-                    if (menuRect.right > viewportWidth) {
-                        const offset = menuRect.right - viewportWidth + 10;
-                        menu.style.right = `${offset}px`;
-                    } else {
-                        menu.style.right = '10px';
-                    }
-                }
-            }
-
-            window.addEventListener('click', function (e) {
-                const menu = document.getElementById('profileMenu');
-                const profileImage = document.querySelector('.profile');
-
-                if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
-                    menu.classList.remove('active');
-                }
-            });
-        </script>
-
-        <!-- ==================== status Approved ==================== -->
-        <script>
-            async function fetchHistory(status, username) {
-                try {
-                    const response = await fetch(`/get-history?status=${status}&username=${username}`); // แก้ไขส่วนพารามิเตอร์
-                    if (response.ok) {
-                        const data = await response.json();
-                        const container = document.getElementById('pending-assets-body');
-                        container.innerHTML = ''; // ล้างข้อมูลเก่า
-
-                        data.forEach(item => {
-                            const card = document.createElement('div');
-                            card.className = "card card-horizontal shadow-sm";
-                            card.innerHTML = `
-                    <div class="d-flex" style="justify-content: flex-start">
-                        <img class="asset-image" src="/public/Addimg/${item.Assetimg}" alt="${item.Assetname}">
-                        <div class="card-body">
-                            <h5 class="card-title">${item.Assetname}</h5>
-                            <p class="card-text">
-                                <b>Asset Location:</b> ${item.Assetlocation || 'N/A'}<br>
-                                <b>Borrow name:</b> ${item.Borrowname || 'N/A'}<br>
-                                <b>Phone number:</b> ${item.phonenum || 'N/A'}<br>
-                                <b>Borrow Date:</b> ${item.Borrowdate || 'N/A'}<br>
-                                <b>Status:</b> ${item.Status || 'N/A'}
-                            </p>
-                        </div>
-                    </div>
-                `;
-                            container.appendChild(card);
-                        });
-                    } else {
-                        throw new Error('Failed to fetch history data.');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            }
-
-            // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
-            document.addEventListener("DOMContentLoaded", function () {
-                const status = window.location.pathname.includes('History-Re') ? 'Returned' : 'Approved';
-                const username = localStorage.getItem("username"); // ดึง username จาก Local Storage
-                fetchHistory(status, username);
-            });
-
-        </script>
-
-        <!-- ==================== Display User ==================== -->
-        <script>
-            window.onload = function () {
-
-
-                const userid = localStorage.getItem('userid');
-                const username = localStorage.getItem('username');
-                if (username) {
-                    document.getElementById('displayUsername').textContent = 'Admin: ' + username;
-                    document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
                 } else {
-
-                    document.getElementById('displayUsername').textContent = 'Admin';
-                    document.getElementById('displayUserid').textContent = 'ID';
+                    menu.style.right = '10px';
                 }
             }
-        </script>
+        }
 
-        <!-- ==================== Setting ==================== -->
-        <script>
-            function redirectToStudentSet() {
-                window.location.href = '/settings/stf';
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
             }
-        </script>
+        });
+
+        // Filter history based on status
+        function filterHistory(status) {
+            // Update active button
+            document.querySelectorAll('.filter-buttons button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            loadHistory(status);
+        }
+
+        // Load history data
+        function loadHistory(status) {
+            fetch(`/get-history?status=${status}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('table-body');
+                    tableBody.innerHTML = ''; // Clear existing content
+
+                    data.forEach(item => {
+                        const row = createTableRow(item);
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Create table row
+        function createTableRow(item) {
+            const tr = document.createElement('tr');
+            const statusClass = item.Status === 'Approved' ? 'status-approved' : 
+                              item.Status === 'Returned' ? 'status-returned' : '';
+            
+            tr.innerHTML = `
+                <th scope="row">${item.Assetid}</th>
+                <td><img src="/public/Addimg/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
+                <td>${item.Assetname}</td>
+                <td class="${statusClass}">${item.Status}</td>
+                <td>${item.Borrowdate || 'N/A'}</td>
+                <td>${item.ReturnDate || 'N/A'}</td>
+                <td>${item.Borrowname || 'N/A'}</td>
+                <td>${item.Activity || 'N/A'}</td>
+                <td>${item.lectname || 'N/A'}</td>
+            `;
+            return tr;
+        }
+
+        // Search functionality
+        document.getElementById('search-button').addEventListener('click', function() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.getElementById('table-body').getElementsByTagName('tr');
+
+            Array.from(rows).forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Search on enter key
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('search-button').click();
+            }
+        });
+    </script>
+
+    <!-- ==================== Display User ==================== -->
+    <script>
+        window.onload = function () {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = 'Admin: ' + username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+                document.getElementById('displayUsername').textContent = 'Admin';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/stf';
+        }
+    </script>
 </body>
 
 </html>

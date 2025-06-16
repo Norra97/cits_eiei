@@ -184,7 +184,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/getreturn-asset/${assetId}`, {
-                        method: 'DELETE', // Using DELETE method as requested
+                        method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' }
                     })
                         .then(response => {
@@ -193,14 +193,16 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                Swal.fire('GetReturned!', 'The asset has been successfully returned!', 'success');
-                                loadData(); // Refresh data after returning asset
+                                Swal.fire('GetReturned!', 'The asset has been successfully returned!', 'success').then(() => {
+                                    window.location.href = '/staff/History'; // Redirect to history page
+                                });
                             } else {
                                 throw new Error('Return failed');
                             }
                         })
                         .catch(error => {
-                            Swal.fire('Error', 'Failed to return the asset!', 'error');
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Failed to return asset!', 'error');
                         });
                 }
             });

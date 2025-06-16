@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS `BorrowReq` (
   `Status` enum('Pending','Approved','Reject','RePending','Returned') NOT NULL DEFAULT 'Pending',
   `lectname` varchar(255) DEFAULT NULL,
   `Comment` text DEFAULT NULL,
+  `Activity` text DEFAULT NULL,
+  `UsageType` varchar(50) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`Reqid`),

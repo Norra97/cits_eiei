@@ -188,37 +188,37 @@
                         },
                         body: JSON.stringify({ requestId: requestId, lectname: result.value }),
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                button.closest('tr').querySelector('td:nth-last-child(2)').textContent = 'Approved';
-                                Swal.fire('Success', 'Request Approved!', 'success').then(() => {
-                                    // รีโหลดข้อมูลหลังจากอนุมัติสำเร็จ
-                                    fetchBorrowingRequests();
-                                });
-                            } else {
-                                throw new Error(data.message || 'Failed to approve request');
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire('Error', error.message || 'Failed to approve request!', 'error');
-                        });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success', 'Request Approved!', 'success').then(() => {
+                                window.location.href = '/staff/History'; // Redirect to history page
+                            });
+                        } else {
+                            throw new Error('Approval failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'Failed to approve request!', 'error');
+                    });
                 }
             });
         }
 
         function disapproveRequest(button, requestId) {
-            const username = localStorage.getItem('username') || '';
+            const username = localStorage.getItem('username') || ''; // Get username or default to empty string
+
             Swal.fire({
                 title: 'Disapprove Request',
                 input: 'text',
-                inputLabel: 'Reason for disapproval',
-                inputPlaceholder: 'Enter the reason',
+                inputLabel: 'Lect name',
+                inputValue: username,
                 showCancelButton: true,
                 confirmButtonText: 'Submit',
                 inputValidator: (value) => {
@@ -227,38 +227,33 @@
                     }
                 }
             }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    fetch('/reject-borrow-request', {
+                if (result.isConfirmed) {
+                    fetch('/disapprove-borrow-request', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ 
-                            requestId: requestId, 
-                            comment: result.value, 
-                            lectname: username 
-                        }),
+                        body: JSON.stringify({ requestId: requestId, lectname: result.value }),
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                button.closest('tr').querySelector('td:nth-last-child(2)').textContent = 'Rejected';
-                                Swal.fire('Success', 'Request Rejected!', 'success').then(() => {
-                                    // รีโหลดข้อมูลหลังจากปฏิเสธสำเร็จ
-                                    fetchBorrowingRequests();
-                                });
-                            } else {
-                                throw new Error(data.message || 'Failed to reject request');
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire('Error', error.message || 'Failed to reject request!', 'error');
-                        });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success', 'Request Disapproved!', 'success').then(() => {
+                                window.location.href = '/staff/History'; // Redirect to history page
+                            });
+                        } else {
+                            throw new Error('Disapproval failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'Failed to disapprove request!', 'error');
+                    });
                 }
             });
         }

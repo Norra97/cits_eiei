@@ -708,10 +708,10 @@ app.post('/borrow-asset', async (req, res) => {
 
         // เพิ่มคำร้องในตาราง BorrowReq
         const sqlInsert = `
-        INSERT INTO BorrowReq (Assetid, Borrowdate, Returndate, Status, Borrowname)
-        VALUES (?, ?, ?, 'Pending', ?)
+        INSERT INTO BorrowReq (Assetid, Borrowdate, Returndate, Status, Borrowname, Activity, UsageType)
+        VALUES (?, ?, ?, 'Pending', ?, ?, ?)
         `;
-        con.query(sqlInsert, [assetId, borrowDate, returnDate, username], (err, result) => {
+        con.query(sqlInsert, [assetId, borrowDate, returnDate, username, activity, usageType], (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).json({ success: false, message: 'Database insertion failed: ' + err.message });
@@ -1414,8 +1414,8 @@ app.get('/return-assets-requests', async (req, res) => {
     `;
 
     try {
-        const [results] = await con.promise().query(sql, [username]); // ใช้ username ที่รับมา
-        res.json(results); // ส่งข้อมูลกลับไปที่ frontend
+        const [results] = await con.promise().query(sql, [username]);
+        res.json(results);
     } catch (error) {
         console.error("Database error:", error);
         res.status(500).send('Server error');
@@ -1881,6 +1881,45 @@ app.get('/get-borrowing-items', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'เกิดข้อผิดพลาดในการดึงข้อมูลรายการที่กำลังยืม' 
+        });
+    }
+});
+
+app.post('/approve-borrow-request', async (req, res) => {
+    const { requestId, lectname } = req.body;
+
+    try {
+        // อัพเดทสถานะคำขอเป็น Approved
+        const updateRequestSql = `
+            UPDATE BorrowReq 
+            SET Status = 'Approved', lectname = ? 
+            WHERE Reqid = ?
+        `;
+        await con.promise().query(updateRequestSql, [lectname, requestId]);
+
+        // ดึงข้อมูล Asset ID จากคำขอ
+        const getAssetSql = 'SELECT Assetid FROM BorrowReq WHERE Reqid = ?';
+        const [assetResult] = await con.promise().query(getAssetSql, [requestId]);
+
+        if (assetResult.length > 0) {
+            // อัพเดทสถานะอุปกรณ์เป็น Borrowing
+            const updateAssetSql = `
+                UPDATE Asset 
+                SET Assetstatus = 'Borrowing' 
+                WHERE Assetid = ?
+            `;
+            await con.promise().query(updateAssetSql, [assetResult[0].Assetid]);
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'อนุมัติคำขอยืมอุปกรณ์เรียบร้อยแล้ว' 
+        });
+    } catch (error) {
+        console.error('Error approving request:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'เกิดข้อผิดพลาดในการอนุมัติคำขอ' 
         });
     }
 });
