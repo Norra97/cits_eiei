@@ -741,168 +741,8 @@ app.put('/update-asset-status/:assetId', (req, res) => {
     });
 });
 
-app.put('/update-asset-status/:assetId', (req, res) => {
-    const assetId = req.params.assetId;
-    const { status } = req.body;
-
-    // SQL query to update the status of the asset
-    const query = 'UPDATE Asset SET Assetstatus = ? WHERE Assetid = ?';
-
-    con.query(query, [status, assetId], (error, results) => {
-        if (error) {
-            res.status(500).send("Database error: " + error.message);
-        } else if (results.affectedRows === 0) {
-            res.status(404).send("Asset not found or no change in status");
-        } else {
-            res.status(200).json({ status: 'success', message: `Asset status updated to ${status}` });
-        }
-    });
-});
-
-app.get("/borrow-assett", function (req, res) {
-    // Adjust the SQL query to match your table and column names exactly.
-    const sql = `
-    SELECT br.Reqid, br.Borrowname, br.Borrowdate, br.ReturnDate, br.Status, a.Assetname
-    FROM BorrowReq br
-    INNER JOIN Asset a ON br.Assetid = a.Assetid
-    WHERE br.Status = 'Pending'
-    `;
-
-
-
-    con.query(sql, function (err, results) {
-        console.log(results); // Add this line to log the results
-        if (err) {
-            res.status(500).send("Database error!!");
-        } else {
-            res.json(results);
-        }
-    });
-
-});
-
-// ... rest of your server code
-
-app.post('/return-asset', async (req, res) => {
-    const { requestId, lectname } = req.body;
-
-    try {
-        // อัพเดทสถานะคำขอเป็น Returned
-        const updateRequestSql = `
-            UPDATE BorrowReq 
-            SET Status = 'Returned', lectname = ? 
-            WHERE Reqid = ?
-        `;
-        await con.promise().query(updateRequestSql, [lectname, requestId]);
-
-        // ดึงข้อมูล Asset ID และ Borrowname จากคำขอ
-        const getRequestSql = 'SELECT Assetid, Borrowname FROM BorrowReq WHERE Reqid = ?';
-        const [requestResult] = await con.promise().query(getRequestSql, [requestId]);
-
-        if (requestResult.length > 0) {
-            // อัพเดทสถานะอุปกรณ์เป็น Available
-            const updateAssetSql = `
-                UPDATE Asset 
-                SET Assetstatus = 'Available' 
-                WHERE Assetid = ?
-            `;
-            await con.promise().query(updateAssetSql, [requestResult[0].Assetid]);
-
-            // บันทึกประวัติการคืน
-            const insertHistorySql = `
-                INSERT INTO AssetHistory 
-                (Assetid, Borrowname, lectname, Action, ActionDate) 
-                VALUES (?, ?, ?, 'Returned', NOW())
-            `;
-            await con.promise().query(insertHistorySql, [
-                requestResult[0].Assetid,
-                requestResult[0].Borrowname,
-                lectname
-            ]);
-
-            res.json({ 
-                success: true, 
-                message: 'คืนอุปกรณ์เรียบร้อยแล้ว'
-            });
-        } else {
-            res.status(404).json({ 
-                success: false, 
-                message: 'ไม่พบข้อมูลคำขอ' 
-            });
-        }
-    } catch (error) {
-        console.error('Error returning asset:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'เกิดข้อผิดพลาดในการคืนอุปกรณ์' 
-        });
-    }
-});
-
-app.post('/disapprove-request', (req, res) => {
-    const { requestId, username, reason } = req.body;
-
-    const sqlDisapprove = 'UPDATE BorrowReq SET lectname = ?, Comment = ?, Status = "Reject" WHERE Reqid = ?';
-
-    pool.query(sqlDisapprove, [username, reason, requestId], (error, disapproveResult) => {
-        if (error) {
-            return res.status(500).json({ message: 'Error on the server.', error: error.message });
-        }
-
-        if (disapproveResult.affectedRows) {
-            const sqlGetAssetId = 'SELECT Assetid FROM BorrowReq WHERE Reqid = ?';
-
-            pool.query(sqlGetAssetId, [requestId], (error, assetResult) => {
-                if (error || assetResult.length === 0) {
-                    return res.status(500).json({ message: 'Error fetching Asset ID.', error: error?.message });
-                }
-
-                const assetId = assetResult[0].Assetid;
-                const sqlUpdateAsset = 'UPDATE Asset SET Assetstatus = "Available" WHERE Assetid = ?';
-
-                pool.query(sqlUpdateAsset, [assetId], (error, updateAssetResult) => {
-                    if (error) {
-                        return res.status(500).json({ message: 'Error on the server.', error: error.message });
-                    }
-
-                    if (updateAssetResult.affectedRows) {
-                        res.json({ message: 'Request disapproved and asset status updated successfully.' });
-                    } else {
-                        res.status(404).json({ message: 'Asset not found.' });
-                    }
-                });
-            });
-        } else {
-            res.status(404).json({ message: 'Request not found.' });
-        }
-    });
-});
-
-app.get('/asset-borrow-requests', async (req, res) => {
-    const username = req.query.username; // Get the username from the query parameter
-
-    const sql = `
-    SELECT 
-    Asset.Assetid, Asset.Assetimg, Asset.Assetname, Asset.Assetstatus, Asset.Staffaddid,
-    BorrowReq.Borrowdate, BorrowReq.ReturnDate, BorrowReq.lectname, BorrowReq.Status
-FROM Asset
-LEFT JOIN BorrowReq ON Asset.Assetid = BorrowReq.Assetid
-WHERE BorrowReq.Borrowname = ? AND BorrowReq.Status = 'Approved'
-GROUP BY Asset.Assetid;
-
-    `;
-
-    try {
-        const [results] = await con.promise().query(sql, [username]);
-        res.json(results);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Database error.");
-    }
-});
-
 app.put('/return-asset/:reqId', async (req, res) => {
-    const reqId = req.params.reqId; // เปลี่ยนเป็น reqId
+    const reqId = req.params.reqId;
     const { newStatus } = req.body;
 
     console.log(`Attempting to return asset with Request ID: ${reqId}`);
@@ -910,22 +750,44 @@ app.put('/return-asset/:reqId', async (req, res) => {
     try {
         await con.promise().beginTransaction();
 
-        // Update BorrowReq table โดยใช้ Reqid แทน Assetid
+        // ดึงข้อมูล Asset ID จากคำขอยืม
+        const [assetResult] = await con.promise().query(
+            'SELECT Assetid FROM BorrowReq WHERE Reqid = ?',
+            [reqId]
+        );
+
+        if (assetResult.length === 0) {
+            throw new Error('ไม่พบคำขอยืม');
+        }
+
+        const assetId = assetResult[0].Assetid;
+
+        // อัพเดทสถานะในตาราง BorrowReq
         const [borrowUpdateResult] = await con.promise().query(
-            'UPDATE BorrowReq SET Status = ? WHERE Reqid = ? AND Status != "Returned"',
+            'UPDATE BorrowReq SET Status = ? WHERE Reqid = ?',
             [newStatus, reqId]
         );
 
         if (borrowUpdateResult.affectedRows === 0) {
-            throw new Error('Borrow request not found or already returned');
+            throw new Error('ไม่สามารถอัพเดทสถานะคำขอยืมได้');
+        }
+
+        // อัพเดทสถานะอุปกรณ์ในตาราง Asset
+        const [assetUpdateResult] = await con.promise().query(
+            'UPDATE Asset SET Assetstatus = "Pending" WHERE Assetid = ?',
+            [assetId]
+        );
+
+        if (assetUpdateResult.affectedRows === 0) {
+            throw new Error('ไม่สามารถอัพเดทสถานะอุปกรณ์ได้');
         }
 
         await con.promise().commit();
-        res.json({ success: true, message: 'Borrow request status updated to RePending' });
+        res.json({ success: true, message: 'อัพเดทสถานะการคืนเรียบร้อยแล้ว' });
     } catch (error) {
-        console.error('Error during the return asset transaction:', error);
+        console.error('เกิดข้อผิดพลาดในการคืนอุปกรณ์:', error);
         await con.promise().rollback();
-        res.status(500).json({ success: false, message: 'Transaction failed: ' + error.message });
+        res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาด: ' + error.message });
     }
 });
 
@@ -970,7 +832,8 @@ app.get('/return-assets-requests', async (req, res) => {
 app.get('/pending-assets-requests', async (req, res) => {
     const username = req.query.username;
     const sql = `
-    SELECT a.*,br.*
+    SELECT a.Assetid, a.Assetimg, a.Assetname, a.Assetcode, a.Assetdetail, a.Assetlocation, a.Assettype,
+           br.Reqid, br.Borrowdate, br.ReturnDate, br.Status, br.Activity, br.UsageType as UsageType
     FROM Asset a
     LEFT JOIN BorrowReq br ON a.Assetid = br.Assetid
     WHERE br.Status = 'Pending' AND br.Borrowname = ?
@@ -1048,65 +911,74 @@ app.get('/Returned-assets-requests', async (req, res) => {
     }
 });
 
-app.get('/asset-borrow-return', async (req, res) => {
+app.get('/asset-borrow-requests', async (req, res) => {
+    const username = req.query.username;
+
     const sql = `
-      SELECT 
+    SELECT 
         Asset.Assetid, Asset.Assetimg, Asset.Assetname, Asset.Assetstatus, Asset.Staffaddid,
-        BorrowReq.Borrowdate, BorrowReq.ReturnDate, BorrowReq.lectname,BorrowReq.Status
-      FROM Asset
-      LEFT JOIN BorrowReq ON Asset.Assetid = BorrowReq.Assetid
+        Asset.Assetcode, Asset.Assetdetail, Asset.Assetlocation, Asset.Assettype,
+        BorrowReq.Reqid, BorrowReq.Borrowdate, BorrowReq.ReturnDate, BorrowReq.lectname, 
+        BorrowReq.Status, BorrowReq.Activity, BorrowReq.UsageType
+    FROM Asset
+    LEFT JOIN BorrowReq ON Asset.Assetid = BorrowReq.Assetid
+    WHERE BorrowReq.Borrowname = ? AND BorrowReq.Status = 'Approved'
+    ORDER BY BorrowReq.Borrowdate DESC
     `;
 
     try {
-        const [results] = await con.promise().query(sql);
+        const [results] = await con.promise().query(sql, [username]);
         res.json(results);
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Database error.");
+        console.error('Error fetching borrow requests:', error);
+        res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
     }
 });
 
-
-
-
-
 app.delete('/cancel-asset-request/:reqId', async (req, res) => {
-    const reqId = req.params.reqId; // รับ reqId แทน assetId
-
+    const { reqId } = req.params;
+    
     try {
         await con.promise().beginTransaction();
 
-        // หา Assetid จาก Reqid
-        const findAssetQuery = 'SELECT Assetid FROM BorrowReq WHERE Reqid = ?';
-        const [assetResult] = await con.promise().query(findAssetQuery, [reqId]);
+        // Get Asset ID from the request
+        const [borrowReq] = await con.promise().query(
+            'SELECT Assetid FROM BorrowReq WHERE Reqid = ? AND Status = "Pending"',
+            [reqId]
+        );
 
-        if (assetResult.length === 0) {
-            throw new Error('Borrow request not found');
+        if (borrowReq.length === 0) {
+            throw new Error('Request not found or already processed');
         }
 
-        const assetId = assetResult[0].Assetid;
+        const { Assetid } = borrowReq[0];
 
-        // Update Asset table to set Assetstatus to 'Available'
-        const updateAssetStatusQuery = 'UPDATE Asset SET Assetstatus = "Available" WHERE Assetid = ?';
-        const [assetUpdateResult] = await con.promise().query(updateAssetStatusQuery, [assetId]);
+        // Delete the borrow request
+        const [deleteResult] = await con.promise().query(
+            'DELETE FROM BorrowReq WHERE Reqid = ? AND Status = "Pending"',
+            [reqId]
+        );
 
-        if (assetUpdateResult.affectedRows === 0) {
-            throw new Error('Asset not found');
+        if (deleteResult.affectedRows === 0) {
+            throw new Error('Failed to delete request');
         }
 
-        // Delete the row from BorrowReq table using Reqid
-        const deleteBorrowReqQuery = 'DELETE FROM BorrowReq WHERE Reqid = ?';
-        const [borrowReqDeleteResult] = await con.promise().query(deleteBorrowReqQuery, [reqId]);
+        // Update asset status back to Available
+        const [assetResult] = await con.promise().query(
+            'UPDATE Asset SET Assetstatus = "Available" WHERE Assetid = ?',
+            [Assetid]
+        );
 
-        if (borrowReqDeleteResult.affectedRows === 0) {
-            throw new Error('Borrow request deletion failed');
+        if (assetResult.affectedRows === 0) {
+            throw new Error('Failed to update asset status');
         }
 
         await con.promise().commit();
-        res.json({ success: true, message: 'Asset returned and borrow request deleted' });
+        res.json({ success: true, message: 'Request cancelled successfully' });
     } catch (error) {
         await con.promise().rollback();
-        res.status(500).json({ success: false, message: 'Transaction failed: ' + error.message });
+        console.error('Error cancelling request:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
@@ -1144,39 +1016,39 @@ app.delete('/getreturn-asset/:assetId', async (req, res) => {
 
 
 
-app.get('/history', async (req, res) => {
-    const sql = `
-        SELECT 
-            Asset.Assetid, 
-            Asset.Assetimg, 
-            Asset.Assetname, 
-            Asset.Assetstatus, 
-            Asset.Staffaddid, 
-            Asset.Assetcode, 
-            Asset.Assetlocation, 
-            BorrowReq.Borrowdate, 
-            BorrowReq.ReturnDate, 
-            BorrowReq.lectname,
-            BorrowReq.Borrowname,
-            BorrowReq.Status,
-            BorrowReq.comment
-        FROM 
-            BorrowReq
-        LEFT JOIN 
-            Asset 
-        ON 
-            BorrowReq.Assetid = Asset.Assetid
-        WHERE 
-            BorrowReq.Status = 'Returned'
-    `;
-
+app.get('/get-history', async (req, res) => {
+    const { status } = req.query;
+    
     try {
-        const [results] = await con.promise().query(sql);
-        console.log(`Query returned ${results.length} rows`); // Debugging
+        let sql = `
+            SELECT 
+                br.Reqid,
+                br.Assetid,
+                br.Borrowname,
+                br.Borrowdate,
+                br.ReturnDate,
+                br.Status,
+                br.Activity,
+                br.lectname,
+                a.Assetname,
+                a.Assetimg,
+                a.Assetstatus,
+                a.Assettype
+            FROM BorrowReq br
+            INNER JOIN Asset a ON br.Assetid = a.Assetid
+        `;
+
+        if (status && status !== 'all') {
+            sql += ` WHERE br.Status = ?`;
+        }
+
+        sql += ` ORDER BY br.Borrowdate DESC`;
+
+        const [results] = await con.promise().query(sql, status !== 'all' ? [status] : []);
         res.json(results);
     } catch (error) {
-        console.error('Database error:', error);
-        res.status(500).send("Database error.");
+        console.error('Error fetching history:', error);
+        res.status(500).json({ message: 'Failed to load history' });
     }
 });
 
@@ -1427,11 +1299,11 @@ app.get('/assets-by-status', (req, res) => {
     const status = req.query.status;
 
     const query = `
-                SELECT BorrowReq.*, Asset.Assetname, Asset.Assetimg
-                FROM BorrowReq
-                JOIN Asset ON BorrowReq.Assetid = Asset.Assetid
-                WHERE BorrowReq.Borrowname = ? AND BorrowReq.Status = ?
-            `;
+        SELECT BorrowReq.*, Asset.Assetname, Asset.Assetimg, BorrowReq.UsageType
+        FROM BorrowReq
+        JOIN Asset ON BorrowReq.Assetid = Asset.Assetid
+        WHERE BorrowReq.Borrowname = ? AND BorrowReq.Status = ?
+    `;
 
     con.query(query, [username, status], (err, results) => {
         if (err) {
@@ -1570,36 +1442,38 @@ app.get(
 
 // history staff
 app.get('/get-history', async (req, res) => {
-    const { status, username} = req.query; // รับสถานะจาก query parameter
-    const sql = `
-        SELECT 
-            Asset.Assetname, 
-            Asset.Assetlocation,
-            Asset.Assetimg, 
-            BorrowReq.Borrowdate, 
-            BorrowReq.ReturnDate, 
-            BorrowReq.Status,
-            BorrowReq.Borrowname,
-            user.username, 
-            user.department, 
-            user.useremail,
-            user.phonenum
-        FROM 
-            BorrowReq
-        JOIN 
-            Asset ON BorrowReq.Assetid = Asset.Assetid
-        JOIN 
-            user ON BorrowReq.Borrowname = user.username
-        WHERE 
-            BorrowReq.Status = ?
-            AND BorrowReq.lectname = ?
-    `;
+    const { status } = req.query;
+    
     try {
-        const [results] = await con.promise().query(sql, [status, username]);
+        let sql = `
+            SELECT 
+                br.Reqid,
+                br.Assetid,
+                br.Borrowname,
+                br.Borrowdate,
+                br.ReturnDate,
+                br.Status,
+                br.Activity,
+                br.lectname,
+                a.Assetname,
+                a.Assetimg,
+                a.Assetstatus,
+                a.Assettype
+            FROM BorrowReq br
+            INNER JOIN Asset a ON br.Assetid = a.Assetid
+        `;
+
+        if (status && status !== 'all') {
+            sql += ` WHERE br.Status = ?`;
+        }
+
+        sql += ` ORDER BY br.Borrowdate DESC`;
+
+        const [results] = await con.promise().query(sql, status !== 'all' ? [status] : []);
         res.json(results);
     } catch (error) {
-        console.error('Database error:', error);
-        res.status(500).send('Database error.');
+        console.error('Error fetching history:', error);
+        res.status(500).json({ message: 'Failed to load history' });
     }
 });
 
@@ -1805,40 +1679,76 @@ app.post('/create-borrow-request', async (req, res) => {
 });
 
 app.post('/reject-borrow-request', async (req, res) => {
-    const { requestId, lectname, comment } = req.body;
+    const { requestId, lectname, rejectReason } = req.body;
+    
+    console.log('Received request data:', { requestId, lectname, rejectReason }); // Debug log
+
+    // Validate input
+    if (!requestId) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Request ID is required' 
+        });
+    }
+    if (!lectname) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Lecturer name is required' 
+        });
+    }
+    if (!rejectReason) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Reject reason is required' 
+        });
+    }
 
     try {
-        // อัพเดทสถานะคำขอเป็น Reject
-        const updateRequestSql = `
-            UPDATE BorrowReq 
-            SET Status = 'Reject', lectname = ?, Comment = ? 
-            WHERE Reqid = ?
-        `;
-        await con.promise().query(updateRequestSql, [lectname, comment, requestId]);
+        await con.promise().beginTransaction();
 
-        // ดึงข้อมูล Asset ID จากคำขอ
-        const getAssetSql = 'SELECT Assetid FROM BorrowReq WHERE Reqid = ?';
-        const [assetResult] = await con.promise().query(getAssetSql, [requestId]);
+        // Get Asset ID from the request
+        const [borrowReq] = await con.promise().query(
+            'SELECT Assetid FROM BorrowReq WHERE Reqid = ? AND Status = "Pending"',
+            [requestId]
+        );
 
-        if (assetResult.length > 0) {
-            // อัพเดทสถานะอุปกรณ์กลับเป็น Available
-            const updateAssetSql = `
-                UPDATE Asset 
-                SET Assetstatus = 'Available' 
-                WHERE Assetid = ?
-            `;
-            await con.promise().query(updateAssetSql, [assetResult[0].Assetid]);
+        if (borrowReq.length === 0) {
+            throw new Error('Request not found or already processed');
         }
 
+        const { Assetid } = borrowReq[0];
+
+        // Update borrow request status with Activity and Comment
+        const [updateResult] = await con.promise().query(
+            'UPDATE BorrowReq SET Status = ?, lectname = ?, Activity = ?, Comment = ? WHERE Reqid = ? AND Status = "Pending"',
+            ['Reject', lectname, 'Request Rejected', rejectReason, requestId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            throw new Error('Failed to update request status');
+        }
+
+        // Update asset status back to Available
+        const [assetResult] = await con.promise().query(
+            'UPDATE Asset SET Assetstatus = "Available" WHERE Assetid = ?',
+            [Assetid]
+        );
+
+        if (assetResult.affectedRows === 0) {
+            throw new Error('Failed to update asset status');
+        }
+
+        await con.promise().commit();
         res.json({ 
             success: true, 
-            message: 'ไม่อนุมัติคำขอยืมอุปกรณ์เรียบร้อยแล้ว' 
+            message: 'Request rejected successfully' 
         });
     } catch (error) {
+        await con.promise().rollback();
         console.error('Error rejecting request:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'เกิดข้อผิดพลาดในการไม่อนุมัติคำขอ' 
+            message: error.message || 'Failed to reject request' 
         });
     }
 });
@@ -1876,41 +1786,124 @@ app.get('/get-borrowing-items', async (req, res) => {
     }
 });
 
-app.post('/approve-borrow-request', async (req, res) => {
-    const { requestId, lectname } = req.body;
+app.put('/approve-borrow-request/:reqId', async (req, res) => {
+    const { reqId } = req.params;
+    const { lecturerName } = req.body;
+    
+    if (!lecturerName) {
+        return res.status(400).json({ message: 'Lecturer name is required' });
+    }
 
     try {
-        // อัพเดทสถานะคำขอเป็น Approved
-        const updateRequestSql = `
-            UPDATE BorrowReq 
-            SET Status = 'Approved', lectname = ? 
-            WHERE Reqid = ?
-        `;
-        await con.promise().query(updateRequestSql, [lectname, requestId]);
+        await con.promise().beginTransaction();
 
-        // ดึงข้อมูล Asset ID จากคำขอ
-        const getAssetSql = 'SELECT Assetid FROM BorrowReq WHERE Reqid = ?';
-        const [assetResult] = await con.promise().query(getAssetSql, [requestId]);
+        // Get Asset ID and Borrowname
+        const [borrowReq] = await con.promise().query(
+            'SELECT Assetid, Borrowname FROM BorrowReq WHERE Reqid = ? AND Status = "Pending"',
+            [reqId]
+        );
 
-        if (assetResult.length > 0) {
-            // อัพเดทสถานะอุปกรณ์เป็น Borrowing
-            const updateAssetSql = `
-                UPDATE Asset 
-                SET Assetstatus = 'Borrowing' 
-                WHERE Assetid = ?
-            `;
-            await con.promise().query(updateAssetSql, [assetResult[0].Assetid]);
+        if (borrowReq.length === 0) {
+            throw new Error('Borrow request not found or already processed');
         }
 
-        res.json({ 
-            success: true, 
-            message: 'อนุมัติคำขอยืมอุปกรณ์เรียบร้อยแล้ว' 
-        });
+        const { Assetid, Borrowname } = borrowReq[0];
+
+        // Update borrow request status
+        const [updateResult] = await con.promise().query(
+            'UPDATE BorrowReq SET Status = ?, lectname = ? WHERE Reqid = ? AND Status = "Pending"',
+            ['Approved', lecturerName, reqId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            throw new Error('Failed to update borrow request');
+        }
+
+        // Update asset status
+        const [assetResult] = await con.promise().query(
+            'UPDATE Asset SET Assetstatus = ? WHERE Assetid = ?',
+            ['Borrowing', Assetid]
+        );
+
+        if (assetResult.affectedRows === 0) {
+            throw new Error('Failed to update asset status');
+        }
+
+        // Record in AssetHistory
+        const [historyResult] = await con.promise().query(
+            'INSERT INTO AssetHistory (Assetid, Action, ActionBy, ActionDate, Details) VALUES (?, ?, ?, NOW(), ?)',
+            [Assetid, 'Approved', lecturerName, `Approved borrow request by ${Borrowname}`]
+        );
+
+        if (historyResult.affectedRows === 0) {
+            throw new Error('Failed to record history');
+        }
+
+        await con.promise().commit();
+        res.json({ message: 'Request approved successfully' });
     } catch (error) {
+        await con.promise().rollback();
         console.error('Error approving request:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'เกิดข้อผิดพลาดในการอนุมัติคำขอ' 
-        });
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.get('/asset-borrow-return', async (req, res) => {
+    const sql = `
+    SELECT 
+        Asset.Assetid, Asset.Assetimg, Asset.Assetname, Asset.Assetstatus, Asset.Staffaddid,
+        BorrowReq.Borrowdate, BorrowReq.ReturnDate, BorrowReq.lectname, BorrowReq.Status,
+        BorrowReq.Reqid
+    FROM Asset
+    LEFT JOIN BorrowReq ON Asset.Assetid = BorrowReq.Assetid
+    WHERE BorrowReq.Status = 'RePending'
+    ORDER BY BorrowReq.Borrowdate DESC
+    `;
+
+    try {
+        const [results] = await con.promise().query(sql);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching return requests:', error);
+        res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    }
+});
+
+app.get("/borrow-assett", async (req, res) => {
+    const sql = `
+    SELECT br.Reqid, br.Borrowname, br.Borrowdate, br.ReturnDate, br.Status, br.Activity, br.UsageType,
+           a.Assetname
+    FROM BorrowReq br
+    INNER JOIN Asset a ON br.Assetid = a.Assetid
+    WHERE br.Status = 'Pending'
+    ORDER BY br.Borrowdate DESC
+    `;
+
+    try {
+        const [results] = await con.promise().query(sql);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching borrow requests:', error);
+        res.status(500).json({ success: false, message: 'Failed to load borrowing requests' });
+    }
+});
+
+// Create AssetHistory table if not exists
+const createAssetHistoryTable = `
+CREATE TABLE IF NOT EXISTS AssetHistory (
+    HistoryID INT AUTO_INCREMENT PRIMARY KEY,
+    Assetid INT NOT NULL,
+    Action VARCHAR(50) NOT NULL,
+    ActionBy VARCHAR(100) NOT NULL,
+    ActionDate DATETIME NOT NULL,
+    Details TEXT,
+    FOREIGN KEY (Assetid) REFERENCES Asset(Assetid)
+)`;
+
+con.query(createAssetHistoryTable, (err) => {
+    if (err) {
+        console.error('Error creating AssetHistory table:', err);
+    } else {
+        console.log('AssetHistory table ready');
     }
 });

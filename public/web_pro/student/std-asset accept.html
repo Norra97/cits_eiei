@@ -230,7 +230,7 @@
 
       // Add Return button only if Assetstatus is 'Borrowing'
       if (item.Assetstatus === 'Borrowing') {
-        tr.innerHTML += `<td><button class="btn btn-danger" onclick="returnAsset(${item.Assetid})">Return</button></td>`;
+        tr.innerHTML += `<td><button class="btn btn-danger" onclick="returnAsset(${item.Reqid})">Return</button></td>`;
       } else {
         tr.innerHTML += `<td></td>`; // Empty cell for 'RePending' status
       }
@@ -238,14 +238,12 @@
       return tr;
     }
 
-    function returnAsset(assetId) {
-      // Get borrowname from localStorage
+    function returnAsset(reqId) {
       const borrowname = localStorage.getItem('username');
       if (!borrowname) {
         Swal.fire('Error', 'User not logged in or username not found in localStorage', 'error');
         return;
       }
-      // Confirm the action with the user
       Swal.fire({
         title: 'Are you sure you want to return this asset?',
         showCancelButton: true,
@@ -253,11 +251,10 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          // Call the API or server-side code to handle the return
-          fetch(`/return-asset/${assetId}`, {
+          fetch(`/return-asset/${reqId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ borrowname, newStatus: 'RePending' }) // Use borrowname from localStorage
+            body: JSON.stringify({ borrowname, newStatus: 'RePending' })
           })
             .then(response => {
               if (!response.ok) throw new Error('Network response was not ok');
@@ -265,9 +262,7 @@
             })
             .then(data => {
               if (data.success) {
-                // Update the UI or refresh the data
                 Swal.fire('Returned!', 'The asset Returned!', 'success');
-                // Optionally reload the page or fetch the data again
               } else {
                 throw new Error('Return failed');
               }

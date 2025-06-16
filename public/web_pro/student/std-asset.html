@@ -22,6 +22,14 @@
 
     <title>Asset</title>
 
+    <style>
+        .card.grayscale {
+            filter: grayscale(100%);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -170,20 +178,7 @@
 
                     // แสดงข้อมูลสินทรัพย์
                     assets.forEach(asset => {
-                        const card = document.createElement('div');
-                        card.className = 'card mx-1 mb-3 shadow-sm';
-                        card.style.width = '13.5rem';
-                        card.style.cursor = 'pointer'; // เปลี่ยน cursor เป็น pointer เมื่อ hover
-                        card.onclick = () => borrowAsset(asset.Assetid); // เพิ่ม event onclick ที่ card
-
-                        card.innerHTML = `
-                    <img src="/public/Addimg/${asset.Assetimg}" class="card-img-top" alt="${asset.Assetname}">
-                    <div class="card-body">
-                        <h5 class="card-title">${asset.Assetname}</h5>
-                        <p class="card-text">Status: ${asset.Assetstatus}</p>
-                       
-                    </div>
-                `;
+                        const card = createAssetCard(asset);
                         mainContainer.appendChild(card);
                     });
                 })
@@ -193,123 +188,122 @@
                 });
         }
 
+        function createAssetCard(asset) {
+            const card = document.createElement('div');
+            card.className = 'card m-3';
+            card.style.width = '18rem';
+            if (asset.Assetstatus !== 'Available') {
+                card.classList.add('grayscale');
+                card.style.cursor = 'not-allowed';
+            } else {
+                card.style.cursor = 'pointer';
+                card.onclick = () => borrowAsset(asset.Assetid);
+            }
+
+            card.innerHTML = `
+                <img src="/public/Addimg/${asset.Assetimg}" class="card-img-top" alt="${asset.Assetname}" style="height: 200px; object-fit: cover; display: block; margin-left: auto; margin-right: auto;">
+                <div class="card-body">
+                    <h5 class="card-title">${asset.Assetname}</h5>
+                    <p class="card-text">
+                        <b>Asset Code:</b> ${asset.Assetcode || 'N/A'}<br>
+                        <b>Asset Type:</b> ${asset.Assettype || 'N/A'}<br>
+                        <b>Location:</b> ${asset.Assetlocation || 'N/A'}<br>
+                        <b>Status:</b> <span class="badge ${asset.Assetstatus === 'Available' ? 'bg-success' : 'bg-danger'}">${asset.Assetstatus || 'N/A'}</span><br>
+                        <b>Asset Details:</b><br>
+                        <span style="white-space: pre-line;">${asset.Assetdetail || 'N/A'}</span>
+                    </p>
+                </div>
+            `;
+            return card;
+        }
+
         // ==================== Borrow ====================
         function borrowAsset(assetId) {
-            fetch(`/Assetlist`)
-                .then(response => response.json())
-                .then(assets => {
-                    const asset = assets.find(a => a.Assetid === assetId);
-                    if (!asset) {
-                        throw new Error('Asset not found');
+            const username = localStorage.getItem('username');
+            if (!username) {
+                Swal.fire('Error', 'Please login first', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Borrow Asset',
+                html: `
+                    <div class="mb-3">
+                        <label for="activity" class="form-label">Activity</label>
+                        <input type="text" id="activity" class="form-control" placeholder="Enter activity">
+                    </div>
+                    <div class="mb-3">
+                        <label for="usagetype" class="form-label">Usage Type</label>
+                        <select id="usagetype" class="form-control">
+                            <option value="" disabled selected>Select usage type</option>
+                            <option value="In Site">In Site</option>
+                            <option value="Out Site">Out Site</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="borrowDate" class="form-label">Borrow Date</label>
+                        <input type="text" id="borrowDate" class="form-control" placeholder="Select borrow date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="returnDate" class="form-label">Return Date</label>
+                        <input type="text" id="returnDate" class="form-control" placeholder="Select return date">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Borrow',
+                focusConfirm: false,
+                didOpen: () => {
+                    flatpickr("#borrowDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today"
+                    });
+                    flatpickr("#returnDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today"
+                    });
+                },
+                preConfirm: () => {
+                    const borrowDate = document.getElementById('borrowDate').value;
+                    const returnDate = document.getElementById('returnDate').value;
+                    const activity = document.getElementById('activity').value.trim();
+                    const usagetype = document.getElementById('usagetype').value;
+                    if (!borrowDate || !returnDate || !activity || !usagetype) {
+                        Swal.showValidationMessage('Please fill in all fields');
+                        return false;
                     }
-
-                    // ดึงวันที่ที่ไม่สามารถจองได้
-                    fetch(`/get-unavailable-dates/${assetId}`)
-                        .then(response => response.json())
-                        .then(unavailableDates => {
-                            Swal.fire({
-                                title: `${asset.Assetname}`,
-                                html: `
-                            <div style="text-align: left;">
-                                <img id="imageAsset" src="/public/Addimg/${asset.Assetimg}" alt="${asset.Assetname}">
-                                <label>Activity:</label>
-                                <input id="activity-input" class="input" placeholder="Enter activity"> <br>
-                                <label>Borrow and Return Date:</label> 
-                                <input id="date-range" class="input" placeholder="Select borrow and return dates"> <br>
-                                <label>Usage:</label>
-                                <select id="usage-input" class="input">
-                                    <option value="" disabled selected>Select usage</option>
-                                    <option value="In Site">on campus</option>
-                                    <option value="Out Site">Out Site</option>
-                                </select>
-                            </div>
-                        `,
-                                confirmButtonText: 'Submit',
-                                focusConfirm: false,
-                                didOpen: () => {
-                                    flatpickr("#date-range", {
-                                        mode: "range",
-                                        dateFormat: "Y-m-d",
-                                        minDate: "today",
-                                        disable: unavailableDates.map(date => new Date(date)),
-                                        onDayCreate: (dObj, dStr, fp, dayElem) => {
-                                            const date = dayElem.dateObj.toISOString().split('T')[0];
-                                            if (unavailableDates.includes(date)) {
-                                                dayElem.style.color = "white";
-                                                dayElem.style.pointerEvents = "none";
-                                                dayElem.style.opacity = "0.6";
-                                                dayElem.style.backgroundColor = "red";
-                                            }
-                                        }
-                                    });
-                                },
-                                preConfirm: () => {
-                                    const dateRange = document.getElementById('date-range').value;
-                                    const activity = document.getElementById('activity-input').value;
-                                    const usageType = document.getElementById('usage-input').value;
-
-                                    if (!dateRange || !activity || !usageType) {
-                                        Swal.showValidationMessage("กรุณากรอกข้อมูลให้ครบถ้วน");
-                                        return false;
-                                    }
-
-                                    return { dateRange, activity, usageType };
-                                }
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    const [borrowDate, returnDate] = result.value.dateRange.split(" to ");
-                                    const activity = result.value.activity;
-                                    const usageType = result.value.usageType;
-                                    const username = localStorage.getItem('username') || 'Guest';
-
-                                    // ส่ง request ไปยัง API
-                                    fetch('/borrow-asset', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            assetId: assetId,
-                                            borrowDate: borrowDate,
-                                            returnDate: returnDate,
-                                            username: username,
-                                            activity: activity,
-                                            usageType: usageType
-                                        }),
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            Swal.fire({
-                                                title: 'สำเร็จ!',
-                                                text: 'ส่งคำขอยืมอุปกรณ์เรียบร้อยแล้ว รอการอนุมัติจากอาจารย์',
-                                                icon: 'success'
-                                            });
-                                            getAssets(); // รีเฟรชรายการอุปกรณ์
-                                        } else {
-                                            throw new Error(data.message || 'เกิดข้อผิดพลาดในการส่งคำขอ');
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        Swal.fire({
-                                            title: 'เกิดข้อผิดพลาด!',
-                                            text: error.message || 'ไม่สามารถส่งคำขอยืมอุปกรณ์ได้',
-                                            icon: 'error'
-                                        });
-                                    });
-                                }
-                            });
+                    return { borrowDate, returnDate, activity, usagetype };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { borrowDate, returnDate, activity, usagetype } = result.value;
+                    fetch('/borrow-asset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            assetId,
+                            username,
+                            borrowDate,
+                            returnDate,
+                            activity,
+                            usageType: usagetype
                         })
-                        .catch(error => {
-                            console.error('Error fetching unavailable dates:', error);
-                            Swal.fire('Error', 'ไม่สามารถดึงข้อมูลวันที่ไม่ว่างได้', 'error');
-                        });
-                })
-                .catch(error => {
-                    console.error('Error fetching asset details:', error);
-                    Swal.fire('Error', 'ไม่สามารถดึงข้อมูลอุปกรณ์ได้', 'error');
-                });
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success', 'Asset borrowed successfully', 'success');
+                            getAssets(); // Refresh the asset list
+                        } else {
+                            throw new Error(data.message || 'Failed to borrow asset');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', error.message, 'error');
+                    });
+                }
+            });
         }
 
         // ==================== Display User ====================

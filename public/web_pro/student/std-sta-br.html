@@ -182,7 +182,7 @@
         // ==================== Asset status Borrow ====================
         function fetchPendingAssets() {
             const username = localStorage.getItem('username');
-            fetch(`/asset-borrow-return`)
+            fetch(`/asset-borrow-requests?username=${username}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -194,18 +194,17 @@
                     pendingAssetsBody.innerHTML = ''; // Clear existing content
 
                     if (!data || data.length === 0) {
-                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>ไม่มีรายการที่กำลังยืม</h4></div>';
+                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>There are no items currently being borrowed.</h4></div>';
                         return;
                     }
 
-                    // กรองเฉพาะรายการที่มีสถานะ Borrowing และเป็นของ user ปัจจุบัน
+                    // กรองเฉพาะรายการที่มีสถานะ Approved
                     const borrowingItems = data.filter(item => 
-                        item.Status === 'Borrowing' && 
-                        item.Borrowname === username
+                        item.Status === 'Approved'
                     );
                     
                     if (borrowingItems.length === 0) {
-                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>ไม่มีรายการที่กำลังยืม</h4></div>';
+                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>There are no items currently being borrowed.</h4></div>';
                         return;
                     }
 
@@ -217,12 +216,12 @@
                 .catch(error => {
                     console.error('Error:', error);
                     const pendingAssetsBody = document.getElementById('pending-assets-body');
-                    pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>เกิดข้อผิดพลาดในการโหลดข้อมูล</h4></div>';
+                    pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>An error occurred while loading data.</h4></div>';
                 });
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            fetchPendingAssets(); // Fetch pending assets on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchPendingAssets();
         });
 
         // ==================== Display User ====================

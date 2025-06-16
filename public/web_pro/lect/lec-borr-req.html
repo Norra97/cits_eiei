@@ -151,7 +151,7 @@
                     <td>${req.ReturnDate}</td>
                     <td>${req.Status}</td>
                     <td>
-                        <button onclick="approveRequest(this, ${req.Reqid})" class="btn btn-success">Approve</button>
+                        <button onclick="approveRequest(${req.Reqid})" class="btn btn-success">Approve</button>
                         <button onclick="disapproveRequest(this, ${req.Reqid})" class="btn btn-danger">Disapprove</button>
                     </td>
                 </tr>`;
@@ -164,51 +164,67 @@
                 });
         }
 
-        function approveRequest(button, requestId) {
-            const username = localStorage.getItem('username') || ''; // Get username or default to empty string
-
-            Swal.fire({
-                title: 'Approve Request',
-                input: 'text',
-                inputLabel: 'Lect name',
-                inputValue: username,
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'You need to write something!';
+        async function approveRequest(reqId) {
+            try {
+                // Show Swal modal to input lecturer name
+                const { value: lecturerName } = await Swal.fire({
+                    title: 'Approve Request',
+                    input: 'text',
+                    inputLabel: 'Lecturer Name',
+                    inputPlaceholder: 'Enter your name',
+                    inputValue: localStorage.getItem('username') || '',
+                    showCancelButton: true,
+                    confirmButtonText: 'Approve',
+                    cancelButtonText: 'Cancel',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Please enter your name';
+                        }
                     }
+                });
+                if (!lecturerName) {
+                    // Cancelled
+                    return;
                 }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/approve-borrow-request', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ requestId: requestId, lectname: result.value }),
+
+                console.log('Approving request:', reqId, 'by lecturer:', lecturerName);
+                
+                const response = await fetch(`/approve-borrow-request/${reqId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lecturerName: lecturerName
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Success', 'Request Approved!', 'success').then(() => {
-                                window.location.href = '/staff/History'; // Redirect to history page
-                            });
-                        } else {
-                            throw new Error('Approval failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire('Error', 'Failed to approve request!', 'error');
-                    });
+                });
+
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to approve request');
                 }
-            });
+
+                await Swal.fire({
+                    title: 'Success!',
+                    text: result.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                
+                await fetchBorrowingRequests();
+            } catch (error) {
+                console.error('Error details:', error);
+                console.error('Error stack:', error.stack);
+                await Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to approve request!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
         }
 
         function disapproveRequest(button, requestId) {
@@ -216,35 +232,62 @@
 
             Swal.fire({
                 title: 'Disapprove Request',
-                input: 'text',
-                inputLabel: 'Lect name',
-                inputValue: username,
+                html: `
+                    <div class="mb-3">
+                        <label for="lectname" class="form-label">Lect name</label>
+                        <input type="text" id="lectname" class="form-control" value="${username}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="rejectReason" class="form-label">Reject Reason</label>
+                        <textarea id="rejectReason" class="form-control" rows="3" placeholder="Enter reason for rejection"></textarea>
+                    </div>
+                `,
                 showCancelButton: true,
                 confirmButtonText: 'Submit',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'You need to write something!';
+                focusConfirm: false,
+                preConfirm: () => {
+                    const lectname = document.getElementById('lectname').value.trim();
+                    const rejectReason = document.getElementById('rejectReason').value.trim();
+                    if (!lectname) {
+                        Swal.showValidationMessage('Please enter lecturer name');
+                        return false;
                     }
+                    if (!rejectReason) {
+                        Swal.showValidationMessage('Please enter reject reason');
+                        return false;
+                    }
+                    return { lectname, rejectReason };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/disapprove-borrow-request', {
+                    const requestData = {
+                        requestId: requestId,
+                        lectname: result.value.lectname,
+                        rejectReason: result.value.rejectReason
+                    };
+
+                    console.log('Sending request data:', requestData); // Debug log
+
+                    fetch('/reject-borrow-request', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ requestId: requestId, lectname: result.value }),
+                        body: JSON.stringify(requestData)
                     })
                     .then(response => {
+                        console.log('Response status:', response.status); // Debug log
                         if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
+                            return response.json().then(err => {
+                                throw new Error(err.message || `HTTP error! Status: ${response.status}`);
+                            });
                         }
                         return response.json();
                     })
                     .then(data => {
                         if (data.success) {
                             Swal.fire('Success', 'Request Disapproved!', 'success').then(() => {
-                                window.location.href = '/staff/History'; // Redirect to history page
+                                window.location.href = '/staff/History';
                             });
                         } else {
                             throw new Error('Disapproval failed');

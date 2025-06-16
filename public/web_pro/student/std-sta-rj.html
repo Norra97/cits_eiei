@@ -124,7 +124,6 @@
         <div class="card-body">
             <h5 class="card-title">${item.Assetname}</h5>
             <p class="card-text">
-                
                 <b>Asset Code    :</b> ${item.Assetcode || 'N/A'} <br>
                 <b>Asset Detail  :</b> ${item.Assetdetail || 'N/A'} <br>
                 <b>Asset Location:</b> ${item.Assetlocation || 'N/A'} <br>
@@ -132,14 +131,9 @@
                 <b>UsageType:</b> ${item.UsageType || 'N/A'} <br>
                 <b>Borrow Date   :</b> ${item.Borrowdate || 'N/A'} <br>
                 <b>Return Date   :</b> ${item.ReturnDate || 'N/A'} <br>
-               
-                <b style="">Reject Reason:</b> 
-<span style="color: red; ">${item.comment || 'N/A'}</span> <br>
-
-               
+                <b>Reject Reason:</b> 
+                <span style="color: red;">${item.Comment || 'N/A'}</span> <br>
             </p>
-            
-
         </div>`;
             return card;
         }
