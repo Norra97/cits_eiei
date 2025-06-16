@@ -182,18 +182,43 @@
         // ==================== Asset status Borrow ====================
         function fetchPendingAssets() {
             const username = localStorage.getItem('username');
-            fetch(`/return-assets-requests?username=${username}`)
-                .then(response => response.json())
+            fetch(`/asset-borrow-return`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const pendingAssetsBody = document.getElementById('pending-assets-body');
                     pendingAssetsBody.innerHTML = ''; // Clear existing content
 
-                    data.forEach(item => {
+                    if (!data || data.length === 0) {
+                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>ไม่มีรายการที่กำลังยืม</h4></div>';
+                        return;
+                    }
+
+                    // กรองเฉพาะรายการที่มีสถานะ Borrowing และเป็นของ user ปัจจุบัน
+                    const borrowingItems = data.filter(item => 
+                        item.Status === 'Borrowing' && 
+                        item.Borrowname === username
+                    );
+                    
+                    if (borrowingItems.length === 0) {
+                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>ไม่มีรายการที่กำลังยืม</h4></div>';
+                        return;
+                    }
+
+                    borrowingItems.forEach(item => {
                         const card = createPendingCard(item);
                         pendingAssetsBody.appendChild(card);
                     });
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    const pendingAssetsBody = document.getElementById('pending-assets-body');
+                    pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>เกิดข้อผิดพลาดในการโหลดข้อมูล</h4></div>';
+                });
         }
 
         document.addEventListener("DOMContentLoaded", function () {

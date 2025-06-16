@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require('path');
 const mysql = require('mysql2');
+const bcrypt = require('bcrypt');
 
 const session = require('express-session'); // session
 const bodyParser = require('body-parser');
@@ -69,7 +70,7 @@ con.connect((err) => {
 //---POST---//
 //-----Register-----//
 
-app.post("/register", function (req, res) {
+app.post("/register", async function (req, res) {
     const { username, password, role, phonenum, department, useremail } = req.body;
 
     // Check for empty fields
@@ -79,84 +80,52 @@ app.post("/register", function (req, res) {
     }
 
     // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
-    // Validate Email Format
     const emailRegex = /^[0-9]{10}@lamduan\.mfu\.ac\.th$/;
     if (!emailRegex.test(useremail)) {
         res.status(400).send("Invalid email format! Use 'xxxx@lamduan.mfu.ac.th'");
         return;
     }
 
-    // Check for duplicate username or email
-    const sqlCheck = "SELECT userid FROM user WHERE username = ? OR useremail = ?";
-    con.query(sqlCheck, [username, useremail], function (err, results) {
-        if (err) {
-            res.status(500).send("Database error!");
-        } else if (results.length > 0) {
-            res.status(400).send("Username or Email already exists!");
-        } else {
-            const sqlInsert = "INSERT INTO user (username, password, role, phonenum, department, useremail) VALUES (?, ?, ?, ?, ?, ?)";
-            con.query(sqlInsert, [username, password, role, phonenum, department, useremail], function (err) {
-                if (err) {
-                    res.status(500).send("Database error during registration!");
-                } else {
-                    res.status(200).send("Successfully registered!");
-                }
-            });
-        }
-    });
+    try {
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Check for duplicate username or email
+        const sqlCheck = "SELECT userid FROM user WHERE username = ? OR useremail = ?";
+        con.query(sqlCheck, [username, useremail], async function (err, results) {
+            if (err) {
+                res.status(500).send("Database error!");
+            } else if (results.length > 0) {
+                res.status(400).send("Username or Email already exists!");
+            } else {
+                const sqlInsert = "INSERT INTO user (username, password, role, phonenum, department, useremail) VALUES (?, ?, ?, ?, ?, ?)";
+                con.query(sqlInsert, [username, hashedPassword, role, phonenum, department, useremail], function (err) {
+                    if (err) {
+                        res.status(500).send("Database error during registration!");
+                    } else {
+                        res.status(200).send("Successfully registered!");
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        res.status(500).send("Error during password hashing!");
+    }
 });
 
 
 //-----Login-----//
-// app.post("/login", function (req, res) {
-//     const username = req.body.username;
-//     const password = req.body.password;
-
-//     const sql = "SELECT userid, username, role, department, useremail, phonenum FROM user WHERE username = ? AND password = ?";
-
-//     con.query(sql, [username, password], function (err, results) {
-//         if (err) {
-//             console.error("Database error:", err);
-//             return res.status(500).send("Database error!!");
-//         }
-
-//         if (results.length !== 1) {
-//             return res.status(401).send("Wrong username or password!!");
-//         }
-
-//         const user = results[0];
-//         console.log("Login successful. User data:", user);
-
-//         res.json({
-//             success: true,
-//             username: user.username,
-//             userid: user.userid,
-//             department: user.department || "Undefined", // ส่งค่า department
-//             useremail: user.useremail,
-//             phonenum: user.phonenum
-//         });
-//     });
-// });
-app.post("/login", function (req, res) {
-    const identifier = req.body.username; // อาจเป็น username หรือ email
+app.post("/login", async function (req, res) {
+    const identifier = req.body.username;
     const password = req.body.password;
 
     const sql = `
-        SELECT userid, username, role, department, useremail, phonenum
+        SELECT userid, username, password, role, department, useremail, phonenum
         FROM user
-        WHERE (username = ? OR useremail = ?) AND password = ?
+        WHERE username = ? OR useremail = ?
     `;
 
-    con.query(sql, [identifier, identifier, password], function (err, results) {
+    con.query(sql, [identifier, identifier], async function (err, results) {
         if (err) {
             console.error("Database error:", err);
             return res.status(500).send("Database error!!");
@@ -167,6 +136,14 @@ app.post("/login", function (req, res) {
         }
 
         const user = results[0];
+        
+        // Compare password with hashed password
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        
+        if (!passwordMatch) {
+            return res.status(401).send("Wrong username/email or password!!");
+        }
+
         console.log("Login successful. User data:", user);
 
         res.json({
@@ -1747,15 +1724,29 @@ app.post("/updatePassword", async (req, res) => {
     const sqlGetPassword = "SELECT password FROM user WHERE userid = ?";
     con.query(sqlGetPassword, [userID], async (err, results) => {
         if (err) return res.status(500).send("Database error");
-        if (!results.length || results[0].password !== oldPassword) {
+        
+        if (!results.length) {
+            return res.status(404).send("User not found");
+        }
+
+        // Verify old password
+        const passwordMatch = await bcrypt.compare(oldPassword, results[0].password);
+        if (!passwordMatch) {
             return res.status(401).send("Old password is incorrect");
         }
 
-        const sqlUpdatePassword = "UPDATE user SET password = ? WHERE userid = ?";
-        con.query(sqlUpdatePassword, [newPassword, userID], (err) => {
-            if (err) return res.status(500).send("Database error");
-            res.send("Password updated successfully");
-        });
+        try {
+            // Hash new password
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            
+            const sqlUpdatePassword = "UPDATE user SET password = ? WHERE userid = ?";
+            con.query(sqlUpdatePassword, [hashedNewPassword, userID], (err) => {
+                if (err) return res.status(500).send("Database error");
+                res.send("Password updated successfully");
+            });
+        } catch (error) {
+            res.status(500).send("Error during password hashing!");
+        }
     });
 });
 
