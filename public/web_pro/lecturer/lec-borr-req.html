@@ -56,8 +56,8 @@ async function fetchBorrowingRequests() {
                     <td>${request.ReqID}</td>
                     <td>${request.Borrowname}</td>
                     <td>${request.AssetName}</td>
-                    <td>${request.BorrowDate}</td>
-                    <td>${request.ReturnDate}</td>
+                    <td>${formatDate(request.BorrowDate)}</td>
+                    <td>${formatDate(request.ReturnDate)}</td>
                     <td>${request.Status}</td>
                     <td>
                         <button onclick="approveRequest('${request.ReqID}')" class="btn btn-success">Approve</button>
@@ -71,4 +71,9 @@ async function fetchBorrowingRequests() {
         console.error('Error fetching borrowing requests:', error);
         alert('Failed to load borrowing requests');
     }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    return dateString;
 } 

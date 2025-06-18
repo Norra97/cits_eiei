@@ -147,8 +147,8 @@
                     <td>${req.Reqid}</td>
                     <td>${req.Borrowname}</td>
                     <td>${req.Assetname}</td>
-                    <td>${req.Borrowdate}</td>
-                    <td>${req.ReturnDate}</td>
+                    <td>${formatDate(req.Borrowdate)}</td>
+                    <td>${formatDate(req.ReturnDate)}</td>
                     <td>${req.Status}</td>
                     <td>
                         <button onclick="approveRequest(${req.Reqid})" class="btn btn-success">Approve</button>
@@ -162,6 +162,11 @@
                     console.error('Error:', error);
                     Swal.fire('Error', 'Failed to load borrowing requests!', 'error');
                 });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString;
         }
 
         async function approveRequest(reqId) {

@@ -149,6 +149,11 @@
         }
 
         // ==================== create card ====================
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString.split('T')[0];
+        }
+
         function createPendingCard(item) {
             const card = document.createElement('div');
             card.className = "card card-horizontal shadow-sm";
@@ -163,8 +168,8 @@
                 <b>Asset Location:</b> ${item.Assetlocation || 'N/A'} <br>
                 <b>Activity:</b> ${item.Activity} <br>
                 <b>UsageType:</b> ${(item.UsageType || item.usagetype || 'N/A')} <br>
-                <b>Borrow Date   :</b> ${item.Borrowdate || 'N/A'} <br>
-                <b>Return Date   :</b> ${item.ReturnDate || 'N/A'} <br>
+                <b>Borrow Date   :</b> ${formatDate(item.Borrowdate)} <br>
+                <b>Return Date   :</b> ${formatDate(item.ReturnDate)} <br>
             </p>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-danger" onclick="cancelAsset(${item.Reqid})">Cancel</button>

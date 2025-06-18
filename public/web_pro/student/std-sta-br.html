@@ -115,6 +115,12 @@
     <script src="/public/web_pro/student/logout.js"></script>
 
     <script>
+        // ==================== Format Date ====================
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString.split('T')[0];
+        }
+
         // ==================== Return Asset ====================
         function returnAsset(reqId) {
             Swal.fire({
@@ -166,8 +172,8 @@
                 <b>Asset Location:</b> ${item.Assetlocation || 'N/A'} <br>
                 <b>Activity:</b> ${item.Activity} <br>
                 <b>UsageType:</b> ${item.UsageType || 'N/A'} <br>
-                <b>Borrow Date   :</b> ${item.Borrowdate || 'N/A'} <br>
-                <b>Return Date   :</b> ${item.ReturnDate || 'N/A'} <br>
+                <b>Borrow Date   :</b> ${formatDate(item.Borrowdate)} <br>
+                <b>Return Date   :</b> ${formatDate(item.ReturnDate)} <br>
             </p>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-danger" onclick="returnAsset(${item.Reqid})">Return</button>
@@ -190,15 +196,16 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log('DEBUG: data from /asset-borrow-requests', data);
                     const pendingAssetsBody = document.getElementById('pending-assets-body');
                     pendingAssetsBody.innerHTML = ''; // Clear existing content
 
                     if (!data || data.length === 0) {
-                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>There are no items currently being borrowed.</h4></div>';
+                        pendingAssetsBody.innerHTML = '<div class="text-center p-4"><h4>There are no items currently being borrowed.<br><span style="color:gray;font-size:14px;">(If you just pressed Approve, please refresh or log out again.)</span></h4></div>';
                         return;
                     }
 
-                    // กรองเฉพาะรายการที่มีสถานะ Approved
+                    // กรองเฉพาะรายการที่มีสถานะ Approved (กำลังยืม)
                     const borrowingItems = data.filter(item => 
                         item.Status === 'Approved'
                     );

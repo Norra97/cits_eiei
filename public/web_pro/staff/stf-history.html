@@ -248,8 +248,8 @@
                 <td><img src="/public/Addimg/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
                 <td>${item.Assetname}</td>
                 <td class="${statusClass}">${item.Status}</td>
-                <td>${item.Borrowdate || 'N/A'}</td>
-                <td>${item.ReturnDate || 'N/A'}</td>
+                <td>${formatDate(item.Borrowdate)}</td>
+                <td>${formatDate(item.ReturnDate)}</td>
                 <td>${item.Borrowname || 'N/A'}</td>
                 <td>${item.Activity || 'N/A'}</td>
                 <td>${item.lectname || 'N/A'}</td>
@@ -274,6 +274,11 @@
                 document.getElementById('search-button').click();
             }
         });
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString.split('T')[0];
+        }
     </script>
 
     <!-- ==================== Display User ==================== -->

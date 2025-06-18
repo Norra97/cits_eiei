@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2025 at 11:02 PM
+-- Generation Time: Jun 18, 2025 at 10:48 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -46,10 +46,11 @@ CREATE TABLE `asset` (
 --
 
 INSERT INTO `asset` (`Assetid`, `Assetname`, `Assetdetail`, `Assetcode`, `Assetlocation`, `Assetimg`, `Staffaddid`, `Assetstatus`, `Assettype`, `created_at`, `updated_at`) VALUES
-(2, 'NongNat', 'Nanyang', '49', 'Dorm Sirinya', '1749807328999.jpg', 2, 'Available', 'Homeless', '2025-06-13 09:35:29', '2025-06-16 20:58:31'),
-(3, 'March', 'Zing', '2011', 'Dorm Nat', '1750060527474.jpg', 3, 'Available', 'Vehicle', '2025-06-16 07:55:27', '2025-06-16 21:00:00'),
+(2, 'NongNat', 'Nanyang', 'K49', 'Dorm Sirinya', '1749807328999.jpg', 2, 'Available', 'Homeless', '2025-06-13 09:35:29', '2025-06-18 08:35:55'),
+(3, 'March', 'Zing', 'Cr1', 'Dorm Nat', '1750060527474.jpg', 3, 'Available', 'Vehicle', '2025-06-16 07:55:27', '2025-06-18 08:36:02'),
 (4, 'Laptop', 'CPU : AMD Ryzen AI 9 HX 375\r\nRAM : 32GB DDR5\r\nSSD : 1TB PCIe 4/NVMe M.2 SSD\r\nMONITOR : 16\" WQXGA (2560x1600) IPS 240Hz\r\nGPU : Nvidia GeForce RTX5080 16GB GDDR7', 'L1', 'MFU', '1750064660723.jpg', 3, 'Available', 'Computer', '2025-06-16 09:04:20', '2025-06-16 20:06:38'),
-(5, 'Olympus', 'Olympus EM5 Matk iii + lens kit 12-40mm', 'C1', 'MFU', '1750105814178.jpg', 15, 'Available', 'Camera', '2025-06-16 20:30:14', '2025-06-16 20:57:38');
+(5, 'Olympus', 'Olympus EM5 Matk iii + lens kit 12-40mm', 'C1', 'MFU', '1750105814178.jpg', 15, 'Available', 'Camera', '2025-06-16 20:30:14', '2025-06-18 08:09:14'),
+(6, 'Projector Samsung', 'SP-LSP3BLAXXT\r\nResolution: 1920 x 1080\r\nScreen Size: 30~100\'\r\nBrightness (LED Lumen): 550 LED Lumen (Peak)\r\nAudio: Dolby Atmos', 'P1', 'MFU', '1750235385363.png', 15, 'Available', 'Projector', '2025-06-18 08:29:45', '2025-06-18 08:29:45');
 
 -- --------------------------------------------------------
 
@@ -75,7 +76,9 @@ INSERT INTO `assethistory` (`HistoryID`, `Assetid`, `Action`, `ActionBy`, `Actio
 (2, 4, 'Rejected', 'Nat', '2025-06-17 03:18:29', 'Request rejected by Nat'),
 (3, 5, 'Approved', 'Ssella', '2025-06-17 03:57:12', 'Approved borrow request by Ssella'),
 (4, 2, 'Approved', 'Ssella', '2025-06-17 03:57:59', 'Approved borrow request by Ssella'),
-(5, 3, 'Approved', 'JingJok', '2025-06-17 03:59:37', 'Approved borrow request by Ssella');
+(5, 3, 'Approved', 'JingJok', '2025-06-17 03:59:37', 'Approved borrow request by Ssella'),
+(6, 2, 'Approved', 'Norra97', '2025-06-18 14:18:35', 'Approved borrow request by Ssella'),
+(7, 5, 'Approved', 'KPKurumi', '2025-06-18 14:46:50', 'Approved borrow request by Ssella');
 
 -- --------------------------------------------------------
 
@@ -136,7 +139,10 @@ INSERT INTO `borrowreq` (`Reqid`, `Assetid`, `Borrowname`, `Borrowdate`, `Return
 (21, 2, 'Ssella', '2025-06-17', '2025-06-24', 'Returned', 'KP', 'เอาไปตัดหญ้าดีกว่าครับ', 'Request Rejected', 'In Site', '2025-06-16 20:22:36', '2025-06-16 20:58:31'),
 (28, 5, 'Ssella', '2025-06-17', '2025-06-18', 'Returned', 'Ssella', NULL, 'ถ่ายสาว', 'Out Site', '2025-06-16 20:56:54', '2025-06-16 20:57:38'),
 (29, 2, 'Ssella', '2025-06-17', '2025-06-18', 'Returned', 'Ssella', NULL, 'พาคนแก่ข้ามถนน', 'In Site', '2025-06-16 20:57:55', '2025-06-16 20:58:31'),
-(30, 3, 'Ssella', '2025-06-17', '2025-06-19', 'Returned', 'JingJok', NULL, 'จ๊วดในมอ', 'In Site', '2025-06-16 20:59:18', '2025-06-16 21:00:00');
+(30, 3, 'Ssella', '2025-06-17', '2025-06-19', 'Returned', 'JingJok', NULL, 'จ๊วดในมอ', 'In Site', '2025-06-16 20:59:18', '2025-06-16 21:00:00'),
+(31, 2, 'Ssella', '2025-06-18', '2025-06-20', 'Returned', 'Norra97', NULL, 'เลี้ยงแมว', 'Out Site', '2025-06-18 07:18:17', '2025-06-18 07:28:24'),
+(32, 3, 'Ssella', '2025-06-18', '2025-06-19', 'Reject', 'น้องนัด', 'ไม่ให้ครับ รถจะพังแล้ว', 'Request Rejected', 'Out Site', '2025-06-18 07:34:47', '2025-06-18 07:35:11'),
+(33, 5, 'Ssella', '2025-06-18', '2025-06-20', 'Returned', 'KPKurumi', NULL, 'ถ่ายวิว', 'Out Site', '2025-06-18 07:44:59', '2025-06-18 08:09:14');
 
 -- --------------------------------------------------------
 
@@ -208,13 +214,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `asset`
 --
 ALTER TABLE `asset`
-  MODIFY `Assetid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `Assetid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `assethistory`
 --
 ALTER TABLE `assethistory`
-  MODIFY `HistoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `HistoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `asset_type`
@@ -226,7 +232,7 @@ ALTER TABLE `asset_type`
 -- AUTO_INCREMENT for table `borrowreq`
 --
 ALTER TABLE `borrowreq`
-  MODIFY `Reqid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `Reqid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `user`
