@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 18, 2025 at 10:48 AM
+-- Generation Time: Jun 18, 2025 at 10:56 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -50,7 +50,8 @@ INSERT INTO `asset` (`Assetid`, `Assetname`, `Assetdetail`, `Assetcode`, `Assetl
 (3, 'March', 'Zing', 'Cr1', 'Dorm Nat', '1750060527474.jpg', 3, 'Available', 'Vehicle', '2025-06-16 07:55:27', '2025-06-18 08:36:02'),
 (4, 'Laptop', 'CPU : AMD Ryzen AI 9 HX 375\r\nRAM : 32GB DDR5\r\nSSD : 1TB PCIe 4/NVMe M.2 SSD\r\nMONITOR : 16\" WQXGA (2560x1600) IPS 240Hz\r\nGPU : Nvidia GeForce RTX5080 16GB GDDR7', 'L1', 'MFU', '1750064660723.jpg', 3, 'Available', 'Computer', '2025-06-16 09:04:20', '2025-06-16 20:06:38'),
 (5, 'Olympus', 'Olympus EM5 Matk iii + lens kit 12-40mm', 'C1', 'MFU', '1750105814178.jpg', 15, 'Available', 'Camera', '2025-06-16 20:30:14', '2025-06-18 08:09:14'),
-(6, 'Projector Samsung', 'SP-LSP3BLAXXT\r\nResolution: 1920 x 1080\r\nScreen Size: 30~100\'\r\nBrightness (LED Lumen): 550 LED Lumen (Peak)\r\nAudio: Dolby Atmos', 'P1', 'MFU', '1750235385363.png', 15, 'Available', 'Projector', '2025-06-18 08:29:45', '2025-06-18 08:29:45');
+(6, 'Projector Samsung', 'SP-LSP3BLAXXT\r\nResolution: 1920 x 1080\r\nScreen Size: 30~100\'\r\nBrightness (LED Lumen): 550 LED Lumen (Peak)\r\nAudio: Dolby Atmos', 'P1', 'MFU', '1750235385363.png', 15, 'Available', 'Projector', '2025-06-18 08:29:45', '2025-06-18 08:29:45'),
+(7, 'iPad', 'iPad Air M3 11 inch', 'iPD1', 'MFU', '1750236937156.png', 15, 'Available', 'Mobile', '2025-06-18 08:55:37', '2025-06-18 08:55:37');
 
 -- --------------------------------------------------------
 
@@ -104,7 +105,8 @@ INSERT INTO `asset_type` (`asset_type_id`, `asset_type_name`, `created_at`, `upd
 (4, 'Camera', '2025-06-13 08:39:05', '2025-06-14 14:37:45'),
 (5, 'Audio Equipment', '2025-06-13 08:39:05', '2025-06-14 14:37:47'),
 (6, 'Homeless', '2025-06-14 14:37:02', '2025-06-14 14:37:49'),
-(7, 'Vehicle', '2025-06-16 07:55:15', '2025-06-16 09:56:39');
+(7, 'Vehicle', '2025-06-16 07:55:15', '2025-06-16 09:56:39'),
+(18, 'Mobile', '2025-06-18 08:55:29', '2025-06-18 08:55:29');
 
 -- --------------------------------------------------------
 
@@ -214,7 +216,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `asset`
 --
 ALTER TABLE `asset`
-  MODIFY `Assetid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `Assetid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `assethistory`
@@ -226,7 +228,7 @@ ALTER TABLE `assethistory`
 -- AUTO_INCREMENT for table `asset_type`
 --
 ALTER TABLE `asset_type`
-  MODIFY `asset_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `asset_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `borrowreq`
