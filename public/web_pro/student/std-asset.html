@@ -318,6 +318,11 @@
                 document.getElementById('displayUserid').textContent = 'ID';
             }
         }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString.split('T')[0];
+        }
     </script>
 
     <!-- ==================== Setting ==================== -->

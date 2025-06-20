@@ -283,9 +283,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-    function formatDate(date, format) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString(undefined, options);
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        return dateString.split('T')[0];
     }
     
     prevMonthBtn.addEventListener("click", function() {

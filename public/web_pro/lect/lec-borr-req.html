@@ -166,7 +166,7 @@
 
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
-            return dateString;
+            return dateString.split('T')[0];
         }
 
         async function approveRequest(reqId) {

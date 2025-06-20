@@ -105,7 +105,7 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Asset ID</th>
+                                        <th scope="col" style="text-align: center;">Asset ID</th>
                                         <th scope="col">Image</th>
                                         <th scope="col">Asset Name</th>
                                         <th scope="col">Status</th>
@@ -153,15 +153,20 @@
         }
 
         // ==================== Create Table ====================
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString.split('T')[0];
+        }
+
         function createTableRow(item) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <th scope="row">${item.Assetid}</th>
+                <th scope="row" style="text-align: center; vertical-align: middle;">${item.Assetid}</th>
                 <td><img src="/public/Addimg/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
                 <td>${item.Assetname}</td>
                 <td>${item.Assetstatus}</td>
-                <td>${item.Borrowdate || 'N/A'}</td>
-                <td>${item.ReturnDate || 'N/A'}</td>
+                <td>${formatDate(item.Borrowdate) || 'N/A'}</td>
+                <td>${formatDate(item.ReturnDate) || 'N/A'}</td>
                 <td>${item.lectname || 'N/A'}</td>
                 <td><button class="btn btn-danger" onclick="returnAsset(${item.Assetid})">GetReturn</button></td>
             `;
