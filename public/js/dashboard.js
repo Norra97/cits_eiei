@@ -2,7 +2,7 @@
   'use strict';
   $(function() {
 
-    Chart.defaults.global.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
     
     if ($("#serviceSaleProgress").length) {
       var bar = new ProgressBar.Circle(serviceSaleProgress, {
@@ -197,7 +197,7 @@
             })
     }
     if ($("#visit-sale-chart").length) {
-      Chart.defaults.global.legend.labels.usePointStyle = true;
+      Chart.defaults.plugins.legend.labels.usePointStyle = true;
       var ctx = document.getElementById('visit-sale-chart').getContext("2d");
 
       var gradientStrokeViolet = ctx.createLinearGradient(0, 0, 0, 181);
@@ -316,7 +316,7 @@
       $("#visit-sale-chart-legend").html(myChart.generateLegend());
     }
     if ($("#visit-sale-chart-dark").length) {
-      Chart.defaults.global.legend.labels.usePointStyle = true;
+      Chart.defaults.plugins.legend.labels.usePointStyle = true;
       var ctx = document.getElementById('visit-sale-chart-dark').getContext("2d");
 
       var gradientStrokeViolet = ctx.createLinearGradient(0, 0, 0, 181);

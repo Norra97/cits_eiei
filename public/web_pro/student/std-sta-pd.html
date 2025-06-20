@@ -182,7 +182,7 @@
         // ==================== Asset status pending ====================
         function fetchPendingAssets() {
             const username = localStorage.getItem('username');
-            fetch(`/pending-assets-requests?username=${username}`)
+            fetch(`/api/borrow/requests?status=pending&username=${username}`)
                 .then(response => response.json())
                 .then(data => {
                     const pendingAssetsBody = document.getElementById('pending-assets-body');

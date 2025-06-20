@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/public/css/bootstrap.min.css">
-    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/public/CSS/Head.css">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -177,7 +177,7 @@
                         <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
                     </a>
 
-                    <a href="/lecturer/Borrowing-requests">
+                    <a href="/staff/Borrowing-requests">
                         <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
                     </a>
 
@@ -304,7 +304,7 @@
 
         <script src="/public/web_pro/student/logout.js"></script>
         <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-        <script src="calendar.js"></script>
+        <script src="/public/js/calendar.js"></script>
 
 
     </div>
@@ -358,7 +358,7 @@
 
         // load asset
         document.addEventListener('DOMContentLoaded', function () {
-            fetch('/assets/count')
+            fetch('/api/assets/count')
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('available-count').textContent = data.available;
@@ -429,7 +429,7 @@
 
         // Polar Area Chart
         document.addEventListener('DOMContentLoaded', function () {
-            fetch('/borrow-requests-summary')
+            fetch('/api/borrow/requests?status=dashboard')
                 .then(response => response.json())
                 .then(data => {
                     var ctx = document.getElementById('myPolarChart').getContext('2d');
@@ -482,7 +482,7 @@
 
         // ====================  fetch available Asset ====================
         function fetchAvailableAssets() {
-            fetch('/get-available-assets')
+            fetch('/api/assets?status=available')
                 .then(response => response.json())
                 .then(data => {
                     const assetContainer = document.getElementById('assetContainer');
@@ -519,7 +519,7 @@
         function listenForStatusUpdates() {
             // Check for status updates every 5 seconds
             setInterval(() => {
-                fetch('/get-dashboard-status')
+                fetch('/api/borrow/requests?status=dashboard')
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'Pending') {
@@ -534,13 +534,13 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function () {
-            fetchAvailableAssets();
-            listenForStatusUpdates();
+            // fetchAvailableAssets();
+            // listenForStatusUpdates();
         });
 
     </script>
     <script src="/public/js/bootstrap.min.js"></script>
-    <script src="calendar.js"></script>
+    <script src="/public/js/calendar.js"></script>
     </script>
 
     <!-- ==================== Drop Down ==================== -->

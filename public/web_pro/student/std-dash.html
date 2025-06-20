@@ -7,7 +7,7 @@
 
 
     <link rel="stylesheet" href="/public/css/bootstrap.min.css">
-    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Icon -->
 
@@ -164,7 +164,6 @@
         </div> <!-- End Container 1 -->
 
             <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-            <script src="calendar.js"></script>
 
         <!-- ==================== Script GUY  ==================== -->
         <script>
@@ -212,9 +211,6 @@
             });
         </script>
 
-        <script src="/public/js/bootstrap.min.js"></script>
-        <script src="calendar.js"></script>
-
         <script>
             function logout() {
                 localStorage.clear(); // ล้างข้อมูลใน localStorage
@@ -240,9 +236,12 @@
 
                 const username = localStorage.getItem('username'); // รับ username จาก localStorage
 
-                async function fetchCalendarData() {
+                async function fetchCalendarData(username) {
                     try {
-                        const response = await fetch(`/calendar-returns?username=${encodeURIComponent(username)}`);
+                        const response = await fetch(`/api/borrow/requests?status=return&username=${encodeURIComponent(username)}`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
                         return await response.json();
                     } catch (error) {
                         console.error("Error fetching calendar data:", error);
@@ -250,8 +249,12 @@
                     }
                 }
 
-                const calendarData = await fetchCalendarData();
+                const calendarData = await fetchCalendarData(username);
                 console.log("Calendar Data:", calendarData);
+
+                const today = new Date();
+                let currentMonth = today.getMonth();
+                let currentYear = today.getFullYear();
 
                 const renderCalendar = (month, year) => {
                     const monthNames = [
@@ -328,30 +331,6 @@
                 monthViewButton.addEventListener("click", () => {
                     switchToMonthView();
                 });
-
-                const today = new Date();
-                let currentMonth = today.getMonth();
-                let currentYear = today.getFullYear();
-
-                const switchToWeekView = () => {
-                    weekViewButton.classList.add("active");
-                    monthViewButton.classList.remove("active");
-
-                    document.getElementById("month-view-container").style.display = "none"; // ซ่อน Month View
-                    document.getElementById("week-view-container").style.display = "block"; // แสดง Week View
-
-                    renderWeekView(currentMonth, currentYear);
-                };
-
-                const switchToMonthView = () => {
-                    weekViewButton.classList.remove("active");
-                    monthViewButton.classList.add("active");
-
-                    document.getElementById("month-view-container").style.display = "block"; // แสดง Month View
-                    document.getElementById("week-view-container").style.display = "none"; // ซ่อน Week View
-
-                    renderCalendar(currentMonth, currentYear);
-                };
 
 
                 // week view
@@ -445,7 +424,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const username = localStorage.getItem('username'); // รับ username ของผู้ใช้จาก localStorage
                 if (username) {
-                    fetch(`/return-assets-requests?username=${encodeURIComponent(username)}`) // เรียก API พร้อมส่ง username
+                    fetch(`/api/borrow/requests?status=return&username=${encodeURIComponent(username)}`) // เรียก API พร้อมส่ง username
                         .then(response => response.json())
                         .then(data => {
                             const tableBody = document.getElementById('table-body');
@@ -499,6 +478,26 @@
                 window.location.href = '/student/set';
             }
         </script>
+
+        <!-- container-scroller -->
+        <!-- plugins:js -->
+        <!-- Removed: <script src="/public/vendors/js/vendor.bundle.base.js"></script> -->
+        <!-- endinject -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Plugin js for this page -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <!-- End plugin js for this page -->
+        <!-- inject:js -->
+        <script src="/public/js/off-canvas.js"></script>
+        <script src="/public/js/hoverable-collapse.js"></script>
+        <script src="/public/js/misc.js"></script>
+        <!-- endinject -->
+        <!-- Custom js for this page -->
+        <script src="/public/js/dashboard.js"></script>
+        <script src="/public/js/todolist.js"></script>
+        <script src="/public/js/bootstrap.min.js"></script>
+        <!-- End custom js for this page -->
 </body>
 
 </html>

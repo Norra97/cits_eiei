@@ -36,7 +36,7 @@ async function approveRequest(reqId) {
 
 async function fetchBorrowingRequests() {
     try {
-        const response = await fetch('/borrow-assett');
+        const response = await fetch('/api/borrow/requests?status=pending');
         if (!response.ok) {
             throw new Error('Failed to fetch borrowing requests');
         }

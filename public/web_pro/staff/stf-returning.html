@@ -83,7 +83,7 @@
                     <a href="/staff/Edit-Asset">
                         <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
                     </a>
-                    <a href="/lecturer/Borrowing-requests">
+                    <a href="/staff/Borrowing-requests">
                         <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
                     </a>
                     <a href="/staff/History">
@@ -135,16 +135,16 @@
 
         // ==================== Repending status ====================
         function loadData() {
-            fetch('/asset-borrow-return')
+            fetch('/api/borrow/requests?status=repending')
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.getElementById('table-body');
-                    tableBody.innerHTML = ''; // Clear existing content
-
-                    // Filter data to only include assets with 'RePending' status
-                    const borrowingAssets = data.filter(item => item.Status === 'RePending');
-
-                    borrowingAssets.forEach(item => {
+                    tableBody.innerHTML = '';
+                    if (!data || data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No assets pending return.</td></tr>';
+                        return;
+                    }
+                    data.forEach(item => {
                         const row = createTableRow(item);
                         tableBody.appendChild(row);
                     });
@@ -163,19 +163,13 @@
                 <td>${item.Borrowdate || 'N/A'}</td>
                 <td>${item.ReturnDate || 'N/A'}</td>
                 <td>${item.lectname || 'N/A'}</td>
-                <td><button class="btn btn-danger" onclick="returnAsset(${item.Assetid})">GetReturn</button></td>
+                <td><button class="btn btn-danger" onclick="returnAsset(${item.Reqid})">GetReturn</button></td>
             `;
             return tr;
         }
 
         // ==================== Update asset status to Return ====================
-        function returnAsset(assetId) {
-            const borrowname = localStorage.getItem('username');
-            if (!borrowname) {
-                Swal.fire('Error', 'User not logged in or username not found in localStorage', 'error');
-                return;
-            }
-
+        function returnAsset(reqId) {
             Swal.fire({
                 title: 'Are you sure you want to return this asset?',
                 showCancelButton: true,
@@ -183,9 +177,10 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/getreturn-asset/${assetId}`, {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' }
+                    fetch(`/api/borrow/return-asset/${reqId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ newStatus: 'Returned' })
                     })
                         .then(response => {
                             if (!response.ok) throw new Error('Network response was not ok');

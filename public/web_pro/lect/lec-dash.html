@@ -373,7 +373,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-    fetch('/assets/count')
+    fetch('/api/assets/count')
         .then(response => response.json())
         .then(data => {
             document.getElementById('available-count').textContent = data.available;
@@ -440,7 +440,7 @@
         .catch(error => console.error('Error:', error));
 });
 document.addEventListener('DOMContentLoaded', function() {
-            fetch('/borrow-requests-summary')
+            fetch('/api/borrow/requests?status=dashboard')
                 .then(response => response.json())
                 .then(data => {
                     var ctx = document.getElementById('myPolarChart').getContext('2d');
@@ -531,4 +531,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
     <!-- ====================  fetch available Asset ==================== -->
+    <script>
+    </script>
 </html>

@@ -160,7 +160,7 @@
 
         // ==================== call asset ====================
         function getAssets(searchTerm = '') {
-            fetch('/Assetlist')
+            fetch('/api/assets')
                 .then(response => response.json())
                 .then(assets => {
                     console.log("Assets from API:", assets); // ตรวจสอบข้อมูลที่ได้รับ
@@ -275,8 +275,15 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const { borrowDate, returnDate, activity, usagetype } = result.value;
-                    fetch('/borrow-asset', {
+                    let { borrowDate, returnDate, activity, usagetype } = result.value;
+                    // แปลงวันที่ให้เป็น YYYY-MM-DD เสมอ
+                    if (borrowDate) {
+                        borrowDate = new Date(borrowDate).toISOString().split('T')[0];
+                    }
+                    if (returnDate) {
+                        returnDate = new Date(returnDate).toISOString().split('T')[0];
+                    }
+                    fetch('/api/borrow/borrow-asset', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

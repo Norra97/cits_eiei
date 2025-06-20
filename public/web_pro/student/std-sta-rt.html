@@ -152,7 +152,7 @@
         // ==================== Asset Return Status ====================
         function fetchPendingAssets() {
             const username = localStorage.getItem('username');
-            fetch(`/Returned-assets-requests?username=${username}`)
+            fetch(`/api/borrow/requests?status=returned&username=${username}`)
                 .then(response => response.json())
                 .then(data => {
                     const pendingAssetsBody = document.getElementById('pending-assets-body');

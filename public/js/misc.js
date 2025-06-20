@@ -110,13 +110,16 @@ var lightColor = getComputedStyle(document.body).getPropertyValue('--light');
         }
       }
     })
-    if ($.cookie('purple-free-banner')!="true") {
-      document.querySelector('#proBanner').classList.add('d-flex');
-      document.querySelector('.navbar').classList.remove('fixed-top');
-    }
-    else {
-      document.querySelector('#proBanner').classList.add('d-none');
-      document.querySelector('.navbar').classList.add('fixed-top');
+    var proBanner = document.querySelector('#proBanner');
+    if (proBanner) {
+      if ($.cookie('purple-free-banner')!="true") {
+        proBanner.classList.add('d-flex');
+        document.querySelector('.navbar').classList.remove('fixed-top');
+      }
+      else {
+        proBanner.classList.add('d-none');
+        document.querySelector('.navbar').classList.add('fixed-top');
+      }
     }
     
     if ($( ".navbar" ).hasClass( "fixed-top" )) {
@@ -130,15 +133,18 @@ var lightColor = getComputedStyle(document.body).getPropertyValue('--light');
       
     }
     document.querySelector('#bannerClose').addEventListener('click',function() {
-      document.querySelector('#proBanner').classList.add('d-none');
-      document.querySelector('#proBanner').classList.remove('d-flex');
-      document.querySelector('.navbar').classList.remove('pt-5');
-      document.querySelector('.navbar').classList.add('fixed-top');
-      document.querySelector('.page-body-wrapper').classList.add('proBanner-padding-top');
-      document.querySelector('.navbar').classList.remove('mt-3');
-      var date = new Date();
-      date.setTime(date.getTime() + 24 * 60 * 60 * 1000); 
-      $.cookie('purple-free-banner', "true", { expires: date });
+      var proBanner = document.querySelector('#proBanner');
+      if (proBanner) {
+        proBanner.classList.add('d-none');
+        proBanner.classList.remove('d-flex');
+        document.querySelector('.navbar').classList.remove('pt-5');
+        document.querySelector('.navbar').classList.add('fixed-top');
+        document.querySelector('.page-body-wrapper').classList.add('proBanner-padding-top');
+        document.querySelector('.navbar').classList.remove('mt-3');
+        var date = new Date();
+        date.setTime(date.getTime() + 24 * 60 * 60 * 1000); 
+        $.cookie('purple-free-banner', "true", { expires: date });
+      }
     });
   });
 })(jQuery);

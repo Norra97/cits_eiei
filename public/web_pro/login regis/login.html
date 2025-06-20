@@ -93,7 +93,7 @@
                         body: JSON.stringify({ "username": username, "password": password }),
                     };
 
-                    const response = await fetch('/login', options);
+                    const response = await fetch('/api/users/login', options);
 
                     if (response.ok) {
                         const data = await response.json();
@@ -118,7 +118,7 @@
                         });
 
                         // Redirect ตาม role
-                        const roleResponse = await fetch('/userRole', {
+                        const roleResponse = await fetch('/api/users/userRole', {
                             method: 'POST',
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ "username": data.username }),

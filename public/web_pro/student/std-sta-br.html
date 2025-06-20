@@ -130,18 +130,20 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/return-asset/${reqId}`, { // เปลี่ยน URL เป็น reqId
+                    fetch(`/api/borrow/return-asset/${reqId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ newStatus: 'RePending' }) // เปลี่ยนสถานะเป็น RePending
+                        body: JSON.stringify({ newStatus: 'RePending' })
                     })
                         .then(response => {
+                            console.log('[DEBUG] return-asset response status:', response.status);
                             if (!response.ok) throw new Error('Network response was not ok');
                             return response.json();
                         })
                         .then(data => {
+                            console.log('[DEBUG] return-asset response data:', data);
                             if (data.success) {
-                                Swal.fire('Returned!', 'The asset has been marked as RePending.', 'success');
+                                Swal.fire('Returned!', 'The asset has been marked as Returned.', 'success');
                                 fetchPendingAssets(); // รีเฟรชข้อมูล
                             } else {
                                 throw new Error(data.message);
@@ -188,7 +190,7 @@
         // ==================== Asset status Borrow ====================
         function fetchPendingAssets() {
             const username = localStorage.getItem('username');
-            fetch(`/asset-borrow-requests?username=${username}`)
+            fetch(`/api/borrow/requests?status=borrow&username=${username}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

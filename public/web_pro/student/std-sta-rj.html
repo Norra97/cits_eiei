@@ -146,7 +146,7 @@
         // ==================== Asset status Reject ====================
         function fetchPendingAssets() {
             const username = localStorage.getItem('username');
-            fetch(`/Reject-assets-requests?username=${username}`)
+            fetch(`/api/borrow/requests?status=reject&username=${username}`)
                 .then(response => response.json())
                 .then(data => {
                     const pendingAssetsBody = document.getElementById('pending-assets-body');

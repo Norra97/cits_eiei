@@ -130,7 +130,7 @@
                         <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
                     </a>
 
-                    <a href="/lecturer/Borrowing-requests">
+                    <a href="/staff/Borrowing-requests">
                         <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
                     </a>
 
@@ -310,7 +310,7 @@
         function toggleAssetStatus(assetId, isChecked) {
             const newStatus = isChecked ? 'Available' : 'Disabled';
 
-            fetch(`/assets/toggle-status/${assetId}`, {
+            fetch(`/api/assets/toggle-status/${assetId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ newStatus })
@@ -333,7 +333,7 @@
 
 
         function getAssets() {
-            fetch('/assets')
+            fetch('/api/assets')
                 .then(response => response.json())
                 .then(data => {
                     displayAssets(data);
@@ -351,7 +351,7 @@
                 confirmButtonText: 'Yes'
             }).then(function (result) {
                 if (result.isConfirmed) {
-                    fetch(`/assets/${id}`, { method: 'DELETE' })
+                    fetch(`/api/assets/${id}`, { method: 'DELETE' })
                         .then(function (response) {
                             if (response.ok) {
                                 getAssets();
@@ -396,7 +396,7 @@
                 return;
             }
 
-            let url = '/assets';
+            let url = '/api/assets';
             let httpMethod = action === 'edit' ? 'PUT' : 'POST';
             if (action === 'edit') {
                 url += `/${editID}`;
@@ -477,7 +477,7 @@
 
         function searchAssets() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            fetch('/assets')
+            fetch('/api/assets')
                 .then(response => response.json())
                 .then(data => {
                     const filteredAssets = data.filter(asset => asset.Assetname.toLowerCase().includes(searchTerm));
@@ -565,7 +565,7 @@
     <!--Type-->
     <script>
         function loadAssetTypes() {
-            fetch('/asset-types')
+            fetch('/api/assets/types')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch asset types');
@@ -624,7 +624,7 @@
                 return;
             }
 
-            fetch('/asset-types', {
+            fetch('/api/assets/types', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ asset_type_name: newType })
