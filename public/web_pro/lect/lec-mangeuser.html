@@ -428,18 +428,17 @@
 
         // Open Edit Other Info Modal
         function openEditOtherModal(userId) {
-            fetch(`/users/${userId}`)
-                .then(response => response.json())
-                .then(user => {
-                    document.getElementById("editOtherUserId").value = user.userid;
-                    document.getElementById("editUsername").value = user.username;
-                    document.getElementById("editPhone").value = user.phonenum;
-                    document.getElementById("editDepartment").value = user.department;
-                    document.getElementById("editEmail").value = user.useremail;
+            const user = allUsers.find(u => u.userid === userId);
+            if (user) {
+                document.getElementById("editOtherUserId").value = user.userid;
+                document.getElementById("editUsername").value = user.username;
+                document.getElementById("editPhone").value = user.phonenum;
+                document.getElementById("editDepartment").value = user.department;
+                document.getElementById("editEmail").value = user.useremail;
 
-                    const editOtherModal = new bootstrap.Modal(document.getElementById("editOtherModal"));
-                    editOtherModal.show();
-                });
+                const editOtherModal = new bootstrap.Modal(document.getElementById("editOtherModal"));
+                editOtherModal.show();
+            }
         }
 
         // Handle Other Info Edit Form

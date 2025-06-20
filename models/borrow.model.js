@@ -149,4 +149,19 @@ exports.rejectBorrowRequest = (requestId, lectname, rejectReason) => {
             resolve(result);
         });
     });
+};
+
+exports.getAllHistory = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT br.*, a.Assetname, a.Assetimg, a.Assetstatus, a.Staffaddid, a.Assetcode, a.Assetlocation
+            FROM BorrowReq br
+            LEFT JOIN Asset a ON br.Assetid = a.Assetid
+            ORDER BY br.Borrowdate DESC
+        `;
+        db.query(sql, (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
 }; 

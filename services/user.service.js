@@ -54,4 +54,16 @@ exports.getRole = async (username) => {
     if (userRole === 2) return { role: 'staff' };
     if (userRole === 3) return { role: 'lecturer' };
     throw { status: 403, message: 'Invalid role' };
+};
+
+exports.getAllUsers = async () => {
+    const users = await userModel.getAll();
+    return users;
+};
+
+exports.updateUser = async (userId, userData) => {
+    if (userData.password) {
+        userData.password = await bcrypt.hash(userData.password, 10);
+    }
+    return await userModel.updateUser(userId, userData);
 }; 

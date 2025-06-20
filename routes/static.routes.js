@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const staticController = require('../controllers/static.controller');
+const borrowController = require('../controllers/borrow.controller');
 
 // Student pages
 router.get('/student', staticController.serveStatic('public/web_pro/student/std-dash.html'));
@@ -40,5 +41,8 @@ router.get('/logout', staticController.logout);
 
 // New route for path '/'
 router.get('/', staticController.serveStatic('public/web_pro/login regis/login.html'));
+
+router.get('/history', borrowController.getAllHistory);
+router.get('/export-csv', borrowController.exportHistoryCSV);
 
 module.exports = router; 

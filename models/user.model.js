@@ -48,4 +48,26 @@ exports.getRoleByUsername = (username) => {
             resolve(results);
         });
     });
+};
+
+exports.getAll = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT userid, username, role, phonenum, department, useremail FROM user';
+        db.query(sql, (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+};
+
+exports.updateUser = (userId, userData) => {
+    return new Promise((resolve, reject) => {
+        const fields = Object.keys(userData).map(key => `${key} = ?`).join(', ');
+        const values = Object.values(userData);
+        const sql = `UPDATE user SET ${fields} WHERE userid = ?`;
+        db.query(sql, [...values, userId], (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
 }; 

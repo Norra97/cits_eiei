@@ -1,4 +1,5 @@
 const borrowService = require('../services/borrow.service');
+const { Parser } = require('json2csv');
 
 exports.borrowAsset = async (req, res) => {
     try {
@@ -66,5 +67,43 @@ exports.rejectBorrowRequest = async (req, res) => {
         res.json({ success: true, message: 'Borrow request rejected successfully.' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message || 'Failed to reject borrow request.' });
+    }
+};
+
+exports.getAllHistory = async (req, res) => {
+    try {
+        const results = await require('../models/borrow.model').getAllHistory();
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message || 'Failed to fetch history' });
+    }
+};
+
+exports.exportHistoryCSV = async (req, res) => {
+    try {
+        const results = await require('../models/borrow.model').getAllHistory();
+        // Define fields to match the table columns
+        const fields = [
+            { label: 'Asset ID', value: 'Assetid' },
+            { label: 'Image', value: 'Assetimg' },
+            { label: 'Asset Name', value: 'Assetname' },
+            { label: 'Status', value: 'Assetstatus' },
+            { label: 'Staff ID', value: 'Staffaddid' },
+            { label: 'Asset Code', value: 'Assetcode' },
+            { label: 'Location', value: 'Assetlocation' },
+            { label: 'Borrow Date', value: 'Borrowdate' },
+            { label: 'Return Date', value: 'ReturnDate' },
+            { label: 'Admin approve', value: 'lectname' },
+            { label: 'Borrower', value: 'Borrowname' },
+            { label: 'Borrow Status', value: 'Status' },
+            { label: 'Comment', value: 'Comment' }
+        ];
+        const json2csvParser = new Parser({ fields });
+        const csv = json2csvParser.parse(results);
+        res.header('Content-Type', 'text/csv');
+        res.attachment('borrowing_history.csv');
+        return res.send(csv);
+    } catch (error) {
+        res.status(500).json({ error: error.message || 'Failed to export CSV' });
     }
 }; 

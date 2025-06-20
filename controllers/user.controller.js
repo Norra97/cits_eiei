@@ -27,4 +27,22 @@ exports.getRole = async (req, res) => {
         console.error('getRole error:', err);
         res.status(err.status || 500).send(err.message || 'Internal server error');
     }
+};
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await userService.getAllUsers();
+        res.json(users);
+    } catch (err) {
+        res.status(err.status || 500).send(err.message || 'Internal server error');
+    }
+};
+
+exports.updateUser = async (req, res) => {
+    try {
+        await userService.updateUser(req.params.id, req.body);
+        res.status(200).send({ message: 'User updated successfully' });
+    } catch (err) {
+        res.status(err.status || 500).send(err.message || 'Internal server error');
+    }
 }; 
