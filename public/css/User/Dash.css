@@ -1,0 +1,362 @@
+/* =================== Global Styles =================== */
+:root {
+    --primary-color: #FFA500;
+    --secondary-color: #ff8a65;
+    --text-color: #6d4c41;
+    --background-light: #fef9f7;
+    --border-color: #fbe9e7;
+    --hover-color: #fdeae4;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f7f7f7;
+}
+
+/* =================== Announcement =================== */
+
+#Row3 {
+    height: 200px;   
+}
+
+.announcement-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* ซ่อนเนื้อหาที่เกินขอบ */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.announcement-slider {
+    display: flex; /* ใช้ flexbox แนวนอน */
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    animation: slide-horizontal 10s infinite; /* เพิ่ม animation แบบแนวนอน */
+}
+
+.announcement {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100%; /* แต่ละ Announcement ต้องเต็มความกว้าง */
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Animation สำหรับการเลื่อนแนวนอน */
+@keyframes slide-horizontal {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-100%); }
+    50% { transform: translateX(-200%); }
+    75% { transform: translateX(-300%); }
+    100% { transform: translateX(0); }
+}
+
+.announcement-slider {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    animation: slide-horizontal 300s infinite; /* 10 วินาทีต่อประกาศ (4 หน้า = 40 วินาที) */
+}
+/* ========== End Announcement ========== */
+
+
+/* ========== calendar ========== */
+#Row2 {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+
+.calendar-container {
+    width: max-content;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-header h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff8a65;
+    margin: 0;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ff8a65;
+}
+
+#month-year {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.toggle-contariner{
+    background-color: #f0f0f0;
+    border-radius: 20px;
+}
+
+.view-toggle {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.view-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 20px;
+    color: #ff8a65;
+    background-color: #f0f0f0;
+    color: #000;
+    transition: all 0.3s ease;
+}
+
+.view-btn.active {
+    background-color: #ff8a65;
+    color: #fff;
+}
+
+
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.days div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 14.28%;
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    background: #f8f8f8;
+    border-radius: 50%;
+    color: #333;
+    cursor: pointer;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+
+}
+
+.days div:hover {
+    background: #fdd4c1;
+}
+
+.days .today {
+    background: #ff8a65;
+    color: #fff;
+    font-weight: bold;
+}
+
+.days div.has-items {
+    background-color: var(--secondary-color);
+    color: #fff;
+    font-weight: bold;
+}
+
+    /* ===== Week ===== */
+    .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        font-size: 0.9rem;
+        text-align: center;
+        color: #a6a6a6;
+        margin-bottom: 10px;
+    }
+
+    .week-view-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        border: none;
+    }
+
+    .week-day {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: var(--background-light);
+        border-radius: 10px;
+        color: var(--text-color);
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .week-day.today {
+        background-color: var(--secondary-color);
+        color: #fff;
+    }
+
+    .week-day.no-items {
+        background: transparent;
+        color: #bdbdbd;
+        border: none;
+        box-shadow: none;
+    }
+    
+    .week-day:hover {
+        background-color: var(--hover-color);
+    }
+    
+    .week-day span {
+        margin-left: 10px;
+        font-size: 14px;
+        font-weight: normal;
+    }
+
+    .week-view .days {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .week-view .days div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        height: 50px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .week-view .days div:hover {
+        background: #fdd4c1;
+    }
+    
+    .week-view .days .today {
+        background: #ff8a65;
+        color: white;
+        font-weight: bold;
+    }
+  
+  /* ===== End Week ===== */
+
+  /* ===== tooltip ===== */
+  #tooltip {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    font-size: 12px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+    /* ===== End tooltip ===== */
+  /* ========== End calendar ========== */
+
+  /* ========== table ========== */
+  .table-container {
+    width: 100%;
+    max-width: 725px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-x: auto;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead {
+    background-color: #fef4ea;
+}
+
+thead th {
+    padding: 12px;
+    font-size: 14px;
+    color: #ff8a65;
+    font-weight: bold;
+    text-align: left;
+}
+
+tbody tr {
+    border-bottom: 1px solid #f0e6de;   
+}
+
+tbody td {
+    padding: 12px;
+    font-size: 14px;
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+tbody td:first-child {
+    display: flex;
+    align-items: center;
+}
+
+tbody td:first-child .status-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #ff5252;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+tbody td span.date-badge {
+    background-color: #ffe0b2;
+    color: #ff8a65;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    display: inline-block;
+}
+  /* ========== End table ========== */
+
+  

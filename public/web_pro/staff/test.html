@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/public/css/Head.css">
+    <link rel="stylesheet" href="/public/css/Admin/AddEdit.css">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Icon -->
+
+    <!-- Bootstrap -->
+
+    <script src="/public/js/bootstrap.min.js"></script>
+
+    <!-- Icon -->
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Asset List</title>
+    <style>
+        body {
+            font-family: var(--bs-body-font-family) !important;
+            background-color: #FFF3E8;
+        }
+
+        .asset-image {
+            width: 100px;
+            height: auto;
+        }
+
+        .container {
+            max-width: 80%;
+            /* จำกัดความกว้างให้ไม่เกินหน้าจอ */
+            padding: 15px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            /* ถ้าตารางกว้างเกิน ให้เลื่อนในแนวนอนได้ */
+            margin-bottom: 15px;
+        }
+
+        .modal-dialog {
+            max-width: 80%;
+            /* จำกัดขนาดโมดัล */
+            margin: 1.75rem auto;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            /* มุมโค้งให้ดูเรียบ */
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        button[type="submit"] {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="row bg-white py-2">
+                    <div class="col">
+                        <div class="input-group" style="width: 350px;">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
+                                id="searchInput">
+                            <button class="btn btn-info" onclick="searchAssets()">Search</button>
+                            <button class="btn btn-success" onclick="addAsset()">Add</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa fa-sign-out"></i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
+                <div class="sidebar">
+                    <a href="/staff">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/staff/Edit-Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
+                    </a>
+
+                    <a href="/staff/Borrowing-requests">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
+                    </a>
+
+                    <a href="/staff/History">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Asset History</button>
+                    </a>
+
+                    <a href="/staff/Returning">
+                        <button class="btn-sidebar"><i class="fa fa-history"> </i>Borrow Return</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="text-primary p-3">
+                    <h1 id="NamePage">Asset List</h1>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Edit Status</th>
+                                <th>Image</th>
+                                <th>NameAsset</th>
+                                <th>Asset Details</th>
+                                <th>AssetID</th>
+                                <th>Location</th>
+                                <th>Admin Add</th>
+                                <th>AssetType</th>
+                                <th>Status</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblAsset">
+                            <!-- Data dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Modal -->
+                <div class="modal fade" id="assetModal" tabindex="-1" aria-labelledby="assetModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="assetModalLabel">Add/Edit Asset</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                                <form id="formAsset" method="post" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" name="Assetname" class="form-control"
+                                            placeholder="Asset Name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Detail</label>
+                                        <textarea name="Assetdetail" class="form-control" placeholder="Asset Detail"
+                                            required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Code</label>
+                                        <input type="text" name="Assetcode" class="form-control"
+                                            placeholder="Asset Code" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Location</label>
+                                        <input type="text" name="Assetlocation" class="form-control"
+                                            placeholder="Asset Location" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Asset Type</label>
+                                        <select name="Assettype" class="form-control" required id="assetTypeDropdown">
+                                            <!-- Options will be dynamically loaded -->
+                                        </select>
+                                        <button type="button" class="btn btn-link" onclick="showAddTypeModal()">+ Add
+                                            Type</button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Image</label>
+                                        <input type="file" name="Assetimg" class="form-control" accept="image/*"
+                                            onchange="previewImage(event)">
+                                        <div class="mt-3">
+                                            <img id="imagePreview" src="" alt="No Image Selected"
+                                                style="max-width: 100%; max-height: 200px; display: none;">
+                                        </div>
+                                    </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">OK</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal for adding a new type -->
+        <div class="modal fade" id="addTypeModal" tabindex="-1" aria-labelledby="addTypeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTypeModalLabel">Add Asset Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="newTypeInput" class="form-control" placeholder="Enter new asset type">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="addNewType()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+
+    <!-- JavaScript -->
+    <script>
+        // add or edit methods
+        var action = 'add';
+        // edit product ID
+        var editID = 0;
+        // get all products
+
+        // add modal
+        const assetModal = new bootstrap.Modal(document.querySelector('#assetModal'));
+
+
+        function displayAssets(data) {
+            let rows = '';
+            data.forEach(asset => {
+                rows += `<tr><td>
+                            <div class="container-sw">
+                                <label class="switch">
+                                <input type="checkbox" onchange="toggleAssetStatus(${asset.Assetid}, this.checked)" ${asset.Assetstatus === 'Available' ? 'checked' : ''}>
+                                <span class="slider"></span>
+                                </label>
+                            </div>
+                            </td>`;
+                if (asset.Assetimg == "") {
+                    rows += `<td><img class="asset-image" src="/public/assets/" alt="Asset Image"/></td>`;
+                } else {
+                    rows += `<td><img class="card-img-top asset-image" src="/public/Addimg/${asset.Assetimg}" alt="Asset Image"></td>`;
+                }
+
+                rows += `<td>${asset.Assetname}</td>`;
+                rows += `<td>${asset.Assetdetail}</td>`;
+                rows += `<td>${asset.Assetcode}</td>`;
+                rows += `<td>${asset.Assetlocation}</td>`;
+                rows += `<td>${asset.Staffaddid}</td>`;
+                rows += `<td>${asset.Assettype}</td>`; // เพิ่มการแสดง Assettype
+                rows += `<td>${asset.Assetstatus}</td>`;
+                rows += `<td>
+                    <div class="container-sw">
+                    <button id="btn-Edit" class="btn btn-warning" onclick=editAsset(${JSON.stringify(asset)})>Edit</button>
+                    </div></td>`;
+                rows += `<td>
+                    <div class="container-sw">
+                    <button id="btn-Delete" class="btn btn-danger" onclick=deleteAsset(${asset.Assetid})>Delete</button>
+                    </div></td>`;
+
+
+                rows += `</tr>`;
+            });
+            document.querySelector("#tblAsset").innerHTML = rows;
+        }
+
+
+        function toggleAssetStatus(assetId, isChecked) {
+            const newStatus = isChecked ? 'Available' : 'Disabled';
+
+            fetch(`/api/assets/toggle-status/${assetId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newStatus })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update status');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire('Success', data.message, 'success');
+                    getAssets(); // รีเฟรชรายการสินทรัพย์
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Could not update asset status', 'error');
+                });
+        }
+
+
+        function getAssets() {
+            fetch('/api/assets')
+                .then(response => response.json())
+                .then(data => {
+                    displayAssets(data);
+                })
+                .catch(err => console.error(err));
+        }
+
+
+        function deleteAsset(id) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: "Sure to delete this asset?",
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    fetch(`/api/assets/${id}`, { method: 'DELETE' })
+                        .then(function (response) {
+                            if (response.ok) {
+                                getAssets();
+                            }
+                        })
+                        .catch(function (err) {
+                            console.error(err);
+                            alert(err);
+                        });
+                }
+            });
+        }
+
+
+        const formAsset = document.getElementById('formAsset');
+        formAsset.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(formAsset);
+            
+            // เพิ่ม Staffaddid จาก localStorage
+            const userid = localStorage.getItem('userid');
+            if (!userid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'User ID is missing. Please login again.'
+                });
+                return;
+            }
+            formData.append('Staffaddid', userid);
+            formData.append('Assetstatus', 'Available');
+
+            // ตรวจสอบ Assettype
+            const assetType = formData.get('Assettype');
+            if (!assetType) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select an asset type.'
+                });
+                return;
+            }
+
+            let url = '/api/assets';
+            let httpMethod = action === 'edit' ? 'PUT' : 'POST';
+            if (action === 'edit') {
+                url += `/${editID}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: httpMethod,
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    throw new Error(errorData || 'Failed to save asset.');
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Asset saved successfully!'
+                });
+                
+                formAsset.reset();
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+                
+                getAssets(); // โหลดข้อมูลใหม่
+                assetModal.hide();
+            } catch (err) {
+                console.error('Error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err.message || 'Failed to save asset. Please try again.'
+                });
+            }
+        });
+
+
+
+
+
+        function addAsset() {
+            action = 'add';
+            formAsset.reset();
+            document.querySelector('h4.modal-title').innerText = 'Add New Asset';
+            // document.getElementById('imageInput').required = true; // บังคับอัปโหลดรูป
+            assetModal.show();
+        }
+
+        function editAsset(asset) {
+            action = 'edit';
+            editID = asset.Assetid;
+
+            document.querySelector('h4.modal-title').innerText = 'Edit Asset';
+            document.querySelector('input[name="Assetname"]').value = asset.Assetname;
+            document.querySelector('textarea[name="Assetdetail"]').value = asset.Assetdetail;
+            document.querySelector('input[name="Assetcode"]').value = asset.Assetcode;
+            document.querySelector('input[name="Assetlocation"]').value = asset.Assetlocation;
+            document.querySelector('select[name="Assettype"]').value = asset.Assettype; // ตั้งค่าประเภท
+
+            const imagePreview = document.getElementById('imagePreview');
+            if (asset.Assetimg) {
+                imagePreview.src = `/public/Addimg/${asset.Assetimg}`;
+                imagePreview.style.display = 'block';
+            } else {
+                imagePreview.style.display = 'none';
+            }
+            // document.getElementById('imageInput').required = false; // ไม่บังคับอัปโหลดรูป
+            assetModal.show();
+        }
+
+
+
+
+
+
+        function searchAssets() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            fetch('/api/assets')
+                .then(response => response.json())
+                .then(data => {
+                    const filteredAssets = data.filter(asset => asset.Assetname.toLowerCase().includes(searchTerm));
+                    displayAssets(filteredAssets);
+                })
+                .catch(err => console.error(err));
+        }
+
+
+        getAssets();
+
+        window.onload = function () {
+
+
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = 'Admin: ' + username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+
+                document.getElementById('displayUsername').textContent = 'Admin';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+    </script>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const imagePreview = document.getElementById('imagePreview');
+            const file = input.files[0];
+
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) { // จำกัดขนาดที่ 2MB
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'File size exceeds 2MB. Please upload a smaller file.'
+                    });
+                    input.value = ''; // รีเซ็ต input file
+                    imagePreview.src = '';
+                    imagePreview.style.display = 'none';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+    </script>
+    <!--Type-->
+    <script>
+        function loadAssetTypes() {
+            fetch('/api/assets/types')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch asset types');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const dropdown = document.getElementById('assetTypeDropdown');
+                    if (!dropdown) {
+                        console.error('Dropdown element not found');
+                        return;
+                    }
+                    dropdown.innerHTML = ''; // Clear existing options
+                    
+                    // Add default option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = '-- Select Asset Type --';
+                    dropdown.appendChild(defaultOption);
+
+                    if (data && data.length > 0) {
+                        data.forEach(type => {
+                            const option = document.createElement('option');
+                            option.value = type.asset_type_name;
+                            option.textContent = type.asset_type_name;
+                            dropdown.appendChild(option);
+                        });
+                    } else {
+                        console.log('No asset types found');
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load asset types:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load asset types. Please try again.'
+                    });
+                });
+        }
+
+        function showAddTypeModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addTypeModal'));
+            modal.show();
+        }
+
+        function addNewType() {
+            const newType = document.getElementById('newTypeInput').value.trim();
+
+            if (!newType) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please enter a valid asset type.'
+                });
+                return;
+            }
+
+            fetch('/api/assets/types', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ asset_type_name: newType })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(err => { throw new Error(err); });
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Asset type added successfully!'
+                    });
+                    document.getElementById('newTypeInput').value = '';
+                    loadAssetTypes(); // Refresh the dropdown
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addTypeModal'));
+                    modal.hide();
+                })
+                .catch(err => {
+                    console.error('Error adding asset type:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to add asset type. Please try again.'
+                    });
+                });
+        }
+
+        // Load asset types on page load
+        document.addEventListener('DOMContentLoaded', loadAssetTypes);
+    </script>
+    <script>
+        // ฟังก์ชันสำหรับล้างค่าฟอร์มและตัวอย่างรูปภาพ
+        function resetForm() {
+            const formAsset = document.getElementById('formAsset');
+            const imagePreview = document.getElementById('imagePreview');
+
+            // รีเซ็ตฟอร์มทั้งหมด
+            formAsset.reset();
+
+            // รีเซ็ตตัวอย่างรูปภาพ
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+
+            // รีเซ็ตสถานะ action และ editID
+            action = 'add';
+            editID = 0;
+        }
+
+        // เพิ่ม Event Listener สำหรับ modal เมื่อถูกปิด
+        const assetModalElement = document.querySelector('#assetModal');
+        assetModalElement.addEventListener('hidden.bs.modal', resetForm);
+
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/stf';
+        }
+    </script>
+
+</body>
+
+</html>

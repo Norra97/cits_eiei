@@ -1,0 +1,39 @@
+{
+  "scripts": {
+    "server": "json-server --watch product.json --port 9000 -H 127.0.0.1"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "^5.43.3",
+    "@clerk/clerk-sdk-node": "^5.1.4",
+    "app": "^0.1.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^2.2.0",
+    "chart.js": "^4.4.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "google-auth-library": "^9.15.0",
+    "json-server": "^0.17.4",
+    "json2csv": "^6.0.0-alpha.2",
+    "multer": "^2.0.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "path": "^0.12.7",
+    "session": "^0.1.0"
+  },
+  "name": "web-appppp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

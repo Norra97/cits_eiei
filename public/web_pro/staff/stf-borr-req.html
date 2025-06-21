@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+    <link rel="stylesheet" href="/public/css/Head.css">
+    <link rel="stylesheet" href="/public/css/Admin/stf-ret.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <title>ฺBorrow Request</title>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="col">
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search Borrower Name"
+                            id="Search_text">
+                        <button class="btn btn-primary border-1" id="Search_btn">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
+                <div class="sidebar">
+                    <a href="/staff">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/staff/Edit-Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
+                    </a>
+
+                    <a href="/staff/Borrowing-requests">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
+                    </a>
+
+                    <a href="/staff/History">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Asset History</button>
+                    </a>
+
+                    <a href="/staff/Returning">
+                        <button class="btn-sidebar"><i class="fa fa-history"> </i>Borrow Return</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col">
+                <!-- Content -->
+                <div class="container mt-5">
+                    <h2>Borrowing Requests</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Req ID</th>
+                                <th>Borrower Name</th>
+                                <th>Asset Name</th>
+                                <th>Borrow Date</th>
+                                <th>Return Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBorrowReq">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchBorrowingRequests(); // Load requests when the page loads
+
+            document.getElementById('Search_btn').addEventListener('click', function () {
+                const searchText = document.getElementById('Search_text').value.toLowerCase();
+                fetchBorrowingRequests(searchText); // Filter requests by search text
+            });
+        });
+
+        function fetchBorrowingRequests(searchText = '') {
+            fetch('/api/borrow/requests?status=pending')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tblBorrowReq = document.getElementById('tblBorrowReq');
+                    let rows = '';
+                    const filteredRequests = data.filter(req =>
+                        (!searchText || req.Borrowname.toLowerCase().includes(searchText)));
+                    filteredRequests.forEach(req => {
+                        rows += `<tr>
+                    <td>${req.Reqid}</td>
+                    <td>${req.Borrowname}</td>
+                    <td>${req.Assetname}</td>
+                    <td>${formatDate(req.Borrowdate)}</td>
+                    <td>${formatDate(req.ReturnDate)}</td>
+                    <td>${req.Status}</td>
+                    <td>
+                        <button onclick="approveRequest(${req.Reqid})" class="btn btn-success">Approve</button>
+                        <button onclick="disapproveRequest(this, ${req.Reqid})" class="btn btn-danger">Disapprove</button>
+                    </td>
+                </tr>`;
+                    });
+                    tblBorrowReq.innerHTML = rows;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Failed to load borrowing requests!', 'error');
+                });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return dateString.split('T')[0];
+        }
+
+        async function approveRequest(reqId) {
+            if (!reqId || isNaN(reqId)) {
+                Swal.fire('Error', 'Invalid request ID!', 'error');
+                return;
+            }
+            try {
+                console.log('[DEBUG] Approve requestId:', reqId);
+                const { value: lecturerName } = await Swal.fire({
+                    title: 'Approve Request',
+                    input: 'text',
+                    inputLabel: 'Lecturer Name',
+                    inputPlaceholder: 'Enter your name',
+                    inputValue: localStorage.getItem('username') || '',
+                    showCancelButton: true,
+                    confirmButtonText: 'Approve',
+                    cancelButtonText: 'Cancel',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Please enter your name';
+                        }
+                    }
+                });
+                if (!lecturerName) {
+                    // Cancelled
+                    return;
+                }
+                if (!reqId || !lecturerName) {
+                    Swal.fire('Error', 'Invalid data for approval!', 'error');
+                    return;
+                }
+                console.log('[DEBUG] Sending approve fetch:', `/api/borrow/approve-borrow-request/${reqId}`, { lecturerName });
+                const response = await fetch(`/api/borrow/approve-borrow-request/${reqId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lecturerName: lecturerName
+                    })
+                });
+                console.log('[DEBUG] Approve response status:', response.status);
+                const result = await response.json();
+                console.log('[DEBUG] Approve response data:', result);
+                if (!response.ok) {
+                    Swal.fire('Error', result.message || 'Failed to approve request', 'error');
+                    throw new Error(result.message || 'Failed to approve request');
+                }
+                await Swal.fire({
+                    title: 'Success!',
+                    text: result.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                await fetchBorrowingRequests();
+            } catch (error) {
+                console.error('[DEBUG] Approve error:', error);
+                await Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to approve request!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        function disapproveRequest(button, requestId) {
+            if (!requestId || isNaN(requestId)) {
+                Swal.fire('Error', 'Invalid request ID!', 'error');
+                return;
+            }
+            const username = localStorage.getItem('username') || '';
+            Swal.fire({
+                title: 'Disapprove Request',
+                html: `
+                    <div class="mb-3">
+                        <label for="lectname" class="form-label">Lect name</label>
+                        <input type="text" id="lectname" class="form-control" value="${username}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="rejectReason" class="form-label">Reject Reason</label>
+                        <textarea id="rejectReason" class="form-control" rows="3" placeholder="Enter reason for rejection"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const lectname = document.getElementById('lectname').value.trim();
+                    const rejectReason = document.getElementById('rejectReason').value.trim();
+                    if (!lectname) {
+                        Swal.showValidationMessage('Please enter lecturer name');
+                        return false;
+                    }
+                    if (!rejectReason) {
+                        Swal.showValidationMessage('Please enter reject reason');
+                        return false;
+                    }
+                    return { lectname, rejectReason };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const requestData = {
+                        requestId: requestId,
+                        lectname: result.value.lectname,
+                        rejectReason: result.value.rejectReason
+                    };
+                    if (!requestData.lectname || !requestData.rejectReason || !requestData.requestId) {
+                        Swal.fire('Error', 'Invalid data for disapproval!', 'error');
+                        return;
+                    }
+                    try {
+                        console.log('[DEBUG] Disapprove requestData:', requestData);
+                        fetch('/api/borrow/reject-borrow-request', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(requestData)
+                        })
+                        .then(response => {
+                            console.log('[DEBUG] Disapprove response status:', response.status);
+                            if (!response.ok) {
+                                return response.json().then(err => {
+                                    Swal.fire('Error', err.message || `HTTP error! Status: ${response.status}`, 'error');
+                                    throw new Error(err.message || `HTTP error! Status: ${response.status}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('[DEBUG] Disapprove response data:', data);
+                            if (data.success) {
+                                Swal.fire('Success', 'Request Disapproved!', 'success').then(() => {
+                                    setTimeout(() => {
+                                        try {
+                                            window.location.href = '/staff/History';
+                                        } catch (e) {
+                                            console.error('Redirect error:', e);
+                                            window.location.reload();
+                                        }
+                                    }, 100);
+                                });
+                            } else {
+                                Swal.fire('Error', 'Disapproval failed', 'error');
+                                throw new Error('Disapproval failed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('[DEBUG] Disapprove error:', error);
+                            Swal.fire('Error', 'Failed to disapprove request! ' + error.message, 'error');
+                        });
+                    } catch (err) {
+                        console.error('[DEBUG] Disapprove error (outer):', err);
+                        Swal.fire('Error', 'Failed to disapprove request! ' + err.message, 'error');
+                    }
+                }
+            });
+        }
+
+        window.onload = function () {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = ' ' + username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        };
+
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/stf';
+        }
+    </script>
+</body>
+
+</html> 

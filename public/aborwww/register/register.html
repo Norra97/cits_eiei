@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <title>Register</title>
+    <style>
+        .transparent-card {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row m-5">
+            <div class="col-6"></div>
+            <div class="col-6 mt-5 d-flex justify-content-end">
+                <div class="card shadow transparent-card" style="border-radius: 40px; width: 500px; height: 700px;">
+                    <div class="card-body m-3 mt-4">
+                        <p class="card-text" style="color: #11D553">Welcome to Asset borrowing system</p>
+                        <h1 class="card-title pb-2">Register</h1>
+                        <form id="formRegister" enctype="multipart/form-data" method="POST" action="/register">
+                            <label for="username" class="small pb-2">Enter your username</label>
+                            <input type="text" name="username" id="username" class="form-control pb-2" placeholder="Username" required>
+                            
+                            <label for="email" class="small pt-3 pb-2">Enter your email address</label>
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Email Address" required>
+                        
+                            <label for="phone" class="small pt-3 pb-2">Enter your phone number</label>
+                            <input type="text" name="phone" id="phone" class="form-control" placeholder="Phone Number" required>
+                        
+                            <label for="department" class="small pt-3 pb-2">Enter your department</label>
+                            <input type="text" name="department" id="department" class="form-control" placeholder="Department" required>
+                        
+                            <label for="password1" class="small pt-3 pb-2">Enter your Password</label>
+                            <input type="password" name="password1" id="password1" class="form-control" placeholder="Password" required>
+                        
+                            <label for="password2" class="small pt-3 pb-2">Confirm your Password</label>
+                            <input type="password" name="password2" id="password2" class="form-control" placeholder="Re-Password" required>
+                        
+                            <label for="image" class="small pt-3 pb-2">Upload your Image</label>
+                            <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                        
+                            <label for="role" class="small pt-3 pb-2">Select Role</label>
+                            <select class="form-control my-2" name="role" id="role" required>
+                                <option value="1">Student</option>
+                                <option value="2">Staff</option>
+                                <option value="3">Lecturer</option>
+                            </select>
+                        
+                            <div class="d-flex justify-content-center pt-3">
+                                <button type="submit" class="form-control text-white border-0" style="width: 180px; background-color : #779341;">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

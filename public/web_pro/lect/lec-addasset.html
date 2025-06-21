@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Icon -->
+    <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dashboard</title>
+</head>
+
+<style>
+    /* ลดขนาดตัวอักษรและ padding */
+    .btn-outline {
+        height: 50px;
+        /* ความสูงเท่ากับ Input */
+        width: 50px;
+        /* ปรับให้เป็นปุ่มวงกลม */
+        font-size: 0.9rem;
+        /* ขนาดตัวอักษรหรือไอคอน */
+        padding: 0;
+        /* ไม่มี Padding */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: #FF9500;
+    }
+
+
+
+    .fa-filter {
+        font-size: 2rem;
+        /* ขนาดไอคอน */
+    }
+
+    /* ตาราง */
+    .table-responsive {
+        max-width: 1500px;
+        max-height: 1000px;
+        /* จำกัดความสูงของตาราง */
+        overflow-y: auto;
+        overflow-x: auto;
+        /* เพิ่มการเลื่อนแนวตั้งเฉพาะตาราง */
+    }
+
+    table {
+        width: 100%;
+        /* ใช้พื้นที่เต็มหน้าจอ */
+        border-collapse: collapse;
+        /* ลดช่องว่างในตาราง */
+        border-radius: 10px;
+        /* มุมโค้ง */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        /* เพิ่มเงา */
+        background-color: #fffdf7;
+        /* สีพื้นหลัง */
+
+    }
+
+    th,
+    td {
+        text-align: center;
+        padding: 1px;
+        /* ลด Padding */
+    }
+
+    th {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        /* เพิ่มสีพื้นหลังให้หัวข้อ */
+        padding: 12px 15px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #fdd4c1;
+    }
+
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .table thead tr {
+        background-color: #ff8a65;
+        /* สีพื้นหลัง */
+        color: #fff;
+        /* สีตัวอักษร */
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .table tbody td {
+        padding: 12px 15px;
+        text-align: center;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* ปุ่มในตาราง */
+    .table tbody .btn {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: #fff;
+    }
+
+    #csv {
+        width: 50 px;
+        height: 100px;
+        padding: 10px;
+    }
+</style>
+
+
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 ">
+                <div class="sidebar">
+                    <a href="/lecturer">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i>Dashboard</button>
+                    </a>
+
+                    <a href="/lecturer/MangeUser">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Manage Role</button>
+                    </a>
+
+                    <a href="/lecturer/history">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Report_CSV </button>
+                    </a>
+                    <a href="/lecturer/AddAsset">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Add Asset</button>
+                    </a>
+                </div>
+            </div>    
+
+            <div class="container">
+                <div>
+                    <img id="csv" src="/public/img/Screenshot 2025-01-23 184958.png" alt="">
+                </div>
+                
+                <h1 class="mt-4">Upload and Preview CSV</h1>
+                <div class="mb-3">
+                    <label for="csvFileInput" class="form-label">Select CSV File</label>
+                    <input type="file" class="form-control" id="csvFileInput" accept=".csv">
+                </div>
+                <button class="btn btn-primary" onclick="previewCSV()">Preview</button>
+
+                <!-- ตารางแสดงผลข้อมูล -->
+                <div class="table-container mt-3">
+                    <table class="table table-bordered">
+                        <thead id="table-head">
+                            <!-- หัวตาราง -->
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- แถวข้อมูล -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-success mt-3" id="uploadButton" onclick="uploadCSV()" disabled>Upload</button>
+
+ 
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+
+        let parsedData = []; // ตัวแปรเก็บข้อมูล CSV
+
+        // ฟังก์ชันสำหรับอ่านไฟล์ CSV
+        function previewCSV() {
+            const fileInput = document.getElementById('csvFileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a CSV file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const csvData = event.target.result;
+                parsedData = parseCSV(csvData); // แปลงข้อมูล CSV เป็นอาร์เรย์
+                displayTable(parsedData);
+                document.getElementById('uploadButton').disabled = false; // เปิดใช้งานปุ่มอัปโหลด
+            };
+            reader.readAsText(file);
+        }
+
+        // ฟังก์ชันสำหรับแปลงข้อมูล CSV เป็นอาร์เรย์
+        function parseCSV(data) {
+            const rows = data.split('\n').map(row => row.split(','));
+            return rows;
+        }
+
+        // ฟังก์ชันสำหรับแสดงข้อมูลในตาราง
+        function displayTable(data) {
+            const tableHead = document.getElementById('table-head');
+            const tableBody = document.getElementById('table-body');
+
+            // สร้างหัวตาราง
+            let headerRow = '<tr>';
+            data[0].forEach(header => {
+                headerRow += `<th>${header}</th>`;
+            });
+            headerRow += '<th>Status</th>'; // เพิ่มคอลัมน์สถานะ
+            headerRow += '</tr>';
+            tableHead.innerHTML = headerRow;
+
+            // สร้างแถวข้อมูล
+            let bodyRows = '';
+            for (let i = 1; i < data.length; i++) {
+                if (data[i].length > 1) { // ตรวจสอบว่ามีข้อมูลในแถว
+                    bodyRows += '<tr>';
+                    data[i].forEach(cell => {
+                        bodyRows += `<td>${cell}</td>`;
+                    });
+                    
+                    // เพิ่มสถานะเริ่มต้นเป็น Available
+                    bodyRows += `<td>
+                        <select class="form-select form-select-sm" onchange="updateStatus(this, ${i})">
+                            <option value="Available">Available</option>
+                            <option value="Disabled">Disabled</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Borrowing">Borrowing</option>
+                        </select>
+                    </td>`;
+                    bodyRows += '</tr>';
+                }
+            }
+            tableBody.innerHTML = bodyRows;
+        }
+
+        // ฟังก์ชันอัพเดทสถานะ
+        function updateStatus(selectElement, rowIndex) {
+            const newStatus = selectElement.value;
+            // อัพเดทสถานะในข้อมูล
+            parsedData[rowIndex].status = newStatus;
+        }
+
+        // ฟังก์ชันสำหรับอัปโหลดข้อมูล CSV
+        async function uploadCSV() {
+            try {
+                const response = await fetch('/upload-csv', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: parsedData })
+                });
+
+                if (response.ok) {
+                    alert('Data uploaded successfully!');
+                } else {
+                    alert('Failed to upload data.');
+                }
+            } catch (error) {
+                console.error('Error uploading data:', error);
+                alert('An error occurred while uploading.');
+            }
+        }
+
+        window.onload = function () {
+
+
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+
+
+    </script>
+    <script src="/public/js/bootstrap.min.js"></script>
+    <script src="calendar.js"></script>
+    </script>
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- setting -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/lec';
+        }
+    </script>
+</body>
+
+</html>
