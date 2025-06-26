@@ -1,0 +1,238 @@
+/* Navigation Components CSS */
+
+/* Navbar Styles */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.navbar-brand .logo {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.navbar-brand .col-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Profile Dropdown Styles */
+.dropdown {
+    position: relative;
+}
+
+.btn-noti {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.btn-noti:hover {
+    color: #333;
+}
+
+.profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile:hover {
+    transform: scale(1.05);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    display: none;
+    z-index: 1001;
+}
+
+.dropdown-menu.active {
+    display: block;
+}
+
+.profile-info {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.profile-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.profile-info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.profile-info p:first-of-type {
+    font-weight: bold;
+    color: #333;
+}
+
+.profile-info p:last-of-type {
+    color: #666;
+    font-size: 12px;
+}
+
+.menu-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.menu-item i {
+    width: 16px;
+    color: #666;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background: white;
+    min-height: 100vh;
+    padding: 20px 0;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 250px;
+    z-index: 999;
+}
+
+.btn-sidebar {
+    width: 100%;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    text-align: left;
+    color: #ff8a65;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.btn-sidebar:hover,
+.btn-sidebar:focus {
+    background-color: #fff3e8 !important;
+    color: #ff9500 !important;
+    transform: translateX(5px);
+}
+
+.btn-sidebar i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Active sidebar item */
+.btn-sidebar.active {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border-left: 4px solid #1976d2;
+}
+
+/* Search Bar Styles */
+.input-group {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.input-group-text {
+    border: none;
+    background-color: #f8f9fa;
+}
+
+.form-control {
+    border: none;
+    background-color: #f8f9fa;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    background-color: #f8f9fa;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: relative;
+        top: 0;
+        min-height: auto;
+        padding: 10px 0;
+    }
+    
+    .navbar-brand .col-logo {
+        display: none;
+    }
+    
+    .input-group {
+        width: 100% !important;
+        margin: 10px 0;
+    }
+    
+    .dropdown-menu {
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+}
+
+/* Animation for dropdown */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-menu.active {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Container adjustments for fixed navbar */
+body {
+    padding-top: 80px;
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 10px;
+    }
+} 

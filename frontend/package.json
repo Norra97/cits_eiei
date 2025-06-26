@@ -1,0 +1,11 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "echo 'Add your frontend start command here (เช่น react-scripts start หรือ serve ./public)'"
+  },
+  "dependencies": {
+    // เพิ่ม dependencies ที่เกี่ยวกับ frontend ที่ต้องใช้
+  }
+} 

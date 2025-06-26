@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PAGE_TITLE}}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/public/css/Head.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    {{ADDITIONAL_CSS}}
+    
+    <style>
+        body {
+            font-family: var(--bs-body-font-family) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Container -->
+    <div id="navbar-container"></div>
+    
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <!-- Sidebar Container -->
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
+                <div id="sidebar-container"></div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col">
+                <div class="main-content">
+                    {{MAIN_CONTENT}}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="/public/js/bootstrap.min.js"></script>
+    
+    <!-- Components JS -->
+    <script src="/public/js/components.js"></script>
+    
+    <!-- Additional Scripts -->
+    {{ADDITIONAL_SCRIPTS}}
+</body>
+</html> 

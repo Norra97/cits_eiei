@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/public/CSS/Head.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Icon -->
+    <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dashboard</title>
+</head>
+<style>
+    .btn-csv {
+        background-color: #ff8a65;
+        border-radius: 10px;
+        border: none;
+        color: white;
+        height: 40px;
+        width: 140px;
+    }
+
+    .btn-csv:hover {
+        background-color: #FF9500;
+    }
+
+    .asset-image {
+        width: 100px;
+        height: auto;
+    }
+
+    .table-container {
+        max-height: 400px;
+        max-width: 1200px;
+        overflow-y: auto;
+        overflow-x: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        margin-left: 10px;
+        margin-top: 10px;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: collapse;
+        /* ลดช่องว่างในตาราง */
+        border-radius: 10px;
+        /* มุมโค้ง */
+        /* เพิ่มเงา */
+        background-color: #fffdf7;
+        /* สีพื้นหลัง */
+    }
+
+    thead {
+        background-color: #fef4ea;
+    }
+
+    thead th {
+        padding: 12px;
+        font-size: 14px;
+        color: #ff8a65;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0e6de;
+    }
+
+    tbody td {
+        padding: 12px;
+        font-size: 14px;
+    }
+</style>
+
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/public/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="col">
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
+                            id="search-input">
+                        <button class="btn btn-primary" id="search-button">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/public/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 ">
+                <div class="sidebar">
+                    <a href="/lecturer">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i>Dashboard</button>
+                    </a>
+
+                    <a href="/lecturer/MangeUser">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Manage Role</button>
+                    </a>
+
+                    <!-- <a href="/lecturer/Borrowing-requests">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i> Asset Assept</button>
+                    </a> -->
+
+                    <a href="/lecturer/history">
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Report_CSV</button>
+                    </a>
+                    <a href="/lecturer/AddAsset">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Add Asset</button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- <div class=""> -->
+            <div class="container">
+                <h1 class="mt-4">Returned Borrowing History</h1>
+
+                <!-- ปุ่ม Export CSV -->
+                <div class="my-3">
+                    <button class="btn-csv" onclick="exportCSV()">Export to CSV</button>
+                </div>
+
+                <!-- ตารางแสดงผลข้อมูล -->
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Asset ID</th>
+                                <th>Image</th>
+                                <th>Asset Name</th>
+                                <th>Status</th>
+                                <th>Staff ID</th>
+                                <th>Asset Code</th>
+                                <th>Location</th>
+                                <th>Borrow Date</th>
+                                <th>Return Date</th>
+                                <th>Admin approve</th>
+                                <th>Borrower</th>
+                                <th>Borrow Status</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- </div> -->
+        </div>
+
+    </div>
+
+    <script src="/public/web_pro/student/logout.js"></script>
+
+    <script>
+        // ฟังก์ชันสำหรับดึงข้อมูลครั้งแรกเมื่อโหลดหน้า
+        async function fetchData() {
+            try {
+                const response = await fetch('/history');
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.length === 0) {
+                        document.getElementById('table-body').innerHTML = `
+                            <tr>
+                                <td colspan="13" class="text-center">No data available</td>
+                            </tr>`;
+                        return;
+                    }
+
+                    let tableBody = '';
+
+                    data.forEach(item => {
+                        tableBody += `
+                            <tr>
+                                <td>${item.Assetid || '-'}</td>
+                                <td><img src="/public/Addimg/${item.Assetimg || 'default.png'}" class="asset-image" alt="${item.Assetname || 'No Image'}"></td>
+                                <td>${item.Assetname || '-'}</td>
+                                <td>${item.Assetstatus || '-'}</td>
+                                <td>${item.Staffaddid || '-'}</td>
+                                <td>${item.Assetcode || '-'}</td>
+                                <td>${item.Assetlocation || '-'}</td>
+                                <td>${item.Borrowdate || '-'}</td>
+                                <td>${item.ReturnDate || '-'}</td>
+                                <td>${item.lectname || '-'}</td>
+                                <td>${item.Borrowname || '-'}</td>
+                                <td>${item.Status || '-'}</td>
+                                <td>${item.comment || '-'}</td>
+                            </tr>
+                        `;
+                    });
+
+                    document.getElementById('table-body').innerHTML = tableBody;
+                } else {
+                    console.error('Failed to fetch data');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // ฟังก์ชันสำหรับ Export CSV
+        function exportCSV() {
+            window.location.href = '/export-csv'; // เรียก API เพื่อดาวน์โหลด CSV
+        }
+
+        // เรียกฟังก์ชัน fetchData
+        fetchData();
+
+        window.onload = function () {
+
+
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+
+
+    </script>
+
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- setting -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/settings/lec';
+        }
+    </script>
+</body>
+
+</html>

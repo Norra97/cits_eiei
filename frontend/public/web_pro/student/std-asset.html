@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/frontend/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/frontend/css/Head.css">
+    <link rel="stylesheet" href="/frontend/css/User/Asset.css">
+
+
+    <script src="/frontend/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>Asset</title>
+
+    <style>
+        .card.grayscale {
+            filter: grayscale(100%);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img class="logo" src="/frontend/img/logo.png" alt="Logo">
+                <div class="col-logo text-center">
+                    <div class="row">
+                        <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
+                    </div>
+                    <div class="row">
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
+                            UNIVERSITY</span>
+                    </div>
+                </div>
+            </a>
+            <div class="row">
+                <div class="col">
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
+                            id="search-input">
+                        <button class="btn btn-primary" id="search-button">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="d-flex align-items-center">
+                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                    <img class="profile" src="/frontend/img/profile.webp" alt="profile" onclick="toggleMenu()">
+                </div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <div class="profile-info">
+                        <img src="/frontend/img/profile.webp" alt="Profile Picture">
+                        <p id="displayUsername">Guest</p>
+                        <p id="displayUserid">ID</p>
+                    </div>
+                    <div class="menu-item" onclick="redirectToStudentSet()">
+                        <i class="fa fa-user"></i> Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fa fa-sign-out">
+                        </i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Navbar -->
+
+    <div class="container-fluid"> <!-- contariner 1 -->
+        <div class="row flex-nowrap"> <!-- row 1 -->
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 "> <!-- col 1 -->
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <a href="/student">
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                    </a>
+
+                    <a href="/student/Asset">
+                        <button class="btn-sidebar"><i class="fa fa-archive"> </i> Asset</button>
+                    </a>
+
+                    <a href="/student/sta/pd">
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i> Asset List</button>
+                    </a>
+                </div>
+                <!-- End Sidebar -->
+            </div> <!-- End col 1 -->
+
+
+            <div class="col"> <!-- col 2 -->
+                <!-- Content -->
+                <div class="content-height">
+                    <div class="text-primary p-3">
+                        <h1 id="NamePage">Asset</h1>
+                    </div>
+                    <div id="main" class="container d-flex flex-wrap">
+                        <!-- Asset cards will be loaded here -->
+                    </div>
+                </div>
+            </div> <!-- End col 2 -->
+        </div> <!-- End row 1 -->
+    </div> <!-- End contariner 1 -->
+
+    <script src="/frontend/web_pro/student/logout.js"></script>
+
+    <script>
+        // ==================== Drop Down ====================
+        function toggleMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuRect = menu.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                if (menuRect.right > viewportWidth) {
+                    const offset = menuRect.right - viewportWidth + 10;
+                    menu.style.right = `${offset}px`;
+                } else {
+                    menu.style.right = '10px';
+                }
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('profileMenu');
+            const profileImage = document.querySelector('.profile');
+
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // ==================== search ====================
+        document.addEventListener("DOMContentLoaded", function () {
+            getAssets(); // Call the function to load assets initially
+
+            // Add event listener to the search button
+            document.getElementById('search-button').addEventListener('click', function () {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                getAssets(searchTerm); // Call getAssets function with the search term
+            });
+        });
+
+        // ==================== call asset ====================
+        function getAssets(searchTerm = '') {
+            fetch('/api/assets')
+                .then(response => response.json())
+                .then(assets => {
+                    console.log("Assets from API:", assets); // ตรวจสอบข้อมูลที่ได้รับ
+
+                    const mainContainer = document.getElementById('main');
+                    mainContainer.innerHTML = ''; // ล้างรายการก่อนโหลดใหม่
+ 
+                    // กรองสถานะสินทรัพย์เป็น Available หรือ Pending
+                    assets = assets.filter(asset =>
+                        (asset.Assetstatus === 'Available' || asset.Assetstatus === 'Pending' || asset.Assetstatus === 'Disabled' || asset.Assetstatus === 'Borrowing') &&
+                        asset.Assetname.toLowerCase().includes(searchTerm)
+                    );
+
+                    console.log("Filtered assets:", assets); // ตรวจสอบข้อมูลที่ผ่านการกรอง
+
+                    // แสดงข้อมูลสินทรัพย์
+                    assets.forEach(asset => {
+                        const card = createAssetCard(asset);
+                        mainContainer.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching assets:', error);
+                    Swal.fire('Error', 'Unable to load assets.', 'error');
+                });
+        }
+
+        function createAssetCard(asset) {
+            const card = document.createElement('div');
+            card.className = 'card m-3';
+            card.style.width = '18rem';
+            if (asset.Assetstatus !== 'Available') {
+                card.classList.add('grayscale');
+                card.style.cursor = 'not-allowed';
+            } else {
+                card.style.cursor = 'pointer';
+                card.onclick = () => borrowAsset(asset.Assetid);
+            }
+
+            card.innerHTML = `
+                <img src="/frontend/Addimg/${asset.Assetimg}" class="card-img-top" alt="${asset.Assetname}" style="height: 200px; object-fit: cover; display: block; margin-left: auto; margin-right: auto;">
+                <div class="card-body">
+                    <h5 class="card-title">${asset.Assetname}</h5>
+                    <p class="card-text">
+                        <b>Asset Code:</b> ${asset.Assetcode || 'N/A'}<br>
+                        <b>Asset Type:</b> ${asset.Assettype || 'N/A'}<br>
+                        <b>Location:</b> ${asset.Assetlocation || 'N/A'}<br>
+                        <b>Status:</b> <span class="badge ${asset.Assetstatus === 'Available' ? 'bg-success' : 'bg-danger'}">${asset.Assetstatus || 'N/A'}</span><br>
+                        <b>Asset Details:</b><br>
+                        <span style="white-space: pre-line;">${asset.Assetdetail || 'N/A'}</span>
+                    </p>
+                </div>
+            `;
+            return card;
+        }
+
+        // ==================== Borrow ====================
+        function borrowAsset(assetId) {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                Swal.fire('Error', 'Please login first', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Borrow Asset',
+                html: `
+                    <div class="mb-3">
+                        <label for="activity" class="form-label">Activity</label>
+                        <input type="text" id="activity" class="form-control" placeholder="Enter activity">
+                    </div>
+                    <div class="mb-3">
+                        <label for="usagetype" class="form-label">Usage Type</label>
+                        <select id="usagetype" class="form-control">
+                            <option value="" disabled selected>Select usage type</option>
+                            <option value="In Site">In Site</option>
+                            <option value="Out Site">Out Site</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="borrowDate" class="form-label">Borrow Date</label>
+                        <input type="text" id="borrowDate" class="form-control" placeholder="Select borrow date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="returnDate" class="form-label">Return Date</label>
+                        <input type="text" id="returnDate" class="form-control" placeholder="Select return date">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Borrow',
+                focusConfirm: false,
+                didOpen: () => {
+                    flatpickr("#borrowDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today"
+                    });
+                    flatpickr("#returnDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today"
+                    });
+                },
+                preConfirm: () => {
+                    const borrowDate = document.getElementById('borrowDate').value;
+                    const returnDate = document.getElementById('returnDate').value;
+                    const activity = document.getElementById('activity').value.trim();
+                    const usagetype = document.getElementById('usagetype').value;
+                    if (!borrowDate || !returnDate || !activity || !usagetype) {
+                        Swal.showValidationMessage('Please fill in all fields');
+                        return false;
+                    }
+                    return { borrowDate, returnDate, activity, usagetype };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let { borrowDate, returnDate, activity, usagetype } = result.value;
+                    // แปลงวันที่ให้เป็น YYYY-MM-DD เสมอ
+                    if (borrowDate) {
+                        borrowDate = new Date(borrowDate).toISOString().split('T')[0];
+                    }
+                    if (returnDate) {
+                        returnDate = new Date(returnDate).toISOString().split('T')[0];
+                    }
+                    fetch('/api/borrow/borrow-asset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            assetId,
+                            username,
+                            borrowDate,
+                            returnDate,
+                            activity,
+                            usageType: usagetype
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success', 'Asset borrowed successfully', 'success');
+                            getAssets(); // Refresh the asset list
+                        } else {
+                            throw new Error(data.message || 'Failed to borrow asset');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', error.message, 'error');
+                    });
+                }
+            });
+        }
+
+        // ==================== Display User ====================
+        window.onload = function () {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('displayUsername').textContent = username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            } else {
+                document.getElementById('displayUsername').textContent = 'Guest';
+                document.getElementById('displayUserid').textContent = 'ID';
+            }
+        }
+    </script>
+
+    <!-- ==================== Setting ==================== -->
+    <script>
+        function redirectToStudentSet() {
+            window.location.href = '/student/set';
+        }
+    </script>
+
+
+</body>
+
+</html>
