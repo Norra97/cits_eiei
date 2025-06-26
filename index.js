@@ -48,6 +48,7 @@ const lecturerRoutes = require('./routes/lecturer.routes');
 
 app.use('/', userRoutes);
 app.use('/', staticRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/borrow', borrowRoutes);
 app.use('/api/lecturer', lecturerRoutes);

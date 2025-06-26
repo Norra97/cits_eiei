@@ -18,7 +18,7 @@ router.get('/student/set', staticController.serveStatic('public/web_pro/student/
 
 // Staff pages
 router.get('/staff', staticController.serveStatic('public/web_pro/staff/stf-dash.html'));
-router.get('/staff/Edit-Asset', staticController.serveStatic('public/web_pro/staff/test.html'));
+router.get('/staff/Edit-Asset', staticController.serveStatic('public/web_pro/staff/stf-addeditdelete.html'));
 router.get('/staff/History', staticController.serveStatic('public/web_pro/staff/stf-history.html'));
 router.get('/staff/History-Re', staticController.serveStatic('public/web_pro/staff/stf-history-re.html'));
 router.get('/staff/Returning', staticController.serveStatic('public/web_pro/staff/stf-returning.html'));

@@ -4,68 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Icon -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/public/css/std-dash.css">
-    <link rel="stylesheet" href="/public/CSS/Head.css">
-    <link rel="stylesheet" href="/public/css/Admin/stf-history.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
-    <script src="/public/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="/public/js/notiflix-aio-3.2.6.min.js"></script>
     <title>Asset History</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/public/css/Head.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="/public/css/dashboard-styles.css">
+    
+    <!-- Custom CSS for History Page -->
+    <link rel="stylesheet" href="/public/css/Admin/stf-history.css">
 </head>
 
-<style>
-    body {
-        font-family: var(--bs-body-font-family) !important;
-    }
-
-    .asset-image {
-        width: 100px;
-        height: auto;
-    }
-
-    .table-container {
-        max-height: 600px;
-        overflow-y: auto;
-        margin-bottom: 20px;
-    }
-
-    .table {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .status-approved {
-        color: #28a745;
-        font-weight: bold;
-    }
-
-    .status-returned {
-        color: #17a2b8;
-        font-weight: bold;
-    }
-
-    .filter-buttons {
-        margin-bottom: 20px;
-    }
-
-    .filter-buttons button {
-        margin-right: 10px;
-    }
-
-    .filter-buttons button.active {
-        background-color: #007bff;
-        color: white;
-    }
-</style>
-
 <body>
-
+    <!-- Navbar -->
     <nav class="navbar navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="#">
@@ -75,8 +34,7 @@
                         <span class="ms-2" style="font-weight: bold;">Equipment Borrowing and Returning System</span>
                     </div>
                     <div class="row">
-                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG
-                            UNIVERSITY</span>
+                        <span class="ms-2" style="font-size: medium; color: #806850; font-weight: bold;">MAE FAH LUANG UNIVERSITY</span>
                     </div>
                 </div>
             </a>
@@ -84,91 +42,137 @@
                 <div class="col">
                     <div class="input-group" style="width: 350px;">
                         <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control bg-light border-0" placeholder="Search or type"
-                            id="search-input">
+                        <input type="text" class="form-control bg-light border-0" placeholder="Search or type" id="search-input">
                         <button class="btn btn-primary" id="search-button">Search</button>
                     </div>
                 </div>
             </div>
-            <div class="dropdown">
-                <div class="d-flex align-items-center">
-                    <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
-                    <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
-                </div>
-                <div id="profileMenu" class="dropdown-menu">
-                    <div class="profile-info">
-                        <img src="/public/img/profile.webp" alt="Profile Picture">
-                        <p id="displayUsername">Guest</p>
-                        <p id="displayUserid">ID</p>
+            <div class="d-flex align-items-center">
+                <!-- Dark Mode Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div class="dropdown">
+                    <div class="d-flex align-items-center">
+                        <button class="btn-noti mx-3"><i class="fa fa-bell fa-lg"></i></button>
+                        <img class="profile" src="/public/img/profile.webp" alt="profile" onclick="toggleMenu()">
                     </div>
-                    <div class="menu-item" onclick="redirectToStudentSet()">
-                        <i class="fa fa-user"></i> Profile
-                    </div>
-                    <div class="menu-item" onclick="logout()">
-                        <i class="fa fa-sign-out">
-                        </i> Logout
+                    <div id="profileMenu" class="dropdown-menu">
+                        <div class="profile-info">
+                            <img src="/public/img/profile.webp" alt="Profile Picture">
+                            <p id="displayUsername">Guest</p>
+                            <p id="displayUserid">ID</p>
+                        </div>
+                        <div class="menu-item" onclick="redirectToStaffSet()">
+                            <i class="fa fa-user"></i> Profile
+                        </div>
+                        <div class="menu-item" onclick="logout()">
+                            <i class="fa fa-sign-out"></i> Logout
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
-
+    
+    <!-- Main Container -->
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <div class="col-auto col-md-3 col-xl-2 px-sm-2">
+            <!-- Sidebar -->
+            <div class="col-auto col-md-3 col-xl-2 px-0">
                 <div class="sidebar">
                     <a href="/staff">
-                        <button class="btn-sidebar"><i class="fa fa-chart-pie"> </i> Dashboard</button>
+                        <button class="btn-sidebar"><i class="fa fa-chart-pie"></i>Dashboard</button>
                     </a>
-
                     <a href="/staff/Edit-Asset">
-                        <button class="btn-sidebar"><i class="fa fa-archive"> </i>Asset List</button>
+                        <button class="btn-sidebar"><i class="fa fa-archive"></i>Asset List</button>
                     </a>
-
                     <a href="/staff/Borrowing-requests">
-                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"> </i>Borrow Request</button>
+                        <button class="btn-sidebar"><i class="fa fa-clipboard-list"></i>Borrow Request</button>
                     </a>
-
                     <a href="/staff/History">
-                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"> </i>Asset History</button>
+                        <button class="btn-sidebar"><i class="fa fa-arrow-circle-left"></i>Asset History</button>
                     </a>
-
                     <a href="/staff/Returning">
-                        <button class="btn-sidebar"><i class="fa fa-history"> </i>Borrow Return</button>
+                        <button class="btn-sidebar"><i class="fa fa-history"></i>Borrow Return</button>
                     </a>
                 </div>
             </div>
-
+            
+            <!-- Main Content -->
             <div class="col">
-                <div class="container">
-                    <div>
-                        <div class="text-primary p-3">
-                            <h1 id="NamePage">Asset History</h1>
+                <div class="main-content">
+                    <!-- Page Header -->
+                    <div class="stats-row">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <div class="stats-card" style="background-color: rgba(54, 162, 235, 0.1); border-left: 4px solid rgba(54, 162, 235, 0.8);">
+                                    <h4>
+                                        Asset History <i class="fas fa-history float-end"></i>
+                                    </h4>
+                                    <h2>History Management</h2>
+                                    <h6>View and manage asset borrowing history</h6>
+                                </div>
+                            </div>
                         </div>
-                        <div class="filter-buttons">
-                            <button class="btn btn-outline-primary active" onclick="filterHistory('all')">All History</button>
-                            <button class="btn btn-outline-success" onclick="filterHistory('Approved')">Approved History</button>
-                            <button class="btn btn-outline-info" onclick="filterHistory('Returned')">Returned History</button>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="widgets-row">
+                        <div class="chart-section">
+                            <div class="widget-card">
+                                <h5>Filter Options</h5>
+                                <div class="filter-buttons">
+                                    <button class="btn btn-outline-primary active" onclick="filterHistory('all')">
+                                        <i class="fas fa-list"></i> All History
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="filterHistory('Approved')">
+                                        <i class="fas fa-check"></i> Approved History
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="filterHistory('Returned')">
+                                        <i class="fas fa-undo"></i> Returned History
+                                    </button>
+                                    <div class="ms-auto">
+                                        <button class="btn btn-outline-secondary" onclick="refreshData()" title="Refresh Data">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success" onclick="exportToCSV()" title="Export to CSV">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="table-container">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Asset ID</th>
-                                        <th scope="col">Image</th>
-                                        <th scope="col">Asset Name</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Borrow Date</th>
-                                        <th scope="col">Return Date</th>
-                                        <th scope="col">Borrower</th>
-                                        <th scope="col">Activity</th>
-                                        <th scope="col">Approved By</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-body">
-                                    <!-- Data rows will be inserted here -->
-                                </tbody>
-                            </table>
+                    </div>
+
+                    <!-- History Table -->
+                    <div class="widgets-row">
+                        <div class="chart-section">
+                            <div class="widget-card">
+                                <h5>Asset History Table</h5>
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Asset ID</th>
+                                                    <th>Image</th>
+                                                    <th>Asset Name</th>
+                                                    <th>Status</th>
+                                                    <th>Borrow Date</th>
+                                                    <th>Return Date</th>
+                                                    <th>Borrower</th>
+                                                    <th>Activity</th>
+                                                    <th>Approved By</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="table-body">
+                                                <!-- Data will be loaded from API -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -176,62 +180,179 @@
         </div>
     </div>
 
-    <script src="/public/web_pro/student/logout.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="/public/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Notiflix -->
+    <script src="/public/js/notiflix-aio-3.2.6.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            loadHistory('all');
-        });
-
-        // Toggle menu functionality
+        // Theme Management
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const themeIcon = document.getElementById('themeIcon');
+            if (theme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+            }
+        }
+        
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(currentTheme);
+        }
+        
+        // Initialize theme
+        setTheme(currentTheme);
+        
+        // Event listeners
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        
+        // Profile Menu
         function toggleMenu() {
             const menu = document.getElementById('profileMenu');
             menu.classList.toggle('active');
-
-            if (menu.classList.contains('active')) {
-                const menuRect = menu.getBoundingClientRect();
-                const viewportWidth = window.innerWidth;
-
-                if (menuRect.right > viewportWidth) {
-                    const offset = menuRect.right - viewportWidth + 10;
-                    menu.style.right = `${offset}px`;
-                } else {
-                    menu.style.right = '10px';
-                }
-            }
         }
-
-        window.addEventListener('click', function (e) {
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
             const menu = document.getElementById('profileMenu');
-            const profileImage = document.querySelector('.profile');
-
-            if (menu.classList.contains('active') && !menu.contains(e.target) && !profileImage.contains(e.target)) {
+            const profile = document.querySelector('.profile');
+            
+            if (!menu.contains(event.target) && !profile.contains(event.target)) {
                 menu.classList.remove('active');
             }
         });
-
-        // Filter history based on status
+        
+        // Loading Overlay
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const overlay = document.getElementById('loadingOverlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+        
+        // Add animations to elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.stats-card, .widget-card, .sidebar, .btn-sidebar');
+            
+            animatedElements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+                element.classList.add('fade-in');
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('search-button').addEventListener('click', function() {
+            const searchTerm = document.getElementById('search-input').value;
+            filterTable(searchTerm);
+        });
+        
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value;
+                filterTable(searchTerm);
+            }
+        });
+        
+        function filterTable(searchTerm) {
+            const tableBody = document.getElementById('table-body');
+            const rows = tableBody.getElementsByTagName('tr');
+            
+            let visibleCount = 0;
+            
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm.toLowerCase())) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            
+            // Show message if no results
+            if (visibleCount === 0 && searchTerm.trim() !== '') {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.innerHTML = '<td colspan="9" class="text-center">No results found for "' + searchTerm + '"</td>';
+                tableBody.appendChild(noResultsRow);
+            }
+        }
+        
+        // Filter functionality
         function filterHistory(status) {
-            // Update active button
-            document.querySelectorAll('.filter-buttons button').forEach(btn => {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
                 btn.classList.remove('active');
             });
+            
+            // Add active class to clicked button
             event.target.classList.add('active');
-
-            loadHistory(status);
+            
+            // Map button text to API status
+            let apiStatus = 'all';
+            switch(status) {
+                case 'all':
+                    apiStatus = 'all';
+                    break;
+                case 'Approved':
+                    apiStatus = 'Approved';
+                    break;
+                case 'Returned':
+                    apiStatus = 'Returned';
+                    break;
+                default:
+                    apiStatus = 'all';
+            }
+            
+            // Load data with filter
+            loadHistoryData(apiStatus);
         }
-
-        // Load history data
-        function loadHistory(status) {
-            fetch(`/api/borrow/requests?status=${status}`)
+        
+        // Load history data from API
+        function loadHistoryData(status = 'all') {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '<tr><td colspan="9" class="text-center">Loading...</td></tr>';
+            
+            let apiUrl = '/api/borrow/requests';
+            if (status !== 'all') {
+                apiUrl += `?status=${status}`;
+            }
+            
+            fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) {
-                        return response.text().then(text => { throw new Error(text || `HTTP error! Status: ${response.status}`); });
+                        throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    const tableBody = document.getElementById('table-body');
+                    if (!Array.isArray(data) || data.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="9" class="text-center text-info">
+                                    <i class="fas fa-info-circle"></i> No ${status} data found.
+                                    <br><small>No records match the selected filter.</small>
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+                    
                     tableBody.innerHTML = '';
                     data.forEach(item => {
                         const row = createTableRow(item);
@@ -239,79 +360,168 @@
                     });
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    if (window.Swal && Swal.fire) {
-                        Swal.fire('Error', error.message, 'error');
-                    } else {
-                        alert(error.message);
-                    }
+                    // Show error message
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="9" class="text-center text-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Failed to load data.
+                                <br><small>Error: ${error.message}</small>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    console.error('Failed to load history data:', error.message);
                 });
         }
-
-        // Create table row
+        
+        // Create table row from API data
         function createTableRow(item) {
             const tr = document.createElement('tr');
-            const statusClass = item.Status === 'Approved' ? 'status-approved' : 
-                              item.Status === 'Returned' ? 'status-returned' : '';
+            
+            // Determine status badge
+            let statusBadge = '';
+            switch(item.Status) {
+                case 'Approved':
+                    statusBadge = '<span class="badge bg-success">Approved</span>';
+                    break;
+                case 'Returned':
+                    statusBadge = '<span class="badge bg-info">Returned</span>';
+                    break;
+                default:
+                    statusBadge = '<span class="badge bg-secondary">' + (item.Status || 'Unknown') + '</span>';
+            }
+            
+            // Format dates
+            const borrowDate = formatDate(item.Borrowdate);
+            const returnDate = formatDate(item.ReturnDate);
+            
+            // Get asset image - handle both real API data and demo data
+            let assetImage = '/public/img/logo.png'; // default fallback
+            if (item.Assetimg) {
+                if (item.Assetimg.startsWith('http') || item.Assetimg.startsWith('/')) {
+                    assetImage = item.Assetimg;
+                } else {
+                    assetImage = `/public/Addimg/${item.Assetimg}`;
+                }
+            }
             
             tr.innerHTML = `
-                <th scope="row">${item.Assetid}</th>
-                <td><img src="/public/Addimg/${item.Assetimg}" class="asset-image" alt="${item.Assetname}"></td>
-                <td>${item.Assetname}</td>
-                <td class="${statusClass}">${item.Status}</td>
-                <td>${formatDate(item.Borrowdate)}</td>
-                <td>${formatDate(item.ReturnDate)}</td>
+                <td>${item.Assetid || 'N/A'}</td>
+                <td><img src="${assetImage}" alt="${item.Assetname || 'Asset'}" class="asset-image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='/public/img/logo.png'"></td>
+                <td>${item.Assetname || 'N/A'}</td>
+                <td>${statusBadge}</td>
+                <td>${borrowDate}</td>
+                <td>${returnDate}</td>
                 <td>${item.Borrowname || 'N/A'}</td>
                 <td>${item.Activity || 'N/A'}</td>
                 <td>${item.lectname || 'N/A'}</td>
             `;
+            
             return tr;
         }
-
-        // Search functionality
-        document.getElementById('search-button').addEventListener('click', function() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const rows = document.getElementById('table-body').getElementsByTagName('tr');
-
-            Array.from(rows).forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-
-        // Search on enter key
-        document.getElementById('search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('search-button').click();
-            }
-        });
-
+        
+        // Format date function
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
-            return dateString.split('T')[0];
-        }
-    </script>
-
-    <!-- ==================== Display User ==================== -->
-    <script>
-        window.onload = function () {
-            const userid = localStorage.getItem('userid');
-            const username = localStorage.getItem('username');
-            if (username) {
-                document.getElementById('displayUsername').textContent = 'Admin: ' + username;
-                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
-            } else {
-                document.getElementById('displayUsername').textContent = 'Admin';
-                document.getElementById('displayUserid').textContent = 'ID';
+            
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'N/A';
+                
+                return date.toLocaleDateString('en-GB', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch (error) {
+                return 'N/A';
             }
         }
-    </script>
-
-    <!-- ==================== Setting ==================== -->
-    <script>
-        function redirectToStudentSet() {
+        
+        // Export functionality
+        function exportToCSV() {
+            const table = document.querySelector('table');
+            const rows = table.querySelectorAll('tr');
+            let csv = [];
+            
+            for (let row of rows) {
+                const cols = row.querySelectorAll('td, th');
+                let rowData = [];
+                
+                for (let col of cols) {
+                    // Remove HTML tags and get text content
+                    let text = col.textContent.trim();
+                    // Escape quotes and wrap in quotes if contains comma
+                    if (text.includes(',') || text.includes('"')) {
+                        text = '"' + text.replace(/"/g, '""') + '"';
+                    }
+                    rowData.push(text);
+                }
+                
+                csv.push(rowData.join(','));
+            }
+            
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'asset_history.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
+        // Refresh data
+        function refreshData() {
+            const activeFilter = document.querySelector('.filter-buttons .btn.active');
+            let currentFilter = 'all';
+            
+            if (activeFilter) {
+                const buttonText = activeFilter.textContent.trim();
+                if (buttonText.includes('All History')) {
+                    currentFilter = 'all';
+                } else if (buttonText.includes('Approved History')) {
+                    currentFilter = 'Approved';
+                } else if (buttonText.includes('Returned History')) {
+                    currentFilter = 'Returned';
+                }
+            }
+            
+            loadHistoryData(currentFilter);
+        }
+        
+        // Navigation functions
+        function redirectToStaffSet() {
             window.location.href = '/settings/stf';
         }
+        
+        function logout() {
+            localStorage.removeItem('userInfo');
+            window.location.href = '/login';
+        }
+        
+        // Load user info
+        function loadUserInfo() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            
+            if (username) {
+                document.getElementById('displayUsername').textContent = 'Staff: ' + username;
+                document.getElementById('displayUserid').textContent = 'ID: ' + userid;
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            loadHistoryData('all'); // Load initial data
+        });
     </script>
 </body>
 

@@ -42,10 +42,15 @@ exports.getRequestsByStatus = async (req, res) => {
             const summary = await borrowService.getDashboardSummary();
             return res.json(summary);
         }
+        
         const results = await borrowService.getRequestsByStatus(status, username);
         res.json(results);
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ 
+            error: 'Server error', 
+            message: error.message || 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
 

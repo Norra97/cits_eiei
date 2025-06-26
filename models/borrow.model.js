@@ -56,18 +56,21 @@ exports.getRequestsByStatus = (status, username) => {
     return new Promise((resolve, reject) => {
         let sql = '';
         let params = [];
-        if (status === 'pending') {
+        
+        // Handle undefined or null status
+        if (!status || status === 'all') {
+            sql = `
+                SELECT br.*, a.Assetname, a.Assetimg
+                FROM BorrowReq br
+                LEFT JOIN Asset a ON br.Assetid = a.Assetid
+                ORDER BY br.Borrowdate DESC
+            `;
+        } else if (status === 'pending') {
             sql = `
                 SELECT br.*, a.Assetname, a.Assetimg
                 FROM BorrowReq br
                 LEFT JOIN Asset a ON br.Assetid = a.Assetid
                 WHERE br.Status = 'Pending'
-            `;
-        } else if (status === 'all') {
-            sql = `
-                SELECT br.*, a.Assetname, a.Assetimg
-                FROM BorrowReq br
-                LEFT JOIN Asset a ON br.Assetid = a.Assetid
                 ORDER BY br.Borrowdate DESC
             `;
         } else if (status === 'Approved') {
@@ -84,6 +87,22 @@ exports.getRequestsByStatus = (status, username) => {
                 FROM BorrowReq br
                 LEFT JOIN Asset a ON br.Assetid = a.Assetid
                 WHERE br.Status = 'Returned'
+                ORDER BY br.Borrowdate DESC
+            `;
+        } else if (status === 'Reject') {
+            sql = `
+                SELECT br.*, a.Assetname, a.Assetimg
+                FROM BorrowReq br
+                LEFT JOIN Asset a ON br.Assetid = a.Assetid
+                WHERE br.Status = 'Reject'
+                ORDER BY br.Borrowdate DESC
+            `;
+        } else if (status === 'RePending') {
+            sql = `
+                SELECT br.*, a.Assetname, a.Assetimg
+                FROM BorrowReq br
+                LEFT JOIN Asset a ON br.Assetid = a.Assetid
+                WHERE br.Status = 'RePending'
                 ORDER BY br.Borrowdate DESC
             `;
         } else if (status === 'disabled') {
@@ -113,9 +132,21 @@ exports.getRequestsByStatus = (status, username) => {
                 WHERE br.Status = 'Approved' AND br.Borrowname = ?
             `;
             params = [username];
+        } else {
+            // Default case - return all data
+            sql = `
+                SELECT br.*, a.Assetname, a.Assetimg
+                FROM BorrowReq br
+                LEFT JOIN Asset a ON br.Assetid = a.Assetid
+                ORDER BY br.Borrowdate DESC
+            `;
         }
+        
         db.query(sql, params, (err, results) => {
-            if (err) return reject(err);
+            if (err) {
+                console.error('Database error in getRequestsByStatus:', err);
+                return reject(err);
+            }
             resolve(results);
         });
     });
