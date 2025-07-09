@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'IBM Plex Sans Thai', 'Sarabun', 'Prompt', 'Kanit', 'Noto Sans Thai', sans-serif;
+}
+
+/* ลูกศร navigation (chevron) ของ react-day-picker เป็นสีแดง (force ทุกระดับ) */
+.rdp-nav_button,
+.rdp-nav_button svg,
+.rdp-nav_button svg path {
+  color: #e74c3c !important;
+  fill: #e74c3c !important;
+  stroke: #e74c3c !important;
+}
+
+/* สามารถเพิ่ม global style อื่นๆ ที่ต้องการได้ที่นี่ */
