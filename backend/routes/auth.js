@@ -15,4 +15,28 @@ router.post('/login', async (req, res) => {
   res.json({ token, role: user.role, userId: user.userid, username: user.username });
 });
 
+router.post('/register', async (req, res) => {
+  const { username, email, password, phone, department } = req.body;
+  if (!username || !email || !password || !phone || !department) {
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+  const exist = await User.findByUsername(username);
+  if (exist) {
+    return res.status(400).json({ message: 'Username นี้ถูกใช้ไปแล้ว' });
+  }
+  try {
+    await User.createUser({
+      username,
+      password,
+      role: 1, // user ทั่วไป
+      phonenum: phone,
+      department,
+      useremail: email
+    });
+    res.status(201).json({ message: 'สมัครสมาชิกสำเร็จ' });
+  } catch (err) {
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก' });
+  }
+});
+
 module.exports = router; 

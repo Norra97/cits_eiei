@@ -62,6 +62,10 @@ export default function LoginPage() {
             เข้าสู่ระบบ
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <span>ยังไม่มีบัญชี?</span>
+          <button className="text-[#a6192e] underline ml-1" onClick={() => navigate('/register')}>สมัครสมาชิก</button>
+        </div>
       </div>
     </div>
   );
