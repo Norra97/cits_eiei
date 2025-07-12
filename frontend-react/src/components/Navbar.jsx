@@ -36,6 +36,15 @@ export default function Navbar({ onLogout }) {
           </div>
         )}
 
+        {user?.role === 3 && (
+          <div className="flex space-x-4 ml-8">
+            <a href="/admin" className="text-white hover:text-mfu-gold font-semibold">แดชบอร์ด</a>
+            <a href="/admin/users" className="text-white hover:text-mfu-gold font-semibold">จัดการผู้ใช้</a>
+            <a href="/admin/items" className="text-white hover:text-mfu-gold font-semibold">จัดการอุปกรณ์</a>
+            <a href="/admin/reports" className="text-white hover:text-mfu-gold font-semibold">รายงาน</a>
+          </div>
+        )}
+
         {/* Right side: Theme, Notification, Profile */}
         <div className="flex items-center space-x-2">
           {/* Profile dropdown */}

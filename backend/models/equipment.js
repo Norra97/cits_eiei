@@ -14,7 +14,19 @@ const Equipment = {
     return rows[0];
   },
   async update(id, { Assetname, Assetdetail, Assetcode, Assetlocation, Assetimg, Assetstatus, Assettype }) {
-    await pool.query('UPDATE asset SET Assetname = ?, Assetdetail = ?, Assetcode = ?, Assetlocation = ?, Assetimg = ?, Assetstatus = ?, Assettype = ? WHERE Assetid = ?', [Assetname, Assetdetail, Assetcode, Assetlocation, Assetimg, Assetstatus, Assettype, id]);
+    await pool.query(
+      'UPDATE asset SET Assetname = ?, Assetdetail = ?, Assetcode = ?, Assetlocation = ?, Assetimg = ?, Assetstatus = ?, Assettype = ? WHERE Assetid = ?',
+      [
+        Assetname || '',
+        Assetdetail || '',
+        Assetcode || '',
+        Assetlocation || 'MFU',
+        Assetimg || '',
+        Assetstatus || 'Available',
+        Assettype || '',
+        id
+      ]
+    );
   },
   async updateStatus(id, Assetstatus) {
     await pool.query('UPDATE asset SET Assetstatus = ? WHERE Assetid = ?', [Assetstatus, id]);
