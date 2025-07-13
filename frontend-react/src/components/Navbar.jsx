@@ -12,8 +12,8 @@ export default function Navbar({ onLogout }) {
         <a href="#" className="flex items-center">
           <img src="/images/mfu-logo.png" alt="Logo" className="h-12 w-auto mr-3" />
           <div className="text-center">
-            <div className="font-bold text-base sm:text-lg">Equipment Borrowing and Returning System</div>
-            <div className="text-[13px] sm:text-sm font-bold text-[#806850]">MAE FAH LUANG UNIVERSITY</div>
+            <div className="font-bold text-base sm:text-lg" style={{ color: '#C89B2C' }}>Equipment Borrowing and Returning System</div>
+            <div className="text-[13px] sm:text-sm font-bold" style={{ color: '#FFFFFF' }}>MAE FAH LUANG UNIVERSITY</div>
           </div>
         </a>
 
