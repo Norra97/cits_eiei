@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+
+function base64UrlDecode(str) {
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (str.length % 4) {
+    str += '=';
+  }
+  return atob(str);
+}
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -9,32 +17,51 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const { login, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [hasProcessedToken, setHasProcessedToken] = useState(false);
 
-  // รับ token จาก URL และ login
+  // รับ token จาก URL และ login (ใช้ location.search)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    if (hasProcessedToken) return; // ป้องกัน execute ซ้ำ
+
+    const params = new URLSearchParams(location.search);
     const token = params.get('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        login({
-          userId: payload.id,
-          username: payload.username,
-          role: payload.role,
-          token,
-          picture: payload.picture // รองรับรูปจาก Google
-        });
-      } catch (e) {
-        console.error('JWT decode error:', e);
+    if (!token) return; // ถ้าไม่มี token ไม่ต้องทำอะไร
+
+    try {
+      const payload = JSON.parse(base64UrlDecode(token.split('.')[1]));
+      login({
+        userId: payload.id,
+        username: payload.username,
+        role: payload.role,
+        token,
+        picture: payload.picture
+      });
+      setHasProcessedToken(true); // set flag
+      // ลบ token ออกจาก URL และ redirect ไปหน้า dashboard ตาม role
+      const role = Number(payload.role);
+      if (role === 3) {
+        window.history.replaceState({}, document.title, '/admin');
+        navigate('/admin', { replace: true });
+      } else if (role === 2) {
+        window.history.replaceState({}, document.title, '/staff');
+        navigate('/staff', { replace: true });
+      } else {
+        window.history.replaceState({}, document.title, '/user');
+        navigate('/user', { replace: true });
       }
+    } catch (e) {
+      console.error('JWT decode error:', e);
     }
-  }, [login]);
+    // eslint-disable-next-line
+  }, [login, location.search, hasProcessedToken, navigate]);
 
   // redirect หลัง login สำเร็จ
   useEffect(() => {
     if (user) {
-      if (user.role === 3) navigate('/admin');
-      else if (user.role === 2) navigate('/staff');
+      const role = Number(user.role); // แปลงเป็นตัวเลขเสมอ
+      if (role === 3) navigate('/admin');
+      else if (role === 2) navigate('/staff');
       else navigate('/user');
     }
   }, [user, navigate]);

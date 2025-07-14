@@ -14,6 +14,7 @@ passport.use(new GoogleStrategy({
     user.picture = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
     return done(null, user);
   } catch (err) {
+    console.error('GoogleStrategy error:', err); // เพิ่ม log error
     return done(err, null);
   }
 }));

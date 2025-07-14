@@ -35,15 +35,14 @@ app.get('/api/auth/google',
 app.get('/api/auth/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: '/login' }),
   (req, res) => {
-    console.log('Google OAuth callback req.user:', req.user);
     const jwt = require('jsonwebtoken');
     const token = jwt.sign({
       id: req.user.userid,
       username: req.user.username,
       email: req.user.useremail,
-      role: req.user.role
+      role: req.user.role,
+      picture: req.user.picture // เพิ่ม picture ใน payload
     }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    console.log('Google OAuth callback token:', token);
     res.redirect(`http://localhost:5173/login?token=${token}`);
   }
 );
