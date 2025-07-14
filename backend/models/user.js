@@ -33,11 +33,8 @@ const User = {
       [rows] = await pool.query('SELECT * FROM user WHERE useremail = ?', [useremail]);
       return rows[0];
     }
-    // ถ้าไม่มีทั้ง google_id และ useremail ให้สร้างใหม่
-    const username = profile.displayName;
-    await pool.query('INSERT INTO user (username, useremail, google_id, role) VALUES (?, ?, ?, ?)', [username, useremail, profile.id, 1]);
-    [rows] = await pool.query('SELECT * FROM user WHERE google_id = ?', [profile.id]);
-    return rows[0];
+    // ถ้าไม่มีทั้ง google_id และ useremail ให้ return null (ไม่สร้าง user ใหม่)
+    return null;
   }
 };
 

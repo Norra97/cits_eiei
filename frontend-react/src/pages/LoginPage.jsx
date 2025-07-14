@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -17,6 +18,7 @@ export default function LoginPage() {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Decoded Google JWT:', payload);
         login({
           userId: payload.id,
           username: payload.username,
@@ -24,6 +26,8 @@ export default function LoginPage() {
           token,
           picture: payload.picture // รองรับรูปจาก Google
         });
+        // ลบ token ออกจาก URL หลัง login
+        window.history.replaceState({}, document.title, window.location.pathname);
       } catch (e) {
         console.error('JWT decode error:', e);
       }
@@ -32,6 +36,7 @@ export default function LoginPage() {
 
   // redirect หลัง login สำเร็จ
   useEffect(() => {
+    console.log('Current user context:', user);
     if (user) {
       if (user.role === 3) navigate('/admin');
       else if (user.role === 2) navigate('/staff');
@@ -60,8 +65,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#a6192e] to-[#bfa14a]">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center relative" style={{ minHeight: '100vh' }}>
+      <img
+        src="http://localhost:3001/images/mfubackgroud.jpg"
+        alt="MFU Background"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        style={{ filter: 'brightness(0.6)' }}
+      />
+      <div className="absolute inset-0 bg-black opacity-30 z-10" />
+      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative z-20">
         <div className="flex flex-col items-center mb-6">
           <img src="/images/mfu-logo.png" alt="MFU Logo" className="w-10 h-16 mb-2" />
           <h1 className="text-2xl font-bold text-[#a6192e]">MFU Borrow System</h1>
@@ -91,15 +103,19 @@ export default function LoginPage() {
             เข้าสู่ระบบ
           </button>
         </form>
-        <div className="mt-4 flex flex-col items-center gap-2">
-          <button
-            onClick={() => window.location.href = 'http://localhost:3001/api/auth/google'}
-            className="bg-white border text-black px-4 py-2 rounded flex items-center gap-2 shadow hover:bg-gray-100"
-          >
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style={{ width: 20 }} />
-            Login with Google
-          </button>
+        <div className="flex items-center my-4">
+          <div className="flex-grow h-px bg-gray-300" />
+          <span className="mx-2 text-gray-400">หรือ</span>
+          <div className="flex-grow h-px bg-gray-300" />
         </div>
+        <button
+          className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded py-2 hover:bg-gray-100 transition-colors font-semibold text-gray-700 mb-2"
+          onClick={() => window.location.href = 'http://localhost:3001/api/auth/google'}
+          type="button"
+        >
+          <FcGoogle className="text-2xl" />
+          <span>เข้าสู่ระบบด้วย Google</span>
+        </button>
         <div className="mt-4 text-center">
           <span>ยังไม่มีบัญชี?</span>
           <button className="text-[#a6192e] underline ml-1" onClick={() => navigate('/register')}>สมัครสมาชิก</button>

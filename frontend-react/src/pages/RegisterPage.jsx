@@ -31,8 +31,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#a6192e] to-[#bfa14a]">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center relative" style={{ minHeight: '100vh' }}>
+      <img
+        src="http://localhost:3001/images/mfubackgroud.jpg"
+        alt="MFU Background"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        style={{ filter: 'brightness(0.6)' }}
+      />
+      <div className="absolute inset-0 bg-black opacity-30 z-10" />
+      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative z-20">
         <div className="flex flex-col items-center mb-6">
           <img src="/images/mfu-logo.png" alt="MFU Logo" className="w-10 h-16 mb-2" />
           <h1 className="text-2xl font-bold text-[#a6192e]">สมัครสมาชิก</h1>
