@@ -70,7 +70,7 @@ export default function ConfirmReturn() {
 
   return (
     <div className="p-4 bg-white rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
-      <h2 className="text-2xl font-bold mb-4 text-mfu-red">ยืนยันการคืน</h2>
+      <h2 className="text-2xl font-bold mb-4 text-mfu-red">Confirm Return</h2>
       {successMsg && <div className="mb-2 text-green-700 font-semibold">{successMsg}</div>}
       {error && <div className="mb-2 text-red-600">{error}</div>}
       {loading ? (
@@ -105,12 +105,12 @@ export default function ConfirmReturn() {
                       className="bg-green-100 text-green-800 font-bold py-2 px-6 rounded-full shadow-none mr-2 text-lg hover:bg-green-200 transition disabled:opacity-60"
                       onClick={() => setApproveModal({ open: true, req })}
                       disabled={actionLoading}
-                    >ยืนยัน</button>
+                    >Approve</button>
                     <button
                       className="bg-red-100 text-red-700 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-red-200 transition disabled:opacity-60"
                       onClick={() => setRejectModal({ open: true, req, comment: '' })}
                       disabled={actionLoading}
-                    >ปฏิเสธ</button>
+                    >Reject</button>
                   </td>
                 </tr>
               ))}
@@ -123,19 +123,19 @@ export default function ConfirmReturn() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
-            <h3 className="text-lg font-bold mb-2 text-green-800">ยืนยันการคืน</h3>
-            <div className="mb-4">คุณต้องการยืนยันการคืนของ <b>{approveModal.req.Borrowname}</b> สำหรับอุปกรณ์ <b>{approveModal.req.Assetname || approveModal.req.Assetid}</b> ใช่หรือไม่?</div>
+            <h3 className="text-lg font-bold mb-2 text-green-800">Approve Return</h3>
+            <div className="mb-4">Do you want to approve the return for <b>{approveModal.req.Borrowname}</b> (equipment: <b>{approveModal.req.Assetname || approveModal.req.Assetid}</b>)?</div>
             <div className="flex gap-2 justify-end">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setApproveModal({ open: false, req: null })}
                 disabled={actionLoading}
-              >ยกเลิก</button>
+              >Cancel</button>
               <button
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                 onClick={handleApprove}
                 disabled={actionLoading}
-              >{actionLoading ? 'กำลังยืนยัน...' : 'ยืนยัน'}</button>
+              >{actionLoading ? 'Approving...' : 'Approve'}</button>
             </div>
           </div>
         </div>
@@ -145,31 +145,31 @@ export default function ConfirmReturn() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
-            <h3 className="text-lg font-bold mb-2 text-mfu-red">ปฏิเสธการคืน</h3>
-            <div className="mb-2">กรุณาเลือกเหตุผล:</div>
+            <h3 className="text-lg font-bold mb-2 text-mfu-red">Reject Return</h3>
+            <div className="mb-2">Please select a reason:</div>
             <div className="flex flex-col gap-3 mb-3">
               <button
-                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'อุปกรณ์ไม่ครบ' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
-                onClick={() => setRejectModal(m => ({ ...m, comment: 'อุปกรณ์ไม่ครบ' }))}
+                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'Missing equipment' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
+                onClick={() => setRejectModal(m => ({ ...m, comment: 'Missing equipment' }))}
                 disabled={actionLoading}
-              >อุปกรณ์ไม่ครบ</button>
+              >Missing equipment</button>
               <button
-                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'อุปกรณ์เสียหาย' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
-                onClick={() => setRejectModal(m => ({ ...m, comment: 'อุปกรณ์เสียหาย' }))}
+                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'Damaged equipment' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
+                onClick={() => setRejectModal(m => ({ ...m, comment: 'Damaged equipment' }))}
                 disabled={actionLoading}
-              >อุปกรณ์เสียหาย</button>
+              >Damaged equipment</button>
             </div>
             <div className="flex gap-2 justify-end">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setRejectModal({ open: false, req: null, comment: '' })}
                 disabled={actionLoading}
-              >ยกเลิก</button>
+              >Cancel</button>
               <button
                 className="px-4 py-2 bg-mfu-red text-white rounded hover:bg-mfu-gold"
                 onClick={handleReject}
                 disabled={actionLoading || !rejectModal.comment}
-              >{actionLoading ? 'กำลังดำเนินการ...' : 'ยืนยัน'}</button>
+              >{actionLoading ? 'Processing...' : 'Confirm'}</button>
             </div>
           </div>
         </div>

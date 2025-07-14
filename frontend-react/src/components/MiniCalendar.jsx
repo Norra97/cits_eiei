@@ -79,18 +79,58 @@ export default function MiniCalendar({ dueDates = [] }) {
                 return (
                   <td key={j} className="py-1" style={{ minWidth: 40, width: 40, height: 40, padding: 0 }}>
                     {d ? (
-                      <span
-                        className={
-                          isDue
-                            ? "bg-yellow-300 text-red-700 font-extrabold rounded-full border-2 border-red-400 shadow text-lg animate-pulse flex items-center justify-center mx-auto"
-                            : isToday
-                              ? "bg-blue-100 text-blue-700 font-bold rounded-full border border-blue-300 flex items-center justify-center mx-auto"
-                              : "inline-flex items-center justify-center mx-auto"
-                        }
-                        style={{ display: 'inline-flex', minWidth: 32, minHeight: 32, lineHeight: '32px', alignItems: 'center', justifyContent: 'center' }}
-                      >
-                        {d}
-                      </span>
+                      isDue && isToday ? (
+                        <span
+                          className="flex items-center justify-center mx-auto"
+                          style={{ minWidth: 40, minHeight: 40 }}
+                        >
+                          <span
+                            className="rounded-full border-2 border-red-400 flex items-center justify-center"
+                            style={{ width: 36, height: 36, background: 'white' }}
+                          >
+                            <span
+                              className="bg-blue-100 text-red-700 font-extrabold rounded-full flex items-center justify-center animate-pulse"
+                              style={{ width: 28, height: 28, fontSize: 18 }}
+                            >
+                              {d}
+                            </span>
+                          </span>
+                        </span>
+                      ) : (
+                        <span
+                          className={
+                            isDue
+                              ? "bg-yellow-300 text-red-700 font-extrabold rounded-full border-2 border-red-400 shadow text-lg animate-pulse flex items-center justify-center mx-auto"
+                              : isToday
+                                ? "bg-blue-100 text-blue-700 font-bold rounded-full border border-blue-300 flex items-center justify-center mx-auto"
+                                : "inline-flex items-center justify-center mx-auto"
+                          }
+                          style={{ display: 'inline-flex', minWidth: 32, minHeight: 32, lineHeight: '32px', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          {isDue && !isToday ? (
+                            <span
+                              className="rounded-full border-2 border-red-400 flex items-center justify-center animate-pulse"
+                              style={{ width: 36, height: 36, background: 'white' }}
+                            >
+                              <span
+                                className="bg-yellow-300 text-red-700 font-extrabold rounded-full flex items-center justify-center"
+                                style={{ width: 28, height: 28, fontSize: 18 }}
+                              >
+                                {d}
+                              </span>
+                            </span>
+                          ) : isToday ? (
+                            <span
+                              className="bg-blue-100 text-blue-700 font-bold rounded-full border border-blue-300 flex items-center justify-center mx-auto"
+                              style={{ width: 32, height: 32, fontSize: 16 }}
+                            >
+                              {d}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center mx-auto">{d}</span>
+                          )}
+                        </span>
+                      )
                     ) : ""}
                   </td>
                 );

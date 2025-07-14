@@ -24,6 +24,7 @@ export default function RequestBorrow() {
   const [submitting, setSubmitting] = React.useState(false); // สถานะกำลังส่งฟอร์ม
   const [showInfoModal, setShowInfoModal] = React.useState(false); // สำหรับ modal ข้อมูลอุปกรณ์
   const [infoAsset, setInfoAsset] = React.useState(null); // อุปกรณ์ที่ดูข้อมูล
+  const [dateError, setDateError] = React.useState(''); // ข้อความ error วันที่
 
   // โหลดรายการอุปกรณ์เมื่อ component mount
   React.useEffect(() => {
@@ -68,6 +69,12 @@ export default function RequestBorrow() {
   const handleSubmit = async e => {
     e.preventDefault();
     if (!selectedAsset) return;
+    setDateError('');
+    // Validation: ReturnDate must be >= Borrowdate
+    if (form.Borrowdate && form.ReturnDate && form.ReturnDate < form.Borrowdate) {
+      setDateError('ห้ามคืนก่อนวันที่ยืม');
+      return;
+    }
     setSubmitting(true);
     setSubmitMsg('');
     try {
@@ -113,6 +120,7 @@ export default function RequestBorrow() {
                 <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">รหัส</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">สถานที่</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">สถานะ</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">ข้อมูลอุปกรณ์</th>
                 <th className="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider rounded-tr-lg">ขอยืม</th>
               </tr>
             </thead>
@@ -121,12 +129,25 @@ export default function RequestBorrow() {
                 <tr
                   key={asset.Assetid}
                   className="hover:bg-mfu-gold/10 transition cursor-pointer"
-                  onClick={() => openInfoModal(asset)}
                 >
                   <td className="px-6 py-4 border-b font-medium">{asset.Assetname}</td>
                   <td className="px-6 py-4 border-b">{asset.Assetcode}</td>
                   <td className="px-6 py-4 border-b">{asset.Assetlocation}</td>
                   <td className="px-6 py-4 border-b">{asset.Assetstatus}</td>
+                  <td className="px-6 py-4 border-b text-center flex justify-center items-center">
+                    <button
+                      className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent hover:bg-transparent focus:bg-transparent border-none shadow-none"
+                      style={{ background: 'none', border: 'none', boxShadow: 'none' }}
+                      onClick={e => { e.stopPropagation(); openInfoModal(asset); }}
+                      title="ดูข้อมูลอุปกรณ์"
+                    >
+                      <svg className="w-5 h-5 text-mfu-red" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                        <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" />
+                        <circle cx="12" cy="16" r="1" fill="currentColor" />
+                      </svg>
+                    </button>
+                  </td>
                   <td className="px-6 py-4 border-b text-center">
                     <button className="bg-mfu-red text-white px-4 py-1 rounded hover:bg-mfu-gold hover:text-mfu-red transition font-semibold" disabled={false} onClick={e => { e.stopPropagation(); openModal(asset); }}>
                       ขอยืม
@@ -144,6 +165,13 @@ export default function RequestBorrow() {
           <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={closeModal}>&times;</button>
             <h3 className="text-xl font-bold mb-4 text-mfu-red">ขอยืม: {selectedAsset.Assetname}</h3>
+            {selectedAsset.Assetimg && (
+              <img
+                src={`http://localhost:3001/images/${selectedAsset.Assetimg}`}
+                alt={selectedAsset.Assetname}
+                style={{ width: '100%', maxHeight: 200, objectFit: 'contain', marginBottom: 16, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              />
+            )}
             <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <label className="block font-semibold mb-1">วันที่ยืม</label>
@@ -170,6 +198,7 @@ export default function RequestBorrow() {
                   </label>
                 </div>
               </div>
+              {dateError && <div className="text-center text-red-600 font-semibold">{dateError}</div>}
               <button type="submit" className="w-full bg-mfu-red text-white py-2 rounded font-semibold hover:bg-mfu-gold hover:text-mfu-red transition" disabled={submitting}>{submitting ? 'กำลังส่ง...' : 'ยืนยันขอยืม'}</button>
               {submitMsg && <div className="text-center mt-2 text-mfu-red">{submitMsg}</div>}
             </form>

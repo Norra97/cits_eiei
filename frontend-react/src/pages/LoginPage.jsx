@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -7,8 +7,37 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+
+  // รับ token จาก URL และ login
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        login({
+          userId: payload.id,
+          username: payload.username,
+          role: payload.role,
+          token,
+          picture: payload.picture // รองรับรูปจาก Google
+        });
+      } catch (e) {
+        console.error('JWT decode error:', e);
+      }
+    }
+  }, [login]);
+
+  // redirect หลัง login สำเร็จ
+  useEffect(() => {
+    if (user) {
+      if (user.role === 3) navigate('/admin');
+      else if (user.role === 2) navigate('/staff');
+      else navigate('/user');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,6 +91,15 @@ export default function LoginPage() {
             เข้าสู่ระบบ
           </button>
         </form>
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <button
+            onClick={() => window.location.href = 'http://localhost:3001/api/auth/google'}
+            className="bg-white border text-black px-4 py-2 rounded flex items-center gap-2 shadow hover:bg-gray-100"
+          >
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style={{ width: 20 }} />
+            Login with Google
+          </button>
+        </div>
         <div className="mt-4 text-center">
           <span>ยังไม่มีบัญชี?</span>
           <button className="text-[#a6192e] underline ml-1" onClick={() => navigate('/register')}>สมัครสมาชิก</button>

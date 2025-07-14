@@ -20,6 +20,24 @@ const User = {
   },
   async deleteUser(id) {
     await pool.query('DELETE FROM user WHERE userid = ?', [id]);
+  },
+  async findOrCreateGoogle(profile) {
+    // profile.id, profile.displayName, profile.emails[0].value
+    const useremail = profile.emails[0].value;
+    let [rows] = await pool.query('SELECT * FROM user WHERE google_id = ?', [profile.id]);
+    if (rows.length > 0) return rows[0];
+    // ถ้ายังไม่มี google_id, แต่มี useremail อยู่แล้ว ให้ update google_id
+    [rows] = await pool.query('SELECT * FROM user WHERE useremail = ?', [useremail]);
+    if (rows.length > 0) {
+      await pool.query('UPDATE user SET google_id = ? WHERE useremail = ?', [profile.id, useremail]);
+      [rows] = await pool.query('SELECT * FROM user WHERE useremail = ?', [useremail]);
+      return rows[0];
+    }
+    // ถ้าไม่มีทั้ง google_id และ useremail ให้สร้างใหม่
+    const username = profile.displayName;
+    await pool.query('INSERT INTO user (username, useremail, google_id, role) VALUES (?, ?, ?, ?)', [username, useremail, profile.id, 1]);
+    [rows] = await pool.query('SELECT * FROM user WHERE google_id = ?', [profile.id]);
+    return rows[0];
   }
 };
 
