@@ -18,7 +18,7 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
     if (password !== confirmPassword) {
-      setError('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+      setError('รหัสผ่านไม่ตรงกัน');
       return;
     }
     try {

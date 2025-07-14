@@ -22,6 +22,8 @@ export default function RequestBorrow() {
   });
   const [submitMsg, setSubmitMsg] = React.useState(''); // ข้อความแจ้งเตือนหลัง submit
   const [submitting, setSubmitting] = React.useState(false); // สถานะกำลังส่งฟอร์ม
+  const [showInfoModal, setShowInfoModal] = React.useState(false); // สำหรับ modal ข้อมูลอุปกรณ์
+  const [infoAsset, setInfoAsset] = React.useState(null); // อุปกรณ์ที่ดูข้อมูล
 
   // โหลดรายการอุปกรณ์เมื่อ component mount
   React.useEffect(() => {
@@ -47,6 +49,16 @@ export default function RequestBorrow() {
     setShowModal(false);
     setSelectedAsset(null);
     setSubmitMsg('');
+  };
+  // ฟังก์ชันเปิด modal ข้อมูลอุปกรณ์
+  const openInfoModal = (asset) => {
+    setInfoAsset(asset);
+    setShowInfoModal(true);
+  };
+  // ฟังก์ชันปิด modal ข้อมูลอุปกรณ์
+  const closeInfoModal = () => {
+    setShowInfoModal(false);
+    setInfoAsset(null);
   };
   // handleChange: อัปเดตค่าฟอร์มเมื่อกรอกข้อมูล
   const handleChange = e => {
@@ -106,13 +118,17 @@ export default function RequestBorrow() {
             </thead>
             <tbody>
               {assets.map(asset => (
-                <tr key={asset.Assetid} className="hover:bg-mfu-gold/10 transition">
+                <tr
+                  key={asset.Assetid}
+                  className="hover:bg-mfu-gold/10 transition cursor-pointer"
+                  onClick={() => openInfoModal(asset)}
+                >
                   <td className="px-6 py-4 border-b font-medium">{asset.Assetname}</td>
                   <td className="px-6 py-4 border-b">{asset.Assetcode}</td>
                   <td className="px-6 py-4 border-b">{asset.Assetlocation}</td>
                   <td className="px-6 py-4 border-b">{asset.Assetstatus}</td>
                   <td className="px-6 py-4 border-b text-center">
-                    <button className="bg-mfu-red text-white px-4 py-1 rounded hover:bg-mfu-gold hover:text-mfu-red transition font-semibold" disabled={false} onClick={() => openModal(asset)}>
+                    <button className="bg-mfu-red text-white px-4 py-1 rounded hover:bg-mfu-gold hover:text-mfu-red transition font-semibold" disabled={false} onClick={e => { e.stopPropagation(); openModal(asset); }}>
                       ขอยืม
                     </button>
                   </td>
@@ -157,6 +173,23 @@ export default function RequestBorrow() {
               <button type="submit" className="w-full bg-mfu-red text-white py-2 rounded font-semibold hover:bg-mfu-gold hover:text-mfu-red transition" disabled={submitting}>{submitting ? 'กำลังส่ง...' : 'ยืนยันขอยืม'}</button>
               {submitMsg && <div className="text-center mt-2 text-mfu-red">{submitMsg}</div>}
             </form>
+          </div>
+        </div>
+      )}
+      {/* Info Modal */}
+      {showInfoModal && infoAsset && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]">
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={closeInfoModal}>&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-mfu-red">ข้อมูลอุปกรณ์</h3>
+            <div className="mb-4 p-3 bg-gray-50 rounded border">
+              <div><b>ชื่ออุปกรณ์:</b> {infoAsset.Assetname}</div>
+              <div><b>รหัส:</b> {infoAsset.Assetcode}</div>
+              <div><b>สถานที่:</b> {infoAsset.Assetlocation}</div>
+              <div><b>สถานะ:</b> {infoAsset.Assetstatus}</div>
+              <div><b>รายละเอียด:</b> <div className="whitespace-pre-line inline">{infoAsset.Assetdetail || '-'}</div></div>
+            </div>
+            <button className="mt-2 px-4 py-2 bg-mfu-red text-white rounded hover:bg-mfu-gold hover:text-mfu-red font-semibold" onClick={closeInfoModal}>ปิด</button>
           </div>
         </div>
       )}
