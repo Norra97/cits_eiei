@@ -61,7 +61,9 @@ export default function MiniCalendar({ dueDates = [] }) {
         <thead>
           <tr className="text-gray-500">
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
-              <th key={d} className="py-1">{d}</th>
+              <th key={d} className="py-1" style={{ minWidth: 40, width: 40 }}>
+                {d}
+              </th>
             ))}
           </tr>
         </thead>
@@ -73,14 +75,20 @@ export default function MiniCalendar({ dueDates = [] }) {
                   ? `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
                   : "";
                 const isDue = dueSet.has(dateStr);
+                const isToday = d && year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
                 return (
-                  <td key={j} className="py-1">
+                  <td key={j} className="py-1" style={{ minWidth: 40, width: 40, height: 40, padding: 0 }}>
                     {d ? (
-                      <span className={
-                        isDue
-                          ? "text-red-500 font-bold"
-                          : ""
-                      }>
+                      <span
+                        className={
+                          isDue
+                            ? "bg-yellow-300 text-red-700 font-extrabold rounded-full border-2 border-red-400 shadow text-lg animate-pulse flex items-center justify-center mx-auto"
+                            : isToday
+                              ? "bg-blue-100 text-blue-700 font-bold rounded-full border border-blue-300 flex items-center justify-center mx-auto"
+                              : "inline-flex items-center justify-center mx-auto"
+                        }
+                        style={{ display: 'inline-flex', minWidth: 32, minHeight: 32, lineHeight: '32px', alignItems: 'center', justifyContent: 'center' }}
+                      >
                         {d}
                       </span>
                     ) : ""}
@@ -92,7 +100,8 @@ export default function MiniCalendar({ dueDates = [] }) {
         </tbody>
       </table>
       <div className="mt-2 text-xs text-gray-500 text-center">
-        * วันที่เป็นสีแดงคือวันครบกำหนดคืนอุปกรณ์
+        * วันที่เป็น<span style={{ color: '#2563eb', fontWeight: 'bold' }}>สีน้ำเงิน</span>คือวันนี้<br/>
+        * วันที่เป็น<span style={{ color: '#dc2626', fontWeight: 'bold' }}>สีแดง</span>คือวันครบกำหนดคืนอุปกรณ์<br/>
       </div>
     </div>
   );
