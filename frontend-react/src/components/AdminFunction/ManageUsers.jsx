@@ -39,6 +39,7 @@ export default function ManageUsers() {
         role: selectedUser.role || 1,
         department: selectedUser.department || '',
         useremail: selectedUser.useremail || '',
+        phonenum: selectedUser.phonenum || '',
       });
       setError('');
     }
@@ -102,6 +103,7 @@ export default function ManageUsers() {
                 <th className="py-3 px-4 text-left font-semibold">บทบาท</th>
                 <th className="py-3 px-4 text-left font-semibold">แผนก</th>
                 <th className="py-3 px-4 text-left font-semibold">อีเมล</th>
+                <th className="py-3 px-4 text-left font-semibold">เบอร์โทร</th>
               </tr>
             </thead>
             <tbody>
@@ -112,6 +114,7 @@ export default function ManageUsers() {
                   <td className="py-2.5 px-4 text-gray-700">{u.role === 3 ? 'แอดมิน' : u.role === 2 ? 'เจ้าหน้าที่' : 'ผู้ใช้'}</td>
                   <td className="py-2.5 px-4 text-gray-600">{u.department || '-'}</td>
                   <td className="py-2.5 px-4 text-gray-600">{u.useremail || '-'}</td>
+                  <td className="py-2.5 px-4 text-gray-600">{u.phonenum || '-'}</td>
                 </tr>
               ))}
               {filteredUsers.length === 0 && (
@@ -148,6 +151,10 @@ export default function ManageUsers() {
               <div>
                 <label className="block text-sm mb-1">อีเมล</label>
                 <input className="w-full border rounded px-3 py-2" value={form.useremail} onChange={e => setForm(f => ({ ...f, useremail: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">เบอร์โทร</label>
+                <input className="w-full border rounded px-3 py-2" value={form.phonenum || ''} onChange={e => setForm(f => ({ ...f, phonenum: e.target.value }))} />
               </div>
               {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
               <button className="w-full bg-mfu-gold text-white py-2 rounded font-semibold mt-2 hover:opacity-90 disabled:opacity-60" onClick={handleSave} disabled={saving}>{saving ? 'กำลังบันทึก...' : 'บันทึก'}</button>

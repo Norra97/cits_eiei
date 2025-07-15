@@ -147,17 +147,33 @@ export default function ApproveRequests() {
             <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-mfu-red">ปฏิเสธคำขอยืม</h3>
             <div className="mb-2">กรุณาเลือกเหตุผล:</div>
-            <div className="flex flex-col gap-3 mb-3">
-              <button
-                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'ไม่พร้อม' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
-                onClick={() => setRejectModal(m => ({ ...m, comment: 'ไม่พร้อม' }))}
+            <div className="mb-3">
+              <select
+                className="w-full px-4 py-2 rounded font-semibold border bg-gray-100 text-mfu-red focus:outline-none focus:ring-2 focus:ring-mfu-red"
+                value={['ไม่พร้อม', 'เสียหาย'].includes(rejectModal.comment) ? rejectModal.comment : rejectModal.comment ? 'other' : ''}
+                onChange={e => {
+                  if (e.target.value === 'other') {
+                    setRejectModal(m => ({ ...m, comment: '' }));
+                  } else {
+                    setRejectModal(m => ({ ...m, comment: e.target.value }));
+                  }
+                }}
                 disabled={actionLoading}
-              >ไม่พร้อม</button>
-              <button
-                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'เสียหาย' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
-                onClick={() => setRejectModal(m => ({ ...m, comment: 'เสียหาย' }))}
-                disabled={actionLoading}
-              >เสียหาย</button>
+              >
+                <option value="">-- เลือกเหตุผล --</option>
+                <option value="ไม่พร้อม">ไม่พร้อม</option>
+                <option value="เสียหาย">เสียหาย</option>
+                <option value="other">อื่น ๆ (โปรดระบุ)</option>
+              </select>
+              {(!['ไม่พร้อม', 'เสียหาย'].includes(rejectModal.comment)) && (
+                <input
+                  className="w-full mt-2 px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-mfu-red"
+                  placeholder="โปรดระบุเหตุผล"
+                  value={rejectModal.comment}
+                  onChange={e => setRejectModal(m => ({ ...m, comment: e.target.value }))}
+                  disabled={actionLoading}
+                />
+              )}
             </div>
             <div className="flex gap-2 justify-end">
               <button

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -44,6 +45,15 @@ export default function LoginPage() {
       else navigate('/user');
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      window.location.href = '/user'; // reload หน้าใหม่ทันที
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

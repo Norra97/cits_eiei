@@ -50,7 +50,7 @@ export default function Navbar({ onLogout }) {
           {/* Profile dropdown */}
           <div className="relative">
             <img
-              src="/images/profile.webp"
+              src={user?.picture || '/images/profile.webp'}
               alt="profile"
               className="h-9 w-9 rounded-full cursor-pointer border-2 border-mfu-gold"
               onClick={() => setShowProfile(v => !v)}
@@ -58,7 +58,7 @@ export default function Navbar({ onLogout }) {
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
                 <div className="flex flex-col items-center p-4 border-b">
-                  <img src="/images/profile.webp" alt="Profile" className="h-12 w-12 rounded-full mb-2" />
+                  <img src={user?.picture || '/images/profile.webp'} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
                   <p className="font-semibold">{user?.username || 'Guest'}</p>
                   <p className="text-xs text-gray-500">{user?.userId || 'ID'}</p>
                 </div>
