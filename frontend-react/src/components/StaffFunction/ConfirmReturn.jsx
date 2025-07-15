@@ -120,9 +120,11 @@ export default function ConfirmReturn() {
       )}
       {/* Modal ยืนยัน */}
       {approveModal.open && approveModal.req && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) setApproveModal({ open: false, req: null });
+        }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-green-800">Approve Return</h3>
             <div className="mb-4">Do you want to approve the return for <b>{approveModal.req.Borrowname}</b> (equipment: <b>{approveModal.req.Assetname || approveModal.req.Assetid}</b>)?</div>
             <div className="flex gap-2 justify-end">
@@ -142,9 +144,11 @@ export default function ConfirmReturn() {
       )}
       {/* Modal ปฏิเสธ */}
       {rejectModal.open && rejectModal.req && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) setRejectModal({ open: false, req: null, comment: '' });
+        }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-mfu-red">Reject Return</h3>
             <div className="mb-2">Please select a reason:</div>
             <div className="flex flex-col gap-3 mb-3">

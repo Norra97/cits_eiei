@@ -79,8 +79,11 @@ export default function ReturnItem({ items = [] }) {
                     </button>
                     {/* ยืนยันคืน */}
                     {selected === item.Reqid && (
-                      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+                        if (e.target === e.currentTarget) setSelected(null);
+                      }}>
+                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative" onClick={e => e.stopPropagation()}>
+                          <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setSelected(null)}>&times;</button>
                           <h3 className="text-lg font-bold mb-2">ยืนยันการคืนอุปกรณ์</h3>
                           <p className="mb-4">คุณต้องการคืน "{item.Assetname}" ใช่หรือไม่?</p>
                           <div className="flex gap-2 justify-end">

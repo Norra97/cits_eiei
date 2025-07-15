@@ -25,4 +25,18 @@ router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
   res.json({ message: 'deleted' });
 });
 
+// Change password (self)
+router.post('/change-password', authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+  try {
+    await User.changePassword(req.user.id, currentPassword, newPassword);
+    res.json({ message: 'เปลี่ยนรหัสผ่านสำเร็จ' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = router; 

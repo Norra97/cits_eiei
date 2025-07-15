@@ -2,14 +2,28 @@ const express = require('express');
 const router = express.Router();
 const Equipment = require('../models/equipment');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+
+// Multer config
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../images'));
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
 
 // Get all equipment
 router.get('/', authenticateToken, async (req, res) => {
   const items = await Equipment.getAll();
   res.json(items);
 });
-// Create equipment
-router.post('/', authenticateToken, isAdmin, async (req, res) => {
+// Create equipment (with image upload)
+router.post('/', authenticateToken, isAdmin, upload.single('Assetimg'), async (req, res) => {
   const body = req.body;
   try {
     const id = await Equipment.create({
@@ -17,7 +31,7 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
       Assetdetail: body.Assetdetail || '',
       Assetcode: body.Assetcode || '',
       Assetlocation: body.Assetlocation || 'MFU',
-      Assetimg: body.Assetimg || '',
+      Assetimg: req.file ? req.file.filename : '',
       Staffaddid: req.user.id, // ใช้ id ของ admin ที่ login
       Assetstatus: body.Assetstatus || 'Available',
       Assettype: body.Assettype || ''
@@ -59,6 +73,26 @@ router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
 router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
   await Equipment.delete(req.params.id);
   res.json({ message: 'deleted' });
+});
+
+// Get all asset types
+router.get('/types', authenticateToken, async (req, res) => {
+  try {
+    const types = await Equipment.getAllTypes();
+    res.json(types);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to fetch types', error: e.message });
+  }
+});
+
+// Get all asset types from asset_type table
+router.get('/asset-types', authenticateToken, async (req, res) => {
+  try {
+    const types = await Equipment.getAllAssetTypes();
+    res.json(types);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to fetch asset types', error: e.message });
+  }
 });
 
 module.exports = router; 

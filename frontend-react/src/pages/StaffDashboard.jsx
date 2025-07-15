@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import AnnouncementBar from '../components/UserFunction/AnnouncementBar';
 import CalendarBar from '../components/UserFunction/CalendarBar';
 import ApproveRequests from '../components/StaffFunction/ApproveRequests';
 import ConfirmReturn from '../components/StaffFunction/ConfirmReturn';
+import StaffAccount from './StaffAccount';
 
 function Dashboard() {
   const { user } = useAuth();
@@ -56,7 +56,6 @@ function Dashboard() {
 
   return (
     <div className="max-w-5xl mx-auto pt-0 px-2">
-      <AnnouncementBar />
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-xl shadow p-4 flex flex-col items-center">
           <div className="text-mfu-gold text-2xl font-bold">{loading ? '-' : assetCount}</div>
@@ -125,11 +124,21 @@ export default function StaffDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar title="MFU Staff" links={links} onLogout={logout} />
-      <Routes>
-        <Route path="" element={<Dashboard />} />
-        <Route path="approve" element={<ApproveRequests />} />
-        <Route path="return" element={<ConfirmReturn />} />
-      </Routes>
+      <div className="max-w-5xl mx-auto pt-24 px-2">
+        {/* ไม่มี AnnouncementBar สำหรับ staff */}
+        {window.location.pathname === '/staff/account' ? (
+          <div className="mt-2">
+            <StaffAccount />
+          </div>
+        ) : (
+          <Routes>
+            <Route path="" element={<Dashboard />} />
+            <Route path="approve" element={<ApproveRequests />} />
+            <Route path="return" element={<ConfirmReturn />} />
+            <Route path="account" element={null} />
+          </Routes>
+        )}
+      </div>
     </div>
   );
 } 

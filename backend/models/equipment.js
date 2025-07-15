@@ -9,6 +9,14 @@ const Equipment = {
     const [rows] = await pool.query('SELECT * FROM asset');
     return rows;
   },
+  async getAllTypes() {
+    const [rows] = await pool.query('SELECT DISTINCT Assettype FROM asset WHERE Assettype IS NOT NULL AND Assettype != ""');
+    return rows.map(r => r.Assettype);
+  },
+  async getAllAssetTypes() {
+    const [rows] = await pool.query('SELECT asset_type_id, asset_type_name FROM asset_type ORDER BY asset_type_name');
+    return rows;
+  },
   async getById(id) {
     const [rows] = await pool.query('SELECT * FROM asset WHERE Assetid = ?', [id]);
     return rows[0];

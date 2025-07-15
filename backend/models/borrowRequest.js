@@ -26,6 +26,7 @@ const BorrowRequest = {
     }
   },
   async reject(Reqid, lectname, Comment) {
+    console.log('Reject called:', { Reqid, lectname, Comment });
     await pool.query('UPDATE borrowreq SET Status = ?, lectname = ?, Comment = ? WHERE Reqid = ?', ['Reject', lectname, Comment, Reqid]);
   },
   async returnItem(Reqid) {

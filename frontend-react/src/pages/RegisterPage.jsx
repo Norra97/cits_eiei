@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -11,6 +12,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [department, setDepartment] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -18,15 +21,16 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
     if (password !== confirmPassword) {
-      setError('รหัสผ่านไม่ตรงกัน');
+      Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ตรงกัน', text: 'โปรดตรวจสอบรหัสผ่านอีกครั้ง' });
       return;
     }
     try {
       await axios.post('http://localhost:3001/api/register', { username, email, password, phone, department });
-      setSuccess('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ');
+      Swal.fire({ icon: 'success', title: 'สมัครสมาชิกสำเร็จ', text: 'กรุณาเข้าสู่ระบบ' });
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก');
+      const msg = err.response?.data?.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก';
+      Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: msg });
     }
   };
 
@@ -61,22 +65,54 @@ export default function RegisterPage() {
             onChange={e => setEmail(e.target.value)}
             required
           />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#a6192e]"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#a6192e]"
-            value={confirmPassword}
-            onChange={e => setConfirmPassword(e.target.value)}
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#a6192e]"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#a6192e] p-1"
+              onMouseDown={() => setShowPassword(true)}
+              onMouseUp={() => setShowPassword(false)}
+              onMouseLeave={() => setShowPassword(false)}
+              aria-label="Show password"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+              </svg>
+            </button>
+          </div>
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#a6192e]"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#a6192e] p-1"
+              onMouseDown={() => setShowConfirmPassword(true)}
+              onMouseUp={() => setShowConfirmPassword(false)}
+              onMouseLeave={() => setShowConfirmPassword(false)}
+              aria-label="Show confirm password"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+              </svg>
+            </button>
+          </div>
           <input
             type="text"
             placeholder="Phone Number"
@@ -147,17 +183,6 @@ export default function RegisterPage() {
           >
             สมัครสมาชิก
           </button>
-          {/* แสดง error/success message ใต้ปุ่ม */}
-          {error && (
-            <div className="mt-3 text-center text-red-600 text-sm font-medium border border-red-200 bg-red-50 rounded p-2">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="mt-3 text-center text-green-600 text-sm font-medium border border-green-200 bg-green-50 rounded p-2">
-              {success}
-            </div>
-          )}
         </form>
         <div className="mt-4 text-center">
           <span>มีบัญชีอยู่แล้ว? </span>

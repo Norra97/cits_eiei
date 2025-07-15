@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 export default function Navbar({ onLogout }) {
   const [showProfile, setShowProfile] = useState(false);
   const { user } = useAuth();
@@ -50,7 +52,7 @@ export default function Navbar({ onLogout }) {
           {/* Profile dropdown */}
           <div className="relative">
             <img
-              src={user?.picture || '/images/profile.webp'}
+              src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')}
               alt="profile"
               className="h-9 w-9 rounded-full cursor-pointer border-2 border-mfu-gold"
               onClick={() => setShowProfile(v => !v)}
@@ -58,15 +60,20 @@ export default function Navbar({ onLogout }) {
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
                 <div className="flex flex-col items-center p-4 border-b">
-                  <img src={user?.picture || '/images/profile.webp'} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
+                  <img src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
                   <p className="font-semibold">{user?.username || 'Guest'}</p>
                   <p className="text-xs text-gray-500">{user?.userId || 'ID'}</p>
                 </div>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
-                  onClick={() => {/* redirect to profile */}}
+                  onClick={() => {
+                    let path = '/user/account';
+                    if (user?.role === 2) path = '/staff/account';
+                    else if (user?.role === 3) path = '/admin/account';
+                    window.location.href = path;
+                  }}
                 >
-                  <i className="fa fa-user mr-2" /> Profile
+                  <i className="fa fa-user mr-2" /> Account
                 </button>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"

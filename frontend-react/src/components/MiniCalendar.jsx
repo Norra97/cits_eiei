@@ -18,8 +18,18 @@ export default function MiniCalendar({ dueDates = [] }) {
   const [year] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
 
-  // dueDates: array of string 'YYYY-MM-DD'
-  const dueSet = new Set(dueDates);
+  // dueDates: array of {date, user, asset}
+  // Build a map: date string -> array of {user, asset}
+  const dueMap = new Map();
+  dueDates.forEach(d => {
+    if (typeof d === 'string') {
+      // fallback for old usage
+      dueMap.set(d, [{ user: '', asset: '' }]);
+    } else {
+      if (!dueMap.has(d.date)) dueMap.set(d.date, []);
+      dueMap.get(d.date).push({ user: d.user, asset: d.asset });
+    }
+  });
 
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfWeek(year, month);
@@ -74,25 +84,34 @@ export default function MiniCalendar({ dueDates = [] }) {
                 const dateStr = d
                   ? `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
                   : "";
-                const isDue = dueSet.has(dateStr);
+                const isDue = dueMap.has(dateStr);
                 const isToday = d && year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
+                const dueInfo = dueMap.get(dateStr);
                 return (
                   <td key={j} className="py-1" style={{ minWidth: 40, width: 40, height: 40, padding: 0 }}>
                     {d ? (
-                      isDue && isToday ? (
+                      isDue && !isToday ? (
                         <span
-                          className="flex items-center justify-center mx-auto"
+                          className="group flex items-center justify-center mx-auto"
                           style={{ minWidth: 40, minHeight: 40 }}
                         >
                           <span
-                            className="rounded-full border-2 border-red-400 flex items-center justify-center"
+                            className="rounded-full border-2 border-red-400 flex items-center justify-center animate-pulse relative"
                             style={{ width: 36, height: 36, background: 'white' }}
                           >
                             <span
-                              className="bg-blue-100 text-red-700 font-extrabold rounded-full flex items-center justify-center animate-pulse"
+                              className="bg-yellow-300 text-red-700 font-extrabold rounded-full flex items-center justify-center"
                               style={{ width: 28, height: 28, fontSize: 18 }}
                             >
                               {d}
+                            </span>
+                            {/* Tooltip */}
+                            <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg pointer-events-none min-w-max">
+                              {dueInfo && dueInfo.length > 0
+                                ? dueInfo.map((info, idx) => (
+                                    <div key={idx}>{info.user ? `${info.user} (${info.asset})` : ''}</div>
+                                  ))
+                                : ''}
                             </span>
                           </span>
                         </span>

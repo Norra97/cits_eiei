@@ -39,4 +39,42 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.post('/forgot-password', async (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ message: 'กรุณากรอก username' });
+  try {
+    // Use findByStudentCode instead of findByUsername
+    const user = await User.findByStudentCode(username);
+    if (!user) {
+      return res.status(404).json({ message: 'ไม่พบผู้ใช้ในระบบ' });
+    }
+    // ส่ง userid และข้อมูลที่จำเป็นกลับไป
+    return res.json({ userid: user.userid, username: user.username, useremail: user.useremail });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.status(500).json({ message: 'ไม่สามารถส่งคำขอได้' });
+  }
+});
+
+router.post('/reset-password/:userid', async (req, res) => {
+  const { userid } = req.params;
+  const { newPassword } = req.body;
+  if (!newPassword) return res.status(400).json({ message: 'กรุณากรอกรหัสผ่านใหม่' });
+  // Password policy: 8-16, at least 1 upper, 1 lower, 1 digit, no special chars
+  const policy = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+  if (!policy.test(newPassword)) {
+    return res.status(400).json({ message: 'รหัสผ่านไม่ตรงตามเงื่อนไข' });
+  }
+  try {
+    const bcrypt = require('bcrypt');
+    const hash = await bcrypt.hash(newPassword, 10);
+    const pool = require('../config/db');
+    await pool.query('UPDATE user SET password = ? WHERE userid = ?', [hash, userid]);
+    res.json({ message: 'เปลี่ยนรหัสผ่านสำเร็จ' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ message: 'ไม่สามารถเปลี่ยนรหัสผ่านได้' });
+  }
+});
+
 module.exports = router; 

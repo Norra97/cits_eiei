@@ -8,6 +8,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import UserDashboard from './pages/UserDashboard';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPassword from './pages/ForgotPassword';
+import ForgotPasswordSent from './pages/ForgotPasswordSent';
+import ResetPassword from './pages/ResetPassword';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -20,6 +23,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/staff/*" element={<StaffDashboard />} />
           <Route path="/user/*" element={<UserDashboard />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/forgot-password/sent" element={<ForgotPasswordSent />} />
+          <Route path="/reset-password/:userid" element={<ResetPassword />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>

@@ -101,16 +101,18 @@ export default function ApproveRequests() {
                   <td className="px-4 py-2 border-b">{req.Activity || '-'}</td>
                   <td className="px-4 py-2 border-b">{req.UsageType || '-'}</td>
                   <td className="px-4 py-2 border-b text-center">
-                    <button
-                      className="bg-green-100 text-green-800 font-bold py-2 px-6 rounded-full shadow-none mr-2 text-lg hover:bg-green-200 transition disabled:opacity-60"
-                      onClick={() => setApproveModal({ open: true, req })}
-                      disabled={actionLoading}
-                    >Approved</button>
-                    <button
-                      className="bg-red-100 text-red-700 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-red-200 transition disabled:opacity-60"
-                      onClick={() => setRejectModal({ open: true, req, comment: '' })}
-                      disabled={actionLoading}
-                    >Reject</button>
+                    <div className="flex flex-row justify-center items-center gap-2">
+                      <button
+                        className="bg-green-100 text-green-800 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-green-200 transition disabled:opacity-60"
+                        onClick={() => setApproveModal({ open: true, req })}
+                        disabled={actionLoading}
+                      >Approved</button>
+                      <button
+                        className="bg-red-100 text-red-700 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-red-200 transition disabled:opacity-60"
+                        onClick={() => setRejectModal({ open: true, req, comment: '' })}
+                        disabled={actionLoading}
+                      >Reject</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -120,9 +122,11 @@ export default function ApproveRequests() {
       )}
       {/* Modal อนุมัติ */}
       {approveModal.open && approveModal.req && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) setApproveModal({ open: false, req: null });
+        }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-green-800">ยืนยันการอนุมัติ</h3>
             <div className="mb-4">คุณต้องการอนุมัติคำขอของ <b>{approveModal.req.Borrowname}</b> สำหรับอุปกรณ์ <b>{approveModal.req.Assetname || approveModal.req.Assetid}</b> ใช่หรือไม่?</div>
             <div className="flex gap-2 justify-end">
@@ -142,9 +146,11 @@ export default function ApproveRequests() {
       )}
       {/* Modal ปฏิเสธ */}
       {rejectModal.open && rejectModal.req && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) setRejectModal({ open: false, req: null, comment: '' });
+        }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-mfu-red">ปฏิเสธคำขอยืม</h3>
             <div className="mb-2">กรุณาเลือกเหตุผล:</div>
             <div className="mb-3">

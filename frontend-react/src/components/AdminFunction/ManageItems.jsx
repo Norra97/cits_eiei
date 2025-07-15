@@ -21,6 +21,8 @@ export default function ManageItems() {
   const [csvRows, setCsvRows] = useState([]);
   const [csvError, setCsvError] = useState('');
   const [importing, setImporting] = useState(false);
+  const [assetTypes, setAssetTypes] = useState([]);
+  const [addImage, setAddImage] = useState(null);
 
   useEffect(() => {
     if (!user?.token) return;
@@ -34,6 +36,13 @@ export default function ManageItems() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+    // Fetch asset types
+    fetch('http://localhost:3001/api/equipment/asset-types', {
+      headers: { Authorization: `Bearer ${user.token}` },
+    })
+      .then(res => res.json())
+      .then(types => setAssetTypes(types))
+      .catch(() => setAssetTypes([]));
   }, [user]);
 
   // ฟิลเตอร์ข้อมูลตาม search
@@ -181,6 +190,7 @@ export default function ManageItems() {
                 <th className="py-3 px-4 text-left font-semibold">ชื่ออุปกรณ์</th>
                 <th className="py-3 px-4 text-left font-semibold">สถานะ</th>
                 <th className="py-3 px-4 text-left font-semibold">รายละเอียด</th>
+                <th className="py-3 px-4 text-center font-semibold">แก้ไข</th>
               </tr>
             </thead>
             <tbody>
@@ -189,7 +199,7 @@ export default function ManageItems() {
                 const isLong = detail.length > 50;
                 const isExpanded = expanded[i.Assetid];
                 return (
-                  <tr key={i.Assetid} className="border-b last:border-0 hover:bg-mfu-gold/10 transition cursor-pointer" onClick={() => setSelectedItem(i)}>
+                  <tr key={i.Assetid} className="border-b last:border-0 hover:bg-mfu-gold/10 transition cursor-pointer">
                     <td className="py-2.5 px-4 text-gray-800">{i.Assetid}</td>
                     <td className="py-2.5 px-4 text-gray-800">{i.Assetname}</td>
                     <td className="py-2.5 px-4 text-gray-700">{i.Assetstatus}</td>
@@ -208,6 +218,11 @@ export default function ManageItems() {
                         detail
                       )}
                     </td>
+                    <td className="py-2.5 px-4 text-center">
+                      <button className="bg-mfu-gold text-white px-3 py-1 rounded font-semibold hover:opacity-90 text-xs" onClick={() => setSelectedItem(i)}>
+                        แก้ไข
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -221,9 +236,11 @@ export default function ManageItems() {
 
       {/* Modal ฟอร์มแก้ไข */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
-            <button className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-xl" onClick={() => setSelectedItem(null)}>&times;</button>
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) setSelectedItem(null);
+        }}>
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-3 right-3 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setSelectedItem(null)}>&times;</button>
             <h3 className="text-lg font-bold mb-4">แก้ไขข้อมูลอุปกรณ์</h3>
             <div className="space-y-3">
               <div>
@@ -232,34 +249,79 @@ export default function ManageItems() {
               </div>
               <div>
                 <label className="block text-sm mb-1">รายละเอียด</label>
-                <textarea className="w-full border rounded px-3 py-2" rows={3} value={form.Assetdetail} onChange={e => setForm(f => ({ ...f, Assetdetail: e.target.value }))} />
+                <textarea className="w-full border rounded px-3 py-2" value={form.Assetdetail} onChange={e => setForm(f => ({ ...f, Assetdetail: e.target.value }))} />
               </div>
               <div>
                 <label className="block text-sm mb-1">สถานะ</label>
                 <select className="w-full border rounded px-3 py-2" value={form.Assetstatus} onChange={e => setForm(f => ({ ...f, Assetstatus: e.target.value }))}>
                   <option value="Available">Available</option>
-                  <option value="Borrowed">Borrowed</option>
-                  <option value="ชำรุด">ชำรุด</option>
-                  <option value="เสีย">เสีย</option>
-                  <option value="เสียหาย">เสียหาย</option>
+                  <option value="Borrowing">Borrowing</option>
+                  <option value="Broken">Broken</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm mb-1">ประเภท</label>
-                <input className="w-full border rounded px-3 py-2" value={form.Assettype} onChange={e => setForm(f => ({ ...f, Assettype: e.target.value }))} />
+                <select className="w-full border rounded px-3 py-2" value={form.Assettype} onChange={e => setForm(f => ({ ...f, Assettype: e.target.value }))}>
+                  <option value="">-- เลือกประเภท --</option>
+                  {assetTypes.map(type => (
+                    <option key={type.asset_type_id} value={type.asset_type_name}>{type.asset_type_name}</option>
+                  ))}
+                </select>
               </div>
-              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-              <button className="w-full bg-mfu-gold text-white py-2 rounded font-semibold mt-2 hover:opacity-90 disabled:opacity-60" onClick={handleSave} disabled={saving}>{saving ? 'กำลังบันทึก...' : 'บันทึก'}</button>
+              <div>
+                <label className="block text-sm mb-1">รูปภาพ</label>
+                <input type="file" accept="image/*" className="w-full" onChange={e => setForm(f => ({ ...f, Assetimg: e.target.files[0] }))} />
+              </div>
             </div>
+            <button className="w-full bg-mfu-gold text-white py-2 rounded font-semibold mt-4 hover:opacity-90 disabled:opacity-60" onClick={async () => {
+              setSaving(true); setError('');
+              try {
+                let body;
+                let isFormData = !!form.Assetimg;
+                if (isFormData) {
+                  body = new FormData();
+                  body.append('Assetname', form.Assetname);
+                  body.append('Assetdetail', form.Assetdetail);
+                  body.append('Assetstatus', form.Assetstatus);
+                  body.append('Assettype', form.Assettype);
+                  body.append('Assetimg', form.Assetimg);
+                } else {
+                  body = JSON.stringify(form);
+                }
+                const res = await fetch(`http://localhost:3001/api/equipment/${selectedItem.Assetid}`, {
+                  method: 'PUT',
+                  headers: isFormData ? { Authorization: `Bearer ${user.token}` } : {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user.token}`
+                  },
+                  body
+                });
+                if (!res.ok) throw new Error('แก้ไขไม่สำเร็จ');
+                setSelectedItem(null);
+                setLoading(true);
+                fetch('http://localhost:3001/api/equipment', {
+                  headers: { Authorization: `Bearer ${user.token}` },
+                })
+                  .then(res => res.json())
+                  .then(data => { setItems(data); setLoading(false); })
+                  .catch(() => setLoading(false));
+              } catch (e) {
+                setError('เกิดข้อผิดพลาดในการบันทึก');
+              } finally {
+                setSaving(false);
+              }
+            }} disabled={saving}>{saving ? 'กำลังบันทึก...' : 'บันทึก'}</button>
           </div>
         </div>
       )}
 
       {/* Modal ฟอร์มเพิ่มอุปกรณ์ */}
       {showAdd && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
-            <button className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-xl" onClick={() => setShowAdd(false)}>&times;</button>
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) setShowAdd(false);
+        }}>
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-3 right-3 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setShowAdd(false)}>&times;</button>
             <h3 className="text-lg font-bold mb-4">เพิ่มอุปกรณ์ใหม่</h3>
             <div className="space-y-3">
               <div>
@@ -268,51 +330,64 @@ export default function ManageItems() {
               </div>
               <div>
                 <label className="block text-sm mb-1">รายละเอียด</label>
-                <textarea className="w-full border rounded px-3 py-2" rows={3} value={addForm.Assetdetail} onChange={e => setAddForm(f => ({ ...f, Assetdetail: e.target.value }))} />
+                <textarea className="w-full border rounded px-3 py-2" value={addForm.Assetdetail} onChange={e => setAddForm(f => ({ ...f, Assetdetail: e.target.value }))} />
               </div>
               <div>
                 <label className="block text-sm mb-1">สถานะ</label>
                 <select className="w-full border rounded px-3 py-2" value={addForm.Assetstatus} onChange={e => setAddForm(f => ({ ...f, Assetstatus: e.target.value }))}>
                   <option value="Available">Available</option>
-                  <option value="Borrowed">Borrowed</option>
-                  <option value="ชำรุด">ชำรุด</option>
-                  <option value="เสีย">เสีย</option>
-                  <option value="เสียหาย">เสียหาย</option>
+                  <option value="Borrowing">Borrowing</option>
+                  <option value="Broken">Broken</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm mb-1">ประเภท</label>
-                <input className="w-full border rounded px-3 py-2" value={addForm.Assettype} onChange={e => setAddForm(f => ({ ...f, Assettype: e.target.value }))} />
+                <select className="w-full border rounded px-3 py-2" value={addForm.Assettype} onChange={e => setAddForm(f => ({ ...f, Assettype: e.target.value }))}>
+                  <option value="">-- เลือกประเภท --</option>
+                  {assetTypes.map(type => (
+                    <option key={type.asset_type_id} value={type.asset_type_name}>{type.asset_type_name}</option>
+                  ))}
+                </select>
               </div>
-              {addError && <div className="text-red-500 text-sm mt-2">{addError}</div>}
-              <button className="w-full bg-mfu-gold text-white py-2 rounded font-semibold mt-2 hover:opacity-90 disabled:opacity-60" onClick={async () => {
-                setAddSaving(true); setAddError('');
-                try {
-                  const res = await fetch('http://localhost:3001/api/equipment', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${user.token}`,
-                    },
-                    body: JSON.stringify(addForm),
-                  });
-                  if (!res.ok) throw new Error('เพิ่มไม่สำเร็จ');
-                  setShowAdd(false);
-                  setAddForm({ Assetname: '', Assetdetail: '', Assetstatus: 'Available', Assettype: '' });
-                  setLoading(true);
-                  fetch('http://localhost:3001/api/equipment', {
-                    headers: { Authorization: `Bearer ${user.token}` },
-                  })
-                    .then(res => res.json())
-                    .then(data => { setItems(data); setLoading(false); })
-                    .catch(() => setLoading(false));
-                } catch (e) {
-                  setAddError('เกิดข้อผิดพลาดในการเพิ่ม');
-                } finally {
-                  setAddSaving(false);
-                }
-              }} disabled={addSaving}>{addSaving ? 'กำลังบันทึก...' : 'บันทึก'}</button>
+              <div>
+                <label className="block text-sm mb-1">รูปภาพ</label>
+                <input type="file" accept="image/*" className="w-full" onChange={e => setAddImage(e.target.files[0])} />
+              </div>
             </div>
+            <button className="w-full bg-mfu-gold text-white py-2 rounded font-semibold mt-4 hover:opacity-90 disabled:opacity-60" onClick={async () => {
+              setAddSaving(true); setAddError('');
+              try {
+                const formData = new FormData();
+                formData.append('Assetname', addForm.Assetname);
+                formData.append('Assetdetail', addForm.Assetdetail);
+                formData.append('Assetstatus', addForm.Assetstatus);
+                formData.append('Assettype', addForm.Assettype);
+                if (addImage) formData.append('Assetimg', addImage);
+                // เพิ่ม field อื่น ๆ ตามต้องการ
+                const res = await fetch('http://localhost:3001/api/equipment', {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${user.token}`
+                  },
+                  body: formData
+                });
+                if (!res.ok) throw new Error('เพิ่มอุปกรณ์ไม่สำเร็จ');
+                setShowAdd(false);
+                setAddForm({ Assetname: '', Assetdetail: '', Assetstatus: 'Available', Assettype: '' });
+                setAddImage(null);
+                setLoading(true);
+                fetch('http://localhost:3001/api/equipment', {
+                  headers: { Authorization: `Bearer ${user.token}` },
+                })
+                  .then(res => res.json())
+                  .then(data => { setItems(data); setLoading(false); })
+                  .catch(() => setLoading(false));
+              } catch (e) {
+                setAddError('เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์');
+              } finally {
+                setAddSaving(false);
+              }
+            }} disabled={addSaving}>บันทึก</button>
           </div>
         </div>
       )}

@@ -11,6 +11,7 @@ import ViewItems from '../components/UserFunction/ViewItems';
 import RequestBorrow from '../components/UserFunction/RequestBorrow';
 import ReturnItem from '../components/UserFunction/ReturnItem';
 import ViewHistory from '../components/UserFunction/ViewHistory';
+import UserAccount from './UserAccount';
 
 // -----------------------------
 // links: เมนูนำทางของ user dashboard
@@ -53,24 +54,32 @@ export default function UserDashboard() {
       <div className="max-w-5xl mx-auto pt-24 px-2">
         {/* แถบประกาศข่าวสาร */}
         <AnnouncementBar />
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* แสดงปฏิทินเฉพาะหน้า dashboard หลัก */}
-          {isMainDashboard && (
-            <div className="md:w-1/2 w-full">
-              <CalendarBar items={items} />
-            </div>
-          )}
-          {/* ส่วนแสดงเนื้อหาตาม route */}
-          <div className={isMainDashboard ? "md:w-1/2 w-full" : "w-full"}>
-            <Routes>
-              <Route path="/" element={<ViewItems items={items} />} />
-              <Route path="request" element={<RequestBorrow />} />
-              <Route path="return" element={<ReturnItem items={items} />} />
-              <Route path="history" element={<ViewHistory />} />
-              <Route path="*" element={<Navigate to="." />} />
-            </Routes>
+        {/* ถ้าอยู่หน้า /user/account ให้แสดง UserAccount ใต้ announcement เลย */}
+        {location.pathname === '/user/account' ? (
+          <div className="mt-2">
+            <UserAccount />
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* แสดงปฏิทินเฉพาะหน้า dashboard หลัก */}
+            {isMainDashboard && (
+              <div className="md:w-1/2 w-full">
+                <CalendarBar items={items} />
+              </div>
+            )}
+            {/* ส่วนแสดงเนื้อหาตาม route */}
+            <div className={isMainDashboard ? "md:w-1/2 w-full" : "w-full"}>
+              <Routes>
+                <Route path="/" element={<ViewItems items={items} />} />
+                <Route path="request" element={<RequestBorrow />} />
+                <Route path="return" element={<ReturnItem items={items} />} />
+                <Route path="history" element={<ViewHistory />} />
+                <Route path="account" element={null} />
+                <Route path="*" element={<Navigate to="." />} />
+              </Routes>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function RequestBorrow() {
   // ดึงข้อมูลผู้ใช้จาก context
@@ -34,7 +35,10 @@ export default function RequestBorrow() {
       headers: { Authorization: `Bearer ${user.token}` }
     })
       .then(res => setAssets(res.data))
-      .catch(err => setError('ไม่สามารถโหลดรายการอุปกรณ์ได้'))
+      .catch(err => {
+        setError('ไม่สามารถโหลดรายการอุปกรณ์ได้');
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถโหลดรายการอุปกรณ์ได้' });
+      })
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -73,6 +77,7 @@ export default function RequestBorrow() {
     // Validation: ReturnDate must be >= Borrowdate
     if (form.Borrowdate && form.ReturnDate && form.ReturnDate < form.Borrowdate) {
       setDateError('ห้ามคืนก่อนวันที่ยืม');
+      Swal.fire({ icon: 'error', title: 'วันที่คืนไม่ถูกต้อง', text: 'ห้ามคืนก่อนวันที่ยืม' });
       return;
     }
     setSubmitting(true);
@@ -88,11 +93,18 @@ export default function RequestBorrow() {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setSubmitMsg('ส่งคำขอยืมสำเร็จ!');
-      setTimeout(() => {
-        closeModal();
-      }, 1200);
+      await Swal.fire({
+        icon: 'success',
+        title: 'ส่งคำขอยืมสำเร็จ!',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        timer: 1000,
+        timerProgressBar: true
+      });
+      closeModal();
     } catch (err) {
       setSubmitMsg('เกิดข้อผิดพลาดในการส่งคำขอยืม');
+      Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'เกิดข้อผิดพลาดในการส่งคำขอยืม' });
     } finally {
       setSubmitting(false);
     }
@@ -100,7 +112,7 @@ export default function RequestBorrow() {
 
   // แสดงสถานะโหลด/ข้อผิดพลาด
   if (loading) return <div className="p-4">กำลังโหลด...</div>;
-  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (error) return null;
 
   // ส่วนแสดงตารางอุปกรณ์และ modal ฟอร์มขอยืม
   return (
@@ -161,9 +173,11 @@ export default function RequestBorrow() {
       )}
       {/* Modal */}
       {showModal && selectedAsset && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={closeModal}>&times;</button>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) closeModal();
+        }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={closeModal}>&times;</button>
             <h3 className="text-xl font-bold mb-4 text-mfu-red">ขอยืม: {selectedAsset.Assetname}</h3>
             {selectedAsset.Assetimg && (
               <img
@@ -198,18 +212,19 @@ export default function RequestBorrow() {
                   </label>
                 </div>
               </div>
-              {dateError && <div className="text-center text-red-600 font-semibold">{dateError}</div>}
               <button type="submit" className="w-full bg-mfu-red text-white py-2 rounded font-semibold hover:bg-mfu-gold hover:text-mfu-red transition" disabled={submitting}>{submitting ? 'กำลังส่ง...' : 'ยืนยันขอยืม'}</button>
-              {submitMsg && <div className="text-center mt-2 text-mfu-red">{submitMsg}</div>}
+              {submitMsg && null}
             </form>
           </div>
         </div>
       )}
       {/* Info Modal */}
       {showInfoModal && infoAsset && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl" onClick={closeInfoModal}>&times;</button>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={e => {
+          if (e.target === e.currentTarget) closeInfoModal();
+        }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={closeInfoModal}>&times;</button>
             <h3 className="text-xl font-bold mb-4 text-mfu-red">ข้อมูลอุปกรณ์</h3>
             <div className="mb-4 p-3 bg-gray-50 rounded border">
               <div><b>ชื่ออุปกรณ์:</b> {infoAsset.Assetname}</div>
