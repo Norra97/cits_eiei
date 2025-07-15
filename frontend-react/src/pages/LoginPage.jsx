@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -10,15 +9,18 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const { login, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [hasProcessedToken, setHasProcessedToken] = useState(false);
 
-  // รับ token จาก URL และ login
+  // รับ token จาก URL และ login (ใช้ location.search)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    if (hasProcessedToken) return; // ป้องกัน execute ซ้ำ
+
+    const params = new URLSearchParams(location.search);
     const token = params.get('token');
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Decoded Google JWT:', payload);
         login({
           userId: payload.id,
           username: payload.username,
@@ -26,8 +28,6 @@ export default function LoginPage() {
           token,
           picture: payload.picture // รองรับรูปจาก Google
         });
-        // ลบ token ออกจาก URL หลัง login
-        window.history.replaceState({}, document.title, window.location.pathname);
       } catch (e) {
         console.error('JWT decode error:', e);
       }
@@ -38,8 +38,9 @@ export default function LoginPage() {
   useEffect(() => {
     console.log('Current user context:', user);
     if (user) {
-      if (user.role === 3) navigate('/admin');
-      else if (user.role === 2) navigate('/staff');
+      const role = Number(user.role); // แปลงเป็นตัวเลขเสมอ
+      if (role === 3) navigate('/admin');
+      else if (role === 2) navigate('/staff');
       else navigate('/user');
     }
   }, [user, navigate]);
