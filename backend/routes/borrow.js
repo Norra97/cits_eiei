@@ -9,22 +9,26 @@ router.post('/request', authenticateToken, isUser, async (req, res) => {
   const Borrowname = req.user.username;
   const { Assetid, Borrowdate, ReturnDate, Activity, UsageType } = req.body;
   const id = await BorrowRequest.create({ Assetid, Borrowname, Borrowdate, ReturnDate, Activity, UsageType });
+  console.log(`[BORROW REQUEST] User: ${Borrowname}, Assetid: ${Assetid}, Borrowdate: ${Borrowdate}, ReturnDate: ${ReturnDate}, Activity: ${Activity}, UsageType: ${UsageType}, Time: ${new Date().toISOString()}`);
   res.json({ id });
 });
 // Staff อนุมัติ
 router.post('/approve/:id', authenticateToken, isStaff, async (req, res) => {
   await BorrowRequest.approve(req.params.id, req.user.username);
+  console.log(`[APPROVE] Staff: ${req.user.username}, RequestId: ${req.params.id}, Time: ${new Date().toISOString()}`);
   res.json({ message: 'approved' });
 });
 // Staff ปฏิเสธ
 router.post('/reject/:id', authenticateToken, isStaff, async (req, res) => {
   const { Comment } = req.body;
   await BorrowRequest.reject(req.params.id, req.user.username, Comment);
+  console.log(`[REJECT] Staff: ${req.user.username}, RequestId: ${req.params.id}, Comment: ${Comment}, Time: ${new Date().toISOString()}`);
   res.json({ message: 'rejected' });
 });
 // User แจ้งคืน
 router.post('/return/:id', authenticateToken, isUser, async (req, res) => {
   await BorrowRequest.returnItem(req.params.id);
+  console.log(`[RETURN] User: ${req.user.username}, RequestId: ${req.params.id}, Time: ${new Date().toISOString()}`);
   res.json({ message: 'returned' });
 });
 // ดูประวัติการยืมของตัวเอง
@@ -60,12 +64,14 @@ router.get('/return-pending', authenticateToken, isStaff, async (req, res) => {
 // staff ยืนยันการคืน
 router.post('/confirm-return/:id', authenticateToken, isStaff, async (req, res) => {
   await BorrowRequest.confirmReturn(req.params.id, req.user.username);
+  console.log(`[CONFIRM RETURN] Staff: ${req.user.username}, RequestId: ${req.params.id}, Time: ${new Date().toISOString()}`);
   res.json({ message: 'confirmed' });
 });
 // staff ปฏิเสธการคืน
 router.post('/reject-return/:id', authenticateToken, isStaff, async (req, res) => {
   const { Comment } = req.body;
   await BorrowRequest.rejectReturn(req.params.id, req.user.username, Comment);
+  console.log(`[REJECT RETURN] Staff: ${req.user.username}, RequestId: ${req.params.id}, Comment: ${Comment}, Time: ${new Date().toISOString()}`);
   res.json({ message: 'rejected' });
 });
 

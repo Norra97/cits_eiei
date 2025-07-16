@@ -36,6 +36,7 @@ router.post('/', authenticateToken, isAdmin, upload.single('Assetimg'), async (r
       Assetstatus: body.Assetstatus || 'Available',
       Assettype: body.Assettype || ''
     });
+    console.log(`[CREATE EQUIPMENT] Admin: ${req.user.username}, Assetname: ${body.Assetname}, Assetcode: ${body.Assetcode}, Time: ${new Date().toISOString()}`);
     res.json({ id });
   } catch (e) {
     res.status(500).json({ message: 'Create failed', error: e.message });
@@ -57,6 +58,7 @@ router.post('/bulk', authenticateToken, isAdmin, async (req, res) => {
         Assetstatus: item.Assetstatus || 'Available',
         Assettype: item.Assettype || ''
       });
+      console.log(`[BULK CREATE EQUIPMENT] Admin: ${req.user.username}, Assetname: ${item.Assetname}, Assetcode: ${item.Assetcode}, Time: ${new Date().toISOString()}`);
     }
     res.json({ message: 'Bulk insert success' });
   } catch (e) {

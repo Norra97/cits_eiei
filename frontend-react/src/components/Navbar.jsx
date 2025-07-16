@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 export default function Navbar({ onLogout }) {
   const [showProfile, setShowProfile] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-[#7d2f2c] border-b fixed top-0 left-0 w-full z-50 shadow-sm">
@@ -77,7 +79,7 @@ export default function Navbar({ onLogout }) {
                 </button>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
-                  onClick={onLogout}
+                  onClick={() => { onLogout(); navigate('/login'); }}
                 >
                   <i className="fa fa-sign-out mr-2" /> Logout
                 </button>

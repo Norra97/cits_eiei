@@ -4,12 +4,12 @@
 import React from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
 
 export default function ReturnItem({ items = [] }) {
   const { user } = useAuth();
   const [selected, setSelected] = React.useState(null); // Reqid of item to return
   const [loading, setLoading] = React.useState(false);
-  const [message, setMessage] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [localItems, setLocalItems] = React.useState(items);
 
@@ -20,12 +20,17 @@ export default function ReturnItem({ items = [] }) {
   const handleReturn = async (item) => {
     setLoading(true);
     setError(null);
-    setMessage(null);
     try {
       await axios.post(`http://localhost:3001/api/borrow/return/${item.Reqid}`, {}, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      setMessage(`คืนอุปกรณ์ "${item.Assetname}" สำเร็จ!`);
+      Swal.fire({
+        icon: 'success',
+        title: `คืนอุปกรณ์ "${item.Assetname}" สำเร็จ!`,
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
       setLocalItems(localItems.filter(i => i.Reqid !== item.Reqid));
       setSelected(null);
     } catch (err) {
@@ -41,7 +46,6 @@ export default function ReturnItem({ items = [] }) {
         <svg className="w-6 h-6 text-mfu-red" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a4 4 0 014-4h6m-6 0V7a4 4 0 00-4-4H5a4 4 0 00-4 4v10a4 4 0 004 4h6a4 4 0 004-4z" /></svg>
         แจ้งคืนอุปกรณ์
       </h2>
-      {message && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">{message}</div>}
       {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
       {localItems.length === 0 ? (
         <div className="text-gray-500 bg-white rounded shadow p-6 text-center">ไม่มีรายการที่ยืมอยู่</div>
@@ -86,7 +90,7 @@ export default function ReturnItem({ items = [] }) {
                           <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setSelected(null)}>&times;</button>
                           <h3 className="text-lg font-bold mb-2">ยืนยันการคืนอุปกรณ์</h3>
                           <p className="mb-4">คุณต้องการคืน "{item.Assetname}" ใช่หรือไม่?</p>
-                          <div className="flex gap-2 justify-end">
+                          <div className="flex gap-2 justify-center">
                             <button
                               className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                               onClick={() => setSelected(null)}

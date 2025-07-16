@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
 
 export default function ConfirmReturn() {
   const { user } = useAuth();
@@ -34,12 +35,17 @@ export default function ConfirmReturn() {
   const handleApprove = async () => {
     if (!approveModal.req) return;
     setActionLoading(true);
-    setSuccessMsg('');
     try {
       await axios.post(`/api/borrow/confirm-return/${approveModal.req.Reqid}`, {}, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      setSuccessMsg('ยืนยันการคืนเรียบร้อย');
+      Swal.fire({
+        icon: 'success',
+        title: 'ยืนยันการคืนเรียบร้อย',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
       setApproveModal({ open: false, req: null });
       fetchRequests();
     } catch {
@@ -53,12 +59,17 @@ export default function ConfirmReturn() {
   const handleReject = async () => {
     if (!rejectModal.req) return;
     setActionLoading(true);
-    setSuccessMsg('');
     try {
       await axios.post(`/api/borrow/reject-return/${rejectModal.req.Reqid}`, { Comment: rejectModal.comment }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      setSuccessMsg('ปฏิเสธการคืนเรียบร้อย');
+      Swal.fire({
+        icon: 'success',
+        title: 'ปฏิเสธการคืนเรียบร้อย',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
       setRejectModal({ open: false, req: null, comment: '' });
       fetchRequests();
     } catch {
@@ -69,9 +80,8 @@ export default function ConfirmReturn() {
   };
 
   return (
-    <div className="p-4 bg-white rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
-      <h2 className="text-2xl font-bold mb-4 text-mfu-red">Confirm Return</h2>
-      {successMsg && <div className="mb-2 text-green-700 font-semibold">{successMsg}</div>}
+    <div className="p-4 bg-white rounded-xl shadow-lg max-w-6xl mx-auto mt-4">
+      <h2 className="text-2xl font-bold mb-4 text-mfu-red">ยืนยันการคืน</h2>
       {error && <div className="mb-2 text-red-600">{error}</div>}
       {loading ? (
         <div>กำลังโหลด...</div>
@@ -79,7 +89,7 @@ export default function ConfirmReturn() {
         <div className="text-gray-500">ไม่มีรายการที่รอการยืนยันคืน</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg shadow-lg">
+          <table className="min-w-[900px] w-full bg-white border rounded-lg shadow-lg">
             <thead>
               <tr className="bg-mfu-gold text-mfu-red">
                 <th className="px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">ผู้ยืม</th>
@@ -101,16 +111,18 @@ export default function ConfirmReturn() {
                   <td className="px-4 py-2 border-b">{req.Activity || '-'}</td>
                   <td className="px-4 py-2 border-b">{req.UsageType || '-'}</td>
                   <td className="px-4 py-2 border-b text-center">
-                    <button
-                      className="bg-green-100 text-green-800 font-bold py-2 px-6 rounded-full shadow-none mr-2 text-lg hover:bg-green-200 transition disabled:opacity-60"
-                      onClick={() => setApproveModal({ open: true, req })}
-                      disabled={actionLoading}
-                    >Approve</button>
-                    <button
-                      className="bg-red-100 text-red-700 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-red-200 transition disabled:opacity-60"
-                      onClick={() => setRejectModal({ open: true, req, comment: '' })}
-                      disabled={actionLoading}
-                    >Reject</button>
+                    <div className="flex flex-row justify-center items-center gap-2">
+                      <button
+                        className="bg-green-100 text-green-800 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-green-200 transition disabled:opacity-60"
+                        onClick={() => setApproveModal({ open: true, req })}
+                        disabled={actionLoading}
+                      >Approve</button>
+                      <button
+                        className="bg-red-100 text-red-700 font-bold py-2 px-6 rounded-full shadow-none text-lg hover:bg-red-200 transition disabled:opacity-60"
+                        onClick={() => setRejectModal({ open: true, req, comment: '' })}
+                        disabled={actionLoading}
+                      >Reject</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -127,7 +139,7 @@ export default function ConfirmReturn() {
             <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-green-800">Approve Return</h3>
             <div className="mb-4">Do you want to approve the return for <b>{approveModal.req.Borrowname}</b> (equipment: <b>{approveModal.req.Assetname || approveModal.req.Assetid}</b>)?</div>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-center">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setApproveModal({ open: false, req: null })}
@@ -163,7 +175,7 @@ export default function ConfirmReturn() {
                 disabled={actionLoading}
               >Damaged equipment</button>
             </div>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-center">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setRejectModal({ open: false, req: null, comment: '' })}

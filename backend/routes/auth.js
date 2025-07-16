@@ -12,6 +12,7 @@ router.post('/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
   const token = jwt.sign({ id: user.userid, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '8h' });
+  console.log(`[LOGIN] Username: ${user.username}, Role: ${user.role}, Time: ${new Date().toISOString()}`);
   res.json({ token, role: user.role, userId: user.userid, username: user.username });
 });
 
@@ -33,6 +34,7 @@ router.post('/register', async (req, res) => {
       department,
       useremail: email
     });
+    console.log(`[REGISTER] Username: ${username}, Department: ${department}, Time: ${new Date().toISOString()}`);
     res.status(201).json({ message: 'สมัครสมาชิกสำเร็จ' });
   } catch (err) {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก' });

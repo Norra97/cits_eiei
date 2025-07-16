@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
 
 export default function ApproveRequests() {
   const { user } = useAuth();
@@ -9,7 +10,6 @@ export default function ApproveRequests() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectModal, setRejectModal] = useState({ open: false, req: null, comment: '' });
-  const [successMsg, setSuccessMsg] = useState('');
   const [approveModal, setApproveModal] = useState({ open: false, req: null });
 
   // โหลดรายการรออนุมัติ
@@ -34,12 +34,17 @@ export default function ApproveRequests() {
   const handleApprove = async () => {
     if (!approveModal.req) return;
     setActionLoading(true);
-    setSuccessMsg('');
     try {
       await axios.post(`/api/borrow/approve/${approveModal.req.Reqid}`, {}, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      setSuccessMsg('อนุมัติคำขอเรียบร้อย');
+      Swal.fire({
+        icon: 'success',
+        title: 'อนุมัติคำขอเรียบร้อย',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
       setApproveModal({ open: false, req: null });
       fetchRequests();
     } catch {
@@ -53,12 +58,17 @@ export default function ApproveRequests() {
   const handleReject = async () => {
     if (!rejectModal.req) return;
     setActionLoading(true);
-    setSuccessMsg('');
     try {
       await axios.post(`/api/borrow/reject/${rejectModal.req.Reqid}`, { Comment: rejectModal.comment }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      setSuccessMsg('ปฏิเสธคำขอเรียบร้อย');
+      Swal.fire({
+        icon: 'success',
+        title: 'ปฏิเสธคำขอเรียบร้อย',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
       setRejectModal({ open: false, req: null, comment: '' });
       fetchRequests();
     } catch {
@@ -69,9 +79,8 @@ export default function ApproveRequests() {
   };
 
   return (
-    <div className="p-4 bg-white rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
+    <div className="p-4 bg-white rounded-xl shadow-lg max-w-6xl mx-auto mt-4">
       <h2 className="text-2xl font-bold mb-4 text-mfu-red">อนุมัติคำขอยืม</h2>
-      {successMsg && <div className="mb-2 text-green-700 font-semibold">{successMsg}</div>}
       {error && <div className="mb-2 text-red-600">{error}</div>}
       {loading ? (
         <div>กำลังโหลด...</div>
@@ -79,7 +88,7 @@ export default function ApproveRequests() {
         <div className="text-gray-500">ไม่มีคำขอยืมที่รออนุมัติ</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg shadow-lg">
+          <table className="min-w-[900px] w-full bg-white border rounded-lg shadow-lg">
             <thead>
               <tr className="bg-mfu-gold text-mfu-red">
                 <th className="px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">ผู้ขอ</th>
@@ -129,7 +138,7 @@ export default function ApproveRequests() {
             <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setApproveModal({ open: false, req: null })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-green-800">ยืนยันการอนุมัติ</h3>
             <div className="mb-4">คุณต้องการอนุมัติคำขอของ <b>{approveModal.req.Borrowname}</b> สำหรับอุปกรณ์ <b>{approveModal.req.Assetname || approveModal.req.Assetid}</b> ใช่หรือไม่?</div>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-center">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setApproveModal({ open: false, req: null })}
@@ -181,7 +190,7 @@ export default function ApproveRequests() {
                 />
               )}
             </div>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-center">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setRejectModal({ open: false, req: null, comment: '' })}

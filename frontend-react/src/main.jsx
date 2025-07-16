@@ -17,8 +17,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/staff/*" element={<StaffDashboard />} />
           <Route path="/user/*" element={<UserDashboard />} />
