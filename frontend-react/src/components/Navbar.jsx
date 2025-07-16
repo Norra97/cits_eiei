@@ -64,7 +64,6 @@ export default function Navbar({ onLogout }) {
                 <div className="flex flex-col items-center p-4 border-b">
                   <img src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
                   <p className="font-semibold text-nowrap overflow-ellipsis overflow-hidden max-w-xs">{user?.username || 'Guest'}</p>
-                  <p className="text-xs text-gray-500">{user?.userId || 'ID'}</p>
                 </div>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"

@@ -13,6 +13,7 @@ import ReturnItem from '../components/UserFunction/ReturnItem';
 import ViewHistory from '../components/UserFunction/ViewHistory';
 import UserAccount from './UserAccount';
 import UserAccountNew from './UserAccountNew';
+import Swal from 'sweetalert2';
 
 // -----------------------------
 // links: เมนูนำทางของ user dashboard
@@ -47,6 +48,21 @@ export default function UserDashboard() {
   }, [user]);
   // ถ้าไม่ได้ login หรือ role ไม่ใช่ user ให้ redirect กลับหน้าแรก
   if (!user || user.role !== 1) return <Navigate to="/" />;
+  // หา items ที่ถูก reject (RePending)
+  const rejectedItems = items.filter(item => item.Status === 'RePending');
+
+  // แจ้งเตือน popup เมื่อมีรายการถูก reject (RePending) และยังไม่เคยแจ้งเตือนใน session นี้
+  React.useEffect(() => {
+    if (rejectedItems.length > 0 && !sessionStorage.getItem('rejectedAlertShown')) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'การคืนอุปกรณ์ของคุณถูกปฏิเสธ',
+        html: `<ul style='text-align:left;'>${rejectedItems.map(item => `<li><b>${item.Assetname}</b>${item.Comment ? ` <span style='color:#555;'>เหตุผล: ${item.Comment}</span>` : ''}</li>`).join('')}</ul><div style='margin-top:8px;'>กรุณาตรวจสอบและแจ้งคืนใหม่</div>`,
+        confirmButtonText: 'OK'
+      });
+      sessionStorage.setItem('rejectedAlertShown', '1');
+    }
+  }, [rejectedItems]);
   // โครงสร้าง UI หลัก
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,6 +71,8 @@ export default function UserDashboard() {
       <div className="max-w-5xl mx-auto pt-24 px-2">
         {/* แถบประกาศข่าวสาร */}
         <AnnouncementBar />
+        {/* แจ้งเตือนพิเศษเมื่อถูก reject */}
+        {/* (ยกเลิก alert bar เพราะใช้ popup แทน) */}
         {/* ถ้าอยู่หน้า /user/account ให้แสดง UserAccount ใต้ announcement เลย */}
         {location.pathname === '/user/account' ? (
           <div className="mt-2">

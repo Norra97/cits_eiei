@@ -37,13 +37,13 @@ const BorrowRequest = {
     const [rows] = await pool.query(
       `SELECT br.*, a.Assetname, a.Assetcode FROM borrowreq br
        JOIN asset a ON br.Assetid = a.Assetid
-       WHERE br.Borrowname = ? AND br.Status = 'Approved'`,
+       WHERE br.Borrowname = ? AND (br.Status = 'Approved' OR br.Status = 'RePending')`,
       [Borrowname]
     );
     return rows;
   },
   async getReturnPending() {
-    const [rows] = await pool.query('SELECT * FROM borrowreq WHERE Status = ?', ['RePending']);
+    const [rows] = await pool.query('SELECT * FROM borrowreq WHERE Status = ?', ['ReturnPending']);
     return rows;
   },
   async confirmReturn(Reqid, lectname) {
@@ -55,7 +55,8 @@ const BorrowRequest = {
     }
   },
   async rejectReturn(Reqid, lectname, Comment) {
-    await pool.query('UPDATE borrowreq SET Status = ?, lectname = ?, Comment = ? WHERE Reqid = ?', ['ReturnRejected', lectname, Comment, Reqid]);
+    // เปลี่ยน status เป็น 'RePending' แทน 'returnreject'
+    await pool.query('UPDATE borrowreq SET Status = ?, lectname = ?, Comment = ? WHERE Reqid = ?', ['RePending', lectname, Comment, Reqid]);
   }
 };
 

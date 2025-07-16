@@ -12,6 +12,8 @@ export default function ConfirmReturn() {
   const [rejectModal, setRejectModal] = useState({ open: false, req: null, comment: '' });
   const [successMsg, setSuccessMsg] = useState('');
   const [approveModal, setApproveModal] = useState({ open: false, req: null });
+  // เหตุผลที่เคยถูกกรอกเอง
+  const [customReasons, setCustomReasons] = useState([]);
 
   // โหลดรายการรออนุมัติคืน
   const fetchRequests = () => {
@@ -25,6 +27,16 @@ export default function ConfirmReturn() {
       .catch(() => setError('เกิดข้อผิดพลาดในการโหลดข้อมูล'))
       .finally(() => setLoading(false));
   };
+
+  // โหลด custom reasons จาก requests ที่เคยถูก reject
+  useEffect(() => {
+    // ดึงเหตุผลที่ไม่ใช่มาตรฐานและไม่ว่าง
+    const reasons = requests
+      .map(r => r.Comment)
+      .filter(c => c && c !== 'Missing equipment' && c !== 'Damaged equipment')
+      .filter((v, i, arr) => arr.indexOf(v) === i); // unique
+    setCustomReasons(reasons);
+  }, [requests]);
 
   useEffect(() => {
     fetchRequests();
@@ -56,11 +68,11 @@ export default function ConfirmReturn() {
   };
 
   // ปฏิเสธการคืน
-  const handleReject = async () => {
+  const handleReject = async (customComment) => {
     if (!rejectModal.req) return;
     setActionLoading(true);
     try {
-      await axios.post(`/api/borrow/reject-return/${rejectModal.req.Reqid}`, { Comment: rejectModal.comment }, {
+      await axios.post(`/api/borrow/reject-return/${rejectModal.req.Reqid}`, { Comment: customComment ?? rejectModal.comment }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       Swal.fire({
@@ -163,17 +175,40 @@ export default function ConfirmReturn() {
             <button className="absolute top-2 right-2 text-gray-700 hover:text-red-500 text-3xl font-extrabold" onClick={() => setRejectModal({ open: false, req: null, comment: '' })}>&times;</button>
             <h3 className="text-lg font-bold mb-2 text-mfu-red">Reject Return</h3>
             <div className="mb-2">Please select a reason:</div>
-            <div className="flex flex-col gap-3 mb-3">
-              <button
-                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'Missing equipment' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
-                onClick={() => setRejectModal(m => ({ ...m, comment: 'Missing equipment' }))}
+            <div className="mb-3">
+              <select
+                className="w-full px-4 py-2 rounded font-semibold border bg-gray-100 text-mfu-red focus:outline-none focus:ring-2 focus:ring-mfu-red"
+                value={rejectModal.comment === 'Other' ? 'Other' : rejectModal.comment}
+                onChange={e => {
+                  if (e.target.value === 'Other') {
+                    setRejectModal(m => ({ ...m, comment: 'Other', otherReason: '' }));
+                  } else {
+                    setRejectModal(m => ({ ...m, comment: e.target.value, otherReason: undefined }));
+                  }
+                }}
                 disabled={actionLoading}
-              >Missing equipment</button>
-              <button
-                className={`w-full px-4 py-2 rounded font-semibold border ${rejectModal.comment === 'Damaged equipment' ? 'bg-mfu-red text-white' : 'bg-gray-100 text-mfu-red'} hover:bg-mfu-red/80 hover:text-white`}
-                onClick={() => setRejectModal(m => ({ ...m, comment: 'Damaged equipment' }))}
-                disabled={actionLoading}
-              >Damaged equipment</button>
+              >
+                <option value="">-- Select reason --</option>
+                <option value="Missing equipment">Missing equipment</option>
+                <option value="Damaged equipment">Damaged equipment</option>
+                {/* custom reasons */}
+                {customReasons.map((reason, idx) => (
+                  <option value={reason} key={idx}>{reason}</option>
+                ))}
+                <option value="Other">Other (กรอกเหตุผลเอง)</option>
+              </select>
+              {rejectModal.comment === 'Other' && (
+                <input
+                  className="mt-3 w-full px-4 py-2 rounded border border-mfu-red focus:outline-none focus:ring-2 focus:ring-mfu-red"
+                  type="text"
+                  placeholder="กรุณากรอกเหตุผล"
+                  value={rejectModal.otherReason || ''}
+                  onChange={e => setRejectModal(m => ({ ...m, otherReason: e.target.value }))}
+                  disabled={actionLoading}
+                  maxLength={200}
+                  required
+                />
+              )}
             </div>
             <div className="flex gap-2 justify-center">
               <button
@@ -183,9 +218,14 @@ export default function ConfirmReturn() {
               >Cancel</button>
               <button
                 className="px-4 py-2 bg-mfu-red text-white rounded hover:bg-mfu-gold"
-                onClick={handleReject}
-                disabled={actionLoading || !rejectModal.comment}
-              >{actionLoading ? 'Processing...' : 'Confirm'}</button>
+                onClick={() => {
+                  let comment = rejectModal.comment;
+                  if (comment === 'Other') comment = rejectModal.otherReason || '';
+                  // เรียก handleReject พร้อมส่ง comment ที่ถูกต้อง
+                  handleReject(comment);
+                }}
+                disabled={actionLoading || !((rejectModal.comment && rejectModal.comment !== 'Other') || (rejectModal.comment === 'Other' && rejectModal.otherReason && rejectModal.otherReason.trim() !== ''))}
+              >{actionLoading ? 'Rejecting...' : 'Confirm'}</button>
             </div>
           </div>
         </div>
