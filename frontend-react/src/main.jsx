@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPassword from './pages/ForgotPassword';
 import ForgotPasswordSent from './pages/ForgotPasswordSent';
 import ResetPassword from './pages/ResetPassword';
+import LinkAccount from './pages/LinkAccount';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/forgot-password/sent" element={<ForgotPasswordSent />} />
           <Route path="/reset-password/:userid" element={<ResetPassword />} />
+          <Route path="/link-account" element={<LinkAccount />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>

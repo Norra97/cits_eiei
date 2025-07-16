@@ -4,18 +4,17 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-export default function StaffAccount() {
-  const [currentPassword, setCurrentPassword] = useState('');
+export default function UserAccountNew() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { user } = useAuth();
+  const [phone, setPhone] = useState(user?.phonenum || '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (!phone || !newPassword || !confirmPassword) {
       Swal.fire({ icon: 'error', title: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
       return;
     }
@@ -30,25 +29,23 @@ export default function StaffAccount() {
       return;
     }
     try {
-      await axios.post('/api/users/change-password', {
-        currentPassword,
-        newPassword
+      await axios.post('/api/users/set-password', {
+        newPassword,
+        phone
       }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      Swal.fire({ icon: 'success', title: 'เปลี่ยนรหัสผ่านสำเร็จ' });
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      await Swal.fire({ icon: 'success', title: 'ตั้งรหัสผ่านสำเร็จ', timer: 1200, showConfirmButton: false });
+      window.location.href = '/user/account';
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.response?.data?.message || 'เปลี่ยนรหัสผ่านไม่สำเร็จ' });
+      Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.response?.data?.message || 'ตั้งรหัสผ่านไม่สำเร็จ' });
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       {/* Password Policy Banner */}
-      <div className="w-full max-w-md mt-8 mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow text-left">
+      <div className="w-full max-w-md mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow text-left">
         <div className="font-semibold text-gray-800 mb-2">Password Policy Recommendations</div>
         <ul className="list-disc ml-6 text-sm text-gray-700">
           <li>Your password must be between 8 and 16 characters.</li>
@@ -59,50 +56,17 @@ export default function StaffAccount() {
         </ul>
       </div>
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-mfu-red">ตั้งค่าบัญชี (Staff)</h2>
-        {/* ปุ่มยกเลิกผูกบัญชี Google */}
-        <button
-          className="w-full bg-gray-200 text-mfu-red py-2 rounded font-semibold mb-4 hover:bg-gray-300 transition"
-          type="button"
-          onClick={async () => {
-            try {
-              await axios.post('/api/auth/unlink-google', {}, { headers: { Authorization: `Bearer ${user.token}` } });
-              Swal.fire({ icon: 'success', title: 'ยกเลิกผูกบัญชี Google สำเร็จ', timer: 1200, showConfirmButton: false });
-              // อัปเดต localStorage (ลบ google_id)
-              const newUser = { ...user };
-              delete newUser.google_id;
-              delete newUser.googleId;
-              localStorage.setItem('user', JSON.stringify(newUser));
-              setTimeout(() => window.location.reload(), 1200);
-            } catch (err) {
-              Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.response?.data?.message || 'ยกเลิกไม่สำเร็จ' });
-            }
-          }}
-        >
-          ยกเลิกผูกบัญชี Google
-        </button>
+        <h2 className="text-2xl font-bold mb-6 text-center text-mfu-red">ตั้งรหัสผ่านใหม่ (User)</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 font-semibold">รหัสผ่านปัจจุบัน</label>
-            <div className="relative flex items-center">
-              <input
-                type={showCurrent ? 'text' : 'password'}
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-mfu-red"
-                value={currentPassword}
-                onChange={e => setCurrentPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
-                onMouseDown={() => setShowCurrent(true)}
-                onMouseUp={() => setShowCurrent(false)}
-                onMouseLeave={() => setShowCurrent(false)}
-                tabIndex={-1}
-              >
-                {showCurrent ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
+            <label className="block mb-1 font-semibold">เบอร์โทรศัพท์</label>
+            <input
+              type="tel"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-mfu-red"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              required
+            />
           </div>
           <div>
             <label className="block mb-1 font-semibold">รหัสผ่านใหม่</label>
@@ -152,7 +116,7 @@ export default function StaffAccount() {
             type="submit"
             className="w-full bg-mfu-red text-white py-2 rounded hover:bg-mfu-gold transition-colors font-semibold"
           >
-            เปลี่ยนรหัสผ่าน
+            ยืนยัน
           </button>
         </form>
       </div>

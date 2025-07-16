@@ -20,6 +20,7 @@ app.use('/api/auth', authRouter);
 
 const userRouter = require('./routes/user');
 app.use('/api/users', userRouter);
+app.use('/api', userRouter); // for /api/register
 
 const equipmentRouter = require('./routes/equipment');
 app.use('/api/equipment', equipmentRouter);
@@ -39,6 +40,18 @@ app.get('/api/auth/google/callback',
       // ไม่พบ user ในระบบ
       return res.redirect('http://localhost:5173/login?error=notfound');
     }
+    // NEW: If user is flagged as "need_link", redirect to link-account page
+    if (req.user.need_link) {
+      // สร้าง JWT ชั่วคราวสำหรับการผูกบัญชี
+      const jwt = require('jsonwebtoken');
+      const tempToken = jwt.sign({
+        google_id: req.user.google_id,
+        username: req.user.username,
+        email: req.user.useremail,
+        picture: req.user.picture
+      }, process.env.JWT_SECRET, { expiresIn: '10m' });
+      return res.redirect(`http://localhost:5173/link-account?token=${tempToken}`);
+    }
     const jwt = require('jsonwebtoken');
     const token = jwt.sign({
       id: req.user.userid,
@@ -47,8 +60,7 @@ app.get('/api/auth/google/callback',
       role: req.user.role,
       picture: req.user.picture // เพิ่ม picture ใน payload
     }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    console.log('Google OAuth callback req.user:', req.user);
-    console.log('Google OAuth callback token:', token);
+    console.log(`[GOOGLE LOGIN] Username: ${req.user.username}, Email: ${req.user.useremail}, Time: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false })}`);
     res.redirect(`http://localhost:5173/login?token=${token}`);
   }
 );

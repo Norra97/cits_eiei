@@ -116,27 +116,70 @@ export default function ManageUsers() {
       {loading ? (
         <div className="text-gray-400 animate-pulse">กำลังโหลด...</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-xl shadow-sm text-sm border border-gray-100">
+        <div>
+          <table className="w-full bg-white rounded-xl shadow-sm text-sm border border-gray-100 table-auto">
             <thead>
               <tr className="bg-gray-50 text-gray-700">
-                <th className="py-3 px-4 text-left font-semibold">ID</th>
-                <th className="py-3 px-4 text-left font-semibold">ชื่อผู้ใช้</th>
-                <th className="py-3 px-4 text-left font-semibold">บทบาท</th>
-                <th className="py-3 px-4 text-left font-semibold">แผนก</th>
-                <th className="py-3 px-4 text-left font-semibold">อีเมล</th>
-                <th className="py-3 px-4 text-left font-semibold">เบอร์โทร</th>
+                <th className="py-3 px-2 text-left font-semibold w-10">ID</th>
+                <th className="py-3 px-2 text-left font-semibold w-24">ชื่อผู้ใช้</th>
+                <th className="py-3 px-2 text-left font-semibold w-20">บทบาท</th>
+                <th className="py-3 px-2 text-left font-semibold min-w-[120px]">แผนก</th>
+                <th className="py-3 px-2 text-left font-semibold min-w-[160px]">อีเมล</th>
+                <th className="py-3 px-2 text-left font-semibold w-24">เบอร์โทร</th>
+                <th className="py-3 px-2 text-center font-semibold w-12">ลบ</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map(u => (
                 <tr key={u.userid} className="border-b last:border-0 hover:bg-mfu-gold/10 transition cursor-pointer" onClick={() => setSelectedUser(u)}>
-                  <td className="py-2.5 px-4 text-gray-800">{u.userid}</td>
-                  <td className="py-2.5 px-4 text-gray-800">{u.username}</td>
-                  <td className="py-2.5 px-4 text-gray-700">{u.role === 3 ? 'แอดมิน' : u.role === 2 ? 'เจ้าหน้าที่' : 'ผู้ใช้'}</td>
-                  <td className="py-2.5 px-4 text-gray-600">{u.department || '-'}</td>
-                  <td className="py-2.5 px-4 text-gray-600">{u.useremail || '-'}</td>
-                  <td className="py-2.5 px-4 text-gray-600">{u.phonenum || '-'}</td>
+                  <td className="py-2.5 px-2 text-gray-800">{u.userid}</td>
+                  <td className="py-2.5 px-2 text-gray-800 break-words">{u.username}</td>
+                  <td className="py-2.5 px-2 text-gray-700">{u.role === 3 ? 'แอดมิน' : u.role === 2 ? 'เจ้าหน้าที่' : 'ผู้ใช้'}</td>
+                  <td className="py-2.5 px-2 text-gray-600 break-words">{u.department || '-'}</td>
+                  <td className="py-2.5 px-2 text-gray-600 break-words">{u.useremail || '-'}</td>
+                  <td className="py-2.5 px-2 text-gray-600 break-words">{u.phonenum || '-'}</td>
+                  <td className="py-2.5 px-2 text-center" onClick={e => e.stopPropagation()}>
+                    {String(u.userid) !== String(user?.userId) ? (
+                      <button
+                        className="bg-red-500 text-white px-3 py-1 rounded font-semibold hover:bg-red-600 text-xs"
+                        onClick={async () => {
+                          const result = await Swal.fire({
+                            title: 'ยืนยันการลบผู้ใช้?',
+                            text: `คุณต้องการลบผู้ใช้ ${u.username} หรือไม่?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'ลบ',
+                            cancelButtonText: 'ยกเลิก',
+                            confirmButtonColor: '#d33',
+                            reverseButtons: true,
+                          });
+                          if (result.isConfirmed) {
+                            try {
+                              const res = await fetch(`http://localhost:3001/api/users/${u.userid}`, {
+                                method: 'DELETE',
+                                headers: { Authorization: `Bearer ${user.token}` },
+                              });
+                              if (!res.ok) throw new Error('ลบไม่สำเร็จ');
+                              await Swal.fire({ icon: 'success', title: 'ลบผู้ใช้สำเร็จ', timer: 1200, showConfirmButton: false });
+                              fetchUsers();
+                            } catch (e) {
+                              Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
+                            }
+                          }
+                        }}
+                      >ลบ</button>
+                    ) : (
+                      <div className="relative group inline-block">
+                        <button
+                          className="bg-gray-300 text-gray-500 px-3 py-1 rounded font-semibold text-xs cursor-not-allowed"
+                          disabled
+                        >ลบ</button>
+                        <div className="absolute left-1/2 -translate-x-1/2 mt-2 z-50 bg-gray-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                          ไม่สามารถลบตัวเองได้
+                        </div>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
               {filteredUsers.length === 0 && (

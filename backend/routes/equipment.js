@@ -36,7 +36,7 @@ router.post('/', authenticateToken, isAdmin, upload.single('Assetimg'), async (r
       Assetstatus: body.Assetstatus || 'Available',
       Assettype: body.Assettype || ''
     });
-    console.log(`[CREATE EQUIPMENT] Admin: ${req.user.username}, Assetname: ${body.Assetname}, Assetcode: ${body.Assetcode}, Time: ${new Date().toISOString()}`);
+    console.log(`[CREATE EQUIPMENT] Admin: ${req.user.username}, Assetname: ${body.Assetname}, Assetcode: ${body.Assetcode}, Time: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false })}`);
     res.json({ id });
   } catch (e) {
     res.status(500).json({ message: 'Create failed', error: e.message });
@@ -58,7 +58,7 @@ router.post('/bulk', authenticateToken, isAdmin, async (req, res) => {
         Assetstatus: item.Assetstatus || 'Available',
         Assettype: item.Assettype || ''
       });
-      console.log(`[BULK CREATE EQUIPMENT] Admin: ${req.user.username}, Assetname: ${item.Assetname}, Assetcode: ${item.Assetcode}, Time: ${new Date().toISOString()}`);
+      console.log(`[BULK CREATE EQUIPMENT] Admin: ${req.user.username}, Assetname: ${item.Assetname}, Assetcode: ${item.Assetcode}, Time: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false })}`);
     }
     res.json({ message: 'Bulk insert success' });
   } catch (e) {
@@ -67,8 +67,12 @@ router.post('/bulk', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 // Update equipment
-router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
-  await Equipment.update(req.params.id, req.body);
+router.put('/:id', authenticateToken, isAdmin, upload.single('Assetimg'), async (req, res) => {
+  const updateData = req.body;
+  if (req.file) {
+    updateData.Assetimg = req.file.filename;
+  }
+  await Equipment.update(req.params.id, updateData);
   res.json({ message: 'updated' });
 });
 // Delete equipment
@@ -94,6 +98,38 @@ router.get('/asset-types', authenticateToken, async (req, res) => {
     res.json(types);
   } catch (e) {
     res.status(500).json({ message: 'Failed to fetch asset types', error: e.message });
+  }
+});
+
+// เพิ่มประเภทใหม่
+router.post('/asset-types', authenticateToken, isAdmin, async (req, res) => {
+  const { asset_type_name } = req.body;
+  if (!asset_type_name) return res.status(400).json({ message: 'asset_type_name is required' });
+  try {
+    const newType = await Equipment.createAssetType(asset_type_name);
+    res.json(newType);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to add asset type', error: e.message });
+  }
+});
+
+// Get all asset locations
+router.get('/locations', authenticateToken, async (req, res) => {
+  try {
+    const locations = await Equipment.getAllLocations();
+    res.json(locations);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to fetch locations', error: e.message });
+  }
+});
+
+// Get all asset statuses
+router.get('/statuses', authenticateToken, async (req, res) => {
+  try {
+    const statuses = await Equipment.getAllStatuses();
+    res.json(statuses);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to fetch statuses', error: e.message });
   }
 });
 

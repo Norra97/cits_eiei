@@ -7,7 +7,10 @@ const User = {
     return rows[0];
   },
   async createUser({ username, password, role, phonenum, department, useremail }) {
-    const hash = await bcrypt.hash(password, 10);
+    let hash = '';
+    if (password) {
+      hash = await bcrypt.hash(password, 10);
+    }
     const [result] = await pool.query('INSERT INTO user (username, password, role, phonenum, department, useremail) VALUES (?, ?, ?, ?, ?, ?)', [username, hash, role, phonenum, department, useremail]);
     return result.insertId;
   },
@@ -55,11 +58,27 @@ const User = {
         [rows] = await pool.query('SELECT * FROM user WHERE useremail = ?', [useremail]);
         return rows[0];
       }
-      const username = profile.displayName;
-      const picture = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
-      await pool.query('INSERT INTO user (username, useremail, google_id, role, picture) VALUES (?, ?, ?, ?, ?)', [username, useremail, profile.id, 1, picture]);
-      [rows] = await pool.query('SELECT * FROM user WHERE google_id = ?', [profile.id]);
-      return rows[0];
+      // NEW: Check for student code match
+      const studentCode = useremail.split('@')[0];
+      [rows] = await pool.query("SELECT * FROM user WHERE LEFT(useremail, LOCATE('@', useremail) - 1) = ?", [studentCode]);
+      if (rows.length > 0) {
+        await pool.query('UPDATE user SET google_id = ? WHERE userid = ?', [profile.id, rows[0].userid]);
+        const picture = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
+        if (picture) {
+          await pool.query('UPDATE user SET picture = ? WHERE userid = ?', [picture, rows[0].userid]);
+        }
+        [rows] = await pool.query('SELECT * FROM user WHERE userid = ?', [rows[0].userid]);
+        return rows[0];
+      }
+      // END NEW
+      // If no match, return a special object to trigger link-account flow
+      return {
+        need_link: true,
+        google_id: profile.id,
+        username: profile.displayName,
+        useremail: useremail,
+        picture: profile.photos && profile.photos[0] ? profile.photos[0].value : null
+      };
     } catch (err) {
       console.error('findOrCreateGoogle error:', err);
       throw err;

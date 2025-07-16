@@ -12,6 +12,7 @@ import RequestBorrow from '../components/UserFunction/RequestBorrow';
 import ReturnItem from '../components/UserFunction/ReturnItem';
 import ViewHistory from '../components/UserFunction/ViewHistory';
 import UserAccount from './UserAccount';
+import UserAccountNew from './UserAccountNew';
 
 // -----------------------------
 // links: เมนูนำทางของ user dashboard
@@ -59,6 +60,10 @@ export default function UserDashboard() {
           <div className="mt-2">
             <UserAccount />
           </div>
+        ) : location.pathname === '/user/accountnew' ? (
+          <div className="mt-2">
+            <UserAccountNew />
+          </div>
         ) : (
           <div className="flex flex-col md:flex-row gap-6">
             {/* แสดงปฏิทินเฉพาะหน้า dashboard หลัก */}
@@ -75,6 +80,7 @@ export default function UserDashboard() {
                 <Route path="return" element={<ReturnItem items={items} />} />
                 <Route path="history" element={<ViewHistory />} />
                 <Route path="account" element={null} />
+                <Route path="accountnew" element={<UserAccountNew />} />
                 <Route path="*" element={<Navigate to="." />} />
               </Routes>
             </div>

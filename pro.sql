@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 15, 2025 at 12:05 PM
+-- Generation Time: Jul 16, 2025 at 04:33 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -46,12 +46,14 @@ CREATE TABLE `asset` (
 --
 
 INSERT INTO `asset` (`Assetid`, `Assetname`, `Assetdetail`, `Assetcode`, `Assetlocation`, `Assetimg`, `Staffaddid`, `Assetstatus`, `Assettype`, `created_at`, `updated_at`) VALUES
-(2, 'NongNat', 'Nanyang', 'K49', 'Dorm Sirinya', 'nanyang.jpg', 2, 'Borrowing', 'Homeless', '2025-06-13 09:35:29', '2025-07-15 09:24:21'),
-(3, 'March', 'Zing', 'Cr1', 'Dorm Nat', 'march.jpg', 3, 'Available', 'Vehicle', '2025-06-16 07:55:27', '2025-07-15 07:54:34'),
-(4, 'Laptop', 'CPU : AMD Ryzen AI 9 HX 375\nRAM : 32GB DDR5\nSSD : 1TB PCIe 4/NVMe M.2 SSD\nMONITOR : 16\" WQXGA (2560x1600) IPS 240Hz\nGPU : Nvidia GeForce RTX5080 16GB GDDR7', 'L1', 'MFU', 'omen.jpg', 3, 'Available', 'Computer', '2025-06-16 09:04:20', '2025-07-14 07:00:56'),
+(2, 'NongNat', 'Nanyang', 'K49', 'Dorm Sirinya', '', 2, 'Disable', 'Homeless', '2025-06-13 09:35:29', '2025-07-16 07:36:19'),
+(3, 'March', 'Zing', 'Cr1', 'Dorm Nat', '', 3, 'Broken', 'Vehicle', '2025-06-16 07:55:27', '2025-07-16 07:47:59'),
+(4, 'Laptop', 'CPU : AMD Ryzen AI 9 HX 375\nRAM : 32GB DDR5\nSSD : 1TB PCIe 4/NVMe M.2 SSD\nMONITOR : 16\" WQXGA (2560x1600) IPS 240Hz\nGPU : Nvidia GeForce RTX5080 16GB GDDR7', 'L1', 'MFU', 'omen.jpg', 3, 'Available', 'Computer', '2025-06-16 09:04:20', '2025-07-16 06:02:02'),
 (5, 'Olympus', 'Olympus EM5 Matk iii + lens kit 12-40mm', 'C1', 'MFU', 'olympus.jpg', 15, 'Available', 'Camera', '2025-06-16 20:30:14', '2025-07-15 07:54:36'),
-(6, 'Projector Samsung', 'SP-LSP3BLAXXT\r\nResolution: 1920 x 1080\r\nScreen Size: 30~100\'\r\nBrightness (LED Lumen): 550 LED Lumen (Peak)\r\nAudio: Dolby Atmos', 'P1', 'MFU', 'projector.jpg', 15, 'Available', 'Projector', '2025-06-18 08:29:45', '2025-07-14 07:03:07'),
-(7, 'iPad', 'iPad Air M3 11 inch', 'iPD1', 'MFU', 'iPad.jpg', 15, 'Borrowing', 'Mobile', '2025-06-18 08:55:37', '2025-07-15 07:33:51');
+(6, 'Projector Samsung', 'SP-LSP3BLAXXT\r\nResolution: 1920 x 1080\r\nScreen Size: 30~100\'\r\nBrightness (LED Lumen): 550 LED Lumen (Peak)\r\nAudio: Dolby Atmos', 'P1', 'MFU', 'projector.jpg', 15, 'Available', 'Projector', '2025-06-18 08:29:45', '2025-07-16 05:44:36'),
+(7, 'iPad', 'iPad Air M3 11 inch', 'iPD1', 'MFU', 'iPad.jpg', 15, 'Available', 'Mobile', '2025-06-18 08:55:37', '2025-07-16 05:37:40'),
+(9, 'Calculator', 'เครื่องคิดเลข Casio FX-991EX สีชมพู', 'Cal1', 'MFU', '1752650914495-920467306.jpg', 20, 'Available', 'Calculator', '2025-07-16 07:04:38', '2025-07-16 07:28:34'),
+(10, 'Power Strip', 'ปลั๊กพ่วง Toshino 5 ช่อง ยาว 3 เมตร มาตรฐาน มอก. รองรับไฟ, 2300 Watt 10A', 'PS1', 'MFU', '1752651182704-328780218.jpg', 20, 'Available', '', '2025-07-16 07:33:02', '2025-07-16 07:33:02');
 
 -- --------------------------------------------------------
 
@@ -108,7 +110,8 @@ INSERT INTO `asset_type` (`asset_type_id`, `asset_type_name`, `created_at`, `upd
 (5, 'Audio Equipment', '2025-06-13 08:39:05', '2025-06-14 14:37:47'),
 (6, 'Homeless', '2025-06-14 14:37:02', '2025-06-14 14:37:49'),
 (7, 'Vehicle', '2025-06-16 07:55:15', '2025-06-16 09:56:39'),
-(18, 'Mobile', '2025-06-18 08:55:29', '2025-06-18 08:55:29');
+(18, 'Mobile', '2025-06-18 08:55:29', '2025-06-18 08:55:29'),
+(19, 'Calculator', '2025-07-16 07:04:20', '2025-07-16 07:04:20');
 
 -- --------------------------------------------------------
 
@@ -159,13 +162,17 @@ INSERT INTO `borrowreq` (`Reqid`, `Assetid`, `Borrowname`, `Borrowdate`, `Return
 (43, 2, 'Ssella', '2025-07-16', '2025-07-17', 'Returned', 'Norra97', NULL, 'ตัดหญ้า', 'In Site', '2025-07-14 10:49:11', '2025-07-14 10:52:48'),
 (44, 3, 'Ssella', '2025-07-14', '2025-07-14', 'Returned', 'Norra97', NULL, 'ซิ่งๆค้าบ', 'Out Site', '2025-07-14 10:53:35', '2025-07-15 07:54:34'),
 (45, 5, 'Ssella', '2025-07-14', '2025-07-16', 'Returned', 'Norra97', NULL, 'ถ่ายวิว', 'Out Site', '2025-07-14 10:58:11', '2025-07-15 07:54:36'),
-(46, 7, 'Ssella', '2025-07-16', '2025-07-17', 'Approved', 'Norra97', NULL, 'ตีป้อมจ้า', 'Out Site', '2025-07-15 06:02:05', '2025-07-15 07:33:51'),
-(47, 7, 'Kt', '2025-07-16', '2025-07-18', 'Approved', 'Norra97', NULL, 'เล่น grow a garden', 'Out Site', '2025-07-15 07:35:19', '2025-07-15 07:37:16'),
-(48, 2, 'Nat', '2025-07-16', '2025-07-17', 'Approved', 'Norra97', NULL, 'พาตัวเองไปกินชาบู', 'Out Site', '2025-07-15 09:24:05', '2025-07-15 09:24:21'),
+(46, 7, 'Ssella', '2025-07-16', '2025-07-17', 'Returned', 'Norra97', NULL, 'ตีป้อมจ้า', 'Out Site', '2025-07-15 06:02:05', '2025-07-16 05:37:40'),
+(47, 7, 'Kt', '2025-07-16', '2025-07-18', 'Returned', 'Norra97', NULL, 'เล่น grow a garden', 'Out Site', '2025-07-15 07:35:19', '2025-07-16 06:01:57'),
+(48, 2, 'Nat', '2025-07-16', '2025-07-17', 'Returned', 'Norra97', NULL, 'พาตัวเองไปกินชาบู', 'Out Site', '2025-07-15 09:24:05', '2025-07-16 06:02:00'),
 (49, 3, 'Nat', '2025-07-15', '2025-07-17', 'Reject', 'Norra97', 'ทดสอบระบบ', 'ขับไปกินหมูกระทะหน้าราดพัด', 'Out Site', '2025-07-15 09:29:35', '2025-07-15 09:33:23'),
 (50, 6, 'Nat', '2025-07-15', '2025-07-16', 'Reject', 'Norra97', 'ทดสอบระบบ', 'ดูหนังจ้า', 'Out Site', '2025-07-15 09:31:43', '2025-07-15 09:33:28'),
 (51, 5, 'Nat', '2025-07-15', '2025-07-19', 'Reject', 'Norra97', 'ทดสอบระบบ', 'ฝึกถ่ายรูป', 'Out Site', '2025-07-15 09:32:55', '2025-07-15 09:33:34'),
-(52, 2, 'Ssella', '2025-07-15', '2025-07-16', 'Reject', 'Norra97', 'ขอนานๆกว่านี้', 'ขัดห้องน้ำ', 'Out Site', '2025-07-15 09:35:43', '2025-07-15 09:41:53');
+(52, 2, 'Ssella', '2025-07-15', '2025-07-16', 'Reject', 'Norra97', 'ขอนานๆกว่านี้', 'ขัดห้องน้ำ', 'Out Site', '2025-07-15 09:35:43', '2025-07-15 09:41:53'),
+(53, 6, 'Ssella', '2025-07-16', '2025-07-17', 'Returned', 'Norra97', NULL, 'ดูละครคุณธรรม', 'Out Site', '2025-07-16 05:36:37', '2025-07-16 05:44:36'),
+(54, 4, 'Ssella', '2025-07-16', '2025-07-26', 'Returned', 'Norra97', NULL, 'ตัดงาน Pr', 'Out Site', '2025-07-16 05:41:27', '2025-07-16 06:02:02'),
+(55, 10, 'Kt', '2025-07-16', '2025-07-17', 'Pending', NULL, NULL, 'เอาไปต่อดูหนัง', 'Out Site', '2025-07-16 07:54:49', '2025-07-16 07:54:49'),
+(56, 6, 'Kt', '2025-07-16', '2025-07-17', 'Pending', NULL, NULL, 'เอาไปดูหนัง', 'Out Site', '2025-07-16 07:55:00', '2025-07-16 07:55:00');
 
 -- --------------------------------------------------------
 
@@ -195,9 +202,10 @@ INSERT INTO `user` (`userid`, `username`, `password`, `role`, `phonenum`, `depar
 (17, 'Nat', '$2b$10$NwS5RMMMqZwOye3XWgVRS.V2nahpS9gsC9O0e8yR00zNXVIch/DIu', 1, '0910070761', 'สำนักวิชาอุตสาหกรรมเกษตร', '6531501146@lamduan.mfu.ac.th', NULL, NULL),
 (18, 'adm1', '$2b$10$p3iAZj7iVqs7q7b8BM3xM.W0eNp7S2WhYg9wVSCSoHcwx4DtVjCpG', 2, '0878788891', 'ศูนย์เทคโนโลยีสารสนเทศ', '9931501064@lamduan.mfu.ac.th', NULL, NULL),
 (19, 'Norrax', '$2b$10$/W576T0Mt0UMF/Khf9ymQeW4tixvMzUv9w8KP2VvEZ7zYB6iauQFS', 1, '0888888888', 'ศูนย์เทคโนโลยีสารสนเทศ', '6987654321@lamduan.mfu.ac.th', NULL, NULL),
-(20, 'Naruto', '$2b$10$tpO4YXgHyZyfqZAUkisZSOvhN0vm.xlVi4DDjJTpKOBlQowoLzQj6', 3, '0888999988', 'สำนักวิชานวัตกรรมสังคม', '6123456789@lamduan.mfu.ac.th', NULL, NULL),
-(24, 'Ssella', '$2b$10$ji3dt7JYEm9rCDPiYwzwIeXVNWHH8/6zWPMmvsFzs4CUzjmeOdK4C', 1, '0932744094', 'สำนักวิชาการจัดการ', '6531205024@lamduan.mfu.ac.th', NULL, NULL),
-(25, 'awm', '$2b$10$S1fDHecyHwOgXQyLBqmTcu8Q6x8qMjHcW7ZJwmXQmWweLPUbJLzZy', 1, '0888899988', 'ส่วนการเงินและบัญชี', '6631501064@lamduan.mfu.ac.th', NULL, NULL);
+(24, 'Ssella', '$2b$10$4oKvXOk9IfRH0YZAZykmPOPxEEbORyfgcoRBXyAQrYaIGjRgxWgHq', 1, '0932744094', 'สำนักวิชาการจัดการ', '6531205024@lamduan.mfu.ac.th', NULL, NULL),
+(25, 'awm', '$2b$10$S1fDHecyHwOgXQyLBqmTcu8Q6x8qMjHcW7ZJwmXQmWweLPUbJLzZy', 3, '0888899988', 'ส่วนการเงินและบัญชี', '6631501064@lamduan.mfu.ac.th', NULL, NULL),
+(27, 'Naruto', '$2b$10$dW5Utdpj8ecYIzr7K9Qei.93psPyYhLKidVgrOBuPa7T0Boy1S6A2', 3, '0909854765', 'ศูนย์เทคโนโลยีสารสนเทศ', '6731501064@lamduan.mfu.ac.th', NULL, NULL),
+(54, 'Norraphat Jantawong', '', 1, 'external', 'external', 'norraphat1196@gmail.com', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -244,7 +252,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `asset`
 --
 ALTER TABLE `asset`
-  MODIFY `Assetid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `Assetid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `assethistory`
@@ -256,19 +264,19 @@ ALTER TABLE `assethistory`
 -- AUTO_INCREMENT for table `asset_type`
 --
 ALTER TABLE `asset_type`
-  MODIFY `asset_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `asset_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `borrowreq`
 --
 ALTER TABLE `borrowreq`
-  MODIFY `Reqid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `Reqid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- Constraints for dumped tables

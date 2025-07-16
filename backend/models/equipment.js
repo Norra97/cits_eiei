@@ -41,6 +41,19 @@ const Equipment = {
   },
   async delete(id) {
     await pool.query('DELETE FROM asset WHERE Assetid = ?', [id]);
+  },
+  async createAssetType(asset_type_name) {
+    const [result] = await pool.query('INSERT INTO asset_type (asset_type_name) VALUES (?)', [asset_type_name]);
+    const [rows] = await pool.query('SELECT asset_type_id, asset_type_name FROM asset_type WHERE asset_type_id = ?', [result.insertId]);
+    return rows[0];
+  },
+  async getAllLocations() {
+    const [rows] = await pool.query('SELECT DISTINCT Assetlocation FROM asset WHERE Assetlocation IS NOT NULL AND Assetlocation != ""');
+    return rows.map(r => r.Assetlocation);
+  },
+  async getAllStatuses() {
+    const [rows] = await pool.query('SELECT DISTINCT Assetstatus FROM asset WHERE Assetstatus IS NOT NULL AND Assetstatus != ""');
+    return rows.map(r => r.Assetstatus);
   }
 };
 

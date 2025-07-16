@@ -15,9 +15,13 @@ function AllOverview() {
     borrowed: null,
     pending: null,
     broken: null,
+    unavailable: null,
   });
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [assets, setAssets] = useState([]);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [pendingAssets, setPendingAssets] = useState([]);
 
   // เพิ่มฟังก์ชันแปลงวันที่ (ไม่เอาปี)
   const formatDate = (dateStr) => {
@@ -37,45 +41,86 @@ function AllOverview() {
     ]).then(([users, equipment, allHistory]) => {
       const borrowed = allHistory.filter(h => h.Status === 'Borrowed').length;
       const pending = allHistory.filter(h => h.Status === 'Pending').length;
-      const broken = equipment.filter(e => e.Status === 'ชำรุด' || e.Status === 'เสีย' || e.Status === 'เสียหาย').length;
+      const broken = equipment.filter(e => e.Assetstatus === 'Broken').length;
+      const unavailable = equipment.filter(e => e.Assetstatus === 'Disable').length;
       setStats({
         users: users.length,
         equipment: equipment.length,
         borrowed,
         pending,
         broken,
+        unavailable,
       });
+      setAssets(equipment);
       // กิจกรรมล่าสุด: เอา 5 รายการล่าสุดจาก allHistory (เรียงตามวันที่ถ้ามี)
-      const sorted = [...allHistory].sort((a, b) => new Date(b.Borrowdate || b.createdAt) - new Date(a.Borrowdate || a.createdAt));
+      const sorted = [...allHistory].sort((a, b) => {
+        const dateA = new Date(a.Borrowdate || a.createdAt || 0);
+        const dateB = new Date(b.Borrowdate || b.createdAt || 0);
+        return dateB - dateA;
+      });
       setRecent(sorted.slice(0, 5).map(h => ({
-        time: formatDate(h.Borrowdate || h.createdAt),
-        desc: `${h.Borrowname || h.username || 'ไม่ทราบ'} ยืม ${h.Assetid || h.item || ''} (${h.Status})`,
+        time: formatDate(h.Borrowdate || h.createdAt || ''),
+        desc: `${h.Borrowname || h.username || 'ไม่ทราบ'} ยืม ${h.Assetname || h.Assetcode || h.Assetid || ''} (${h.Status})`,
       })));
+      // Prepare pending asset list for tooltip
+      const pendingAssets = allHistory.filter(h => h.Status === 'Pending').map(h => {
+        const asset = equipment.find(e => e.Assetid === h.Assetid);
+        return asset ? (asset.Assetname || asset.Assetcode) : `ID:${h.Assetid}`;
+      });
+      setPendingAssets(Array.from(new Set(pendingAssets)));
       setLoading(false);
     }).catch(() => {
       setLoading(false);
     });
   }, [user]);
 
+  // Prepare asset lists for tooltips
+  const assetLists = {
+    equipment: assets.map(a => a.Assetname || a.Assetcode),
+    borrowed: assets.filter(a => a.Assetstatus === 'Borrowed').map(a => a.Assetname || a.Assetcode),
+    unavailable: assets.filter(a => a.Assetstatus === 'Disable').map(a => a.Assetname || a.Assetcode),
+    broken: assets.filter(a => a.Assetstatus === 'Broken').map(a => a.Assetname || a.Assetcode),
+    pending: pendingAssets,
+  };
+
   const statList = [
-    { label: 'ผู้ใช้ทั้งหมด', value: stats.users, icon: 'fa-user' },
-    { label: 'อุปกรณ์ทั้งหมด', value: stats.equipment, icon: 'fa-laptop' },
-    { label: 'อุปกรณ์ที่ถูกยืม', value: stats.borrowed, icon: 'fa-arrow-up-right-from-square' },
-    { label: 'คำขอยืมที่รออนุมัติ', value: stats.pending, icon: 'fa-clock' },
-    { label: 'อุปกรณ์ชำรุด', value: stats.broken, icon: 'fa-triangle-exclamation' },
+    { label: 'ผู้ใช้ทั้งหมด', value: stats.users, icon: 'fa-user', tooltip: null },
+    { label: 'อุปกรณ์ทั้งหมด', value: stats.equipment, icon: 'fa-laptop', tooltip: assetLists.equipment },
+    { label: 'อุปกรณ์ที่ถูกยืม', value: stats.borrowed, icon: 'fa-arrow-up-right-from-square', tooltip: assetLists.borrowed },
+    { label: 'คำขอยืมที่รออนุมัติ', value: stats.pending, icon: 'fa-clock', tooltip: assetLists.pending },
+    { label: 'อุปกรณ์ชำรุด', value: stats.broken, icon: 'fa-triangle-exclamation', tooltip: assetLists.broken },
+    { label: 'อุปกรณ์ที่ไม่พร้อมใช้งาน', value: stats.unavailable, icon: 'fa-ban', tooltip: assetLists.unavailable },
   ];
 
   return (
     <div className="p-4 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">สรุปภาพรวมระบบ</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-5 mb-10">
         {statList.map((s, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-sm p-5 flex flex-col items-center border border-gray-100 hover:shadow-md transition">
+          <div
+            key={i}
+            className="bg-white rounded-xl shadow-sm p-5 flex flex-col items-center border border-gray-100 hover:shadow-md transition relative"
+            onMouseEnter={() => setHoveredCard(i)}
+            onMouseLeave={() => setHoveredCard(null)}
+          >
             <div className="mb-2 text-mfu-gold">
               <i className={`fa-solid ${s.icon} text-2xl`}></i>
             </div>
             <div className="text-3xl font-bold text-mfu-gold">{loading || s.value === null ? <span className="animate-pulse">-</span> : s.value}</div>
             <div className="text-gray-500 mt-1 text-center text-sm">{s.label}</div>
+            {s.tooltip && hoveredCard === i && (
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 bg-white border border-gray-200 rounded shadow-lg px-4 py-2 min-w-[180px] max-h-60 overflow-y-auto text-sm text-gray-700 whitespace-pre-line">
+                {s.tooltip.length === 0 ? (
+                  <div className="text-gray-400">ไม่มีข้อมูล</div>
+                ) : (
+                  <ul className="list-disc pl-5">
+                    {s.tooltip.map((name, idx) => (
+                      <li key={idx}>{name}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

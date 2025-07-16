@@ -3,9 +3,10 @@ const Equipment = require('./equipment');
 
 const BorrowRequest = {
   async create({ Assetid, Borrowname, Borrowdate, ReturnDate, Activity, UsageType }) {
+    const borrowDateValue = Borrowdate ? Borrowdate : new Date().toISOString().slice(0, 10);
     const [result] = await pool.query(
       'INSERT INTO borrowreq (Assetid, Borrowname, Borrowdate, ReturnDate, Status, Activity, UsageType) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [Assetid, Borrowname, Borrowdate, ReturnDate, 'Pending', Activity, UsageType]
+      [Assetid, Borrowname, borrowDateValue, ReturnDate, 'Pending', Activity, UsageType]
     );
     return result.insertId;
   },

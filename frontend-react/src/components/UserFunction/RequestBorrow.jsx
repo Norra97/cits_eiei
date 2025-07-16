@@ -161,7 +161,15 @@ export default function RequestBorrow() {
                     </button>
                   </td>
                   <td className="px-6 py-4 border-b text-center">
-                    <button className="bg-mfu-red text-white px-4 py-1 rounded hover:bg-mfu-gold hover:text-mfu-red transition font-semibold" disabled={false} onClick={e => { e.stopPropagation(); openModal(asset); }}>
+                    <button
+                      className={
+                        asset.Assetstatus === 'Available'
+                          ? "bg-mfu-red text-white px-4 py-1 rounded hover:bg-mfu-gold hover:text-mfu-red transition font-semibold"
+                          : "bg-gray-200 text-gray-400 px-4 py-1 rounded font-semibold cursor-not-allowed border border-gray-300"
+                      }
+                      disabled={asset.Assetstatus !== 'Available'}
+                      onClick={e => { if (asset.Assetstatus === 'Available') { e.stopPropagation(); openModal(asset); } }}
+                    >
                       ขอยืม
                     </button>
                   </td>

@@ -60,6 +60,27 @@ export default function UserAccount() {
       </div>
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-mfu-red">ตั้งค่าบัญชี (User)</h2>
+        {/* ปุ่มยกเลิกผูกบัญชี Google */}
+        <button
+          className="w-full bg-gray-200 text-mfu-red py-2 rounded font-semibold mb-4 hover:bg-gray-300 transition"
+          type="button"
+          onClick={async () => {
+            try {
+              await axios.post('/api/auth/unlink-google', {}, { headers: { Authorization: `Bearer ${user.token}` } });
+              Swal.fire({ icon: 'success', title: 'ยกเลิกผูกบัญชี Google สำเร็จ', timer: 1200, showConfirmButton: false });
+              // อัปเดต localStorage (ลบ google_id)
+              const newUser = { ...user };
+              delete newUser.google_id;
+              delete newUser.googleId;
+              localStorage.setItem('user', JSON.stringify(newUser));
+              setTimeout(() => window.location.reload(), 1200);
+            } catch (err) {
+              Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.response?.data?.message || 'ยกเลิกไม่สำเร็จ' });
+            }
+          }}
+        >
+          ยกเลิกผูกบัญชี Google
+        </button>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block mb-1 font-semibold">รหัสผ่านปัจจุบัน</label>

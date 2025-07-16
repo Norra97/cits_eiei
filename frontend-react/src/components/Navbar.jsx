@@ -63,15 +63,26 @@ export default function Navbar({ onLogout }) {
               <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
                 <div className="flex flex-col items-center p-4 border-b">
                   <img src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
-                  <p className="font-semibold">{user?.username || 'Guest'}</p>
+                  <p className="font-semibold text-nowrap overflow-ellipsis overflow-hidden max-w-xs">{user?.username || 'Guest'}</p>
                   <p className="text-xs text-gray-500">{user?.userId || 'ID'}</p>
                 </div>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
-                  onClick={() => {
+                  onClick={async () => {
                     let path = '/user/account';
                     if (user?.role === 2) path = '/staff/account';
                     else if (user?.role === 3) path = '/admin/account';
+                    else if (user?.role === 1) {
+                      try {
+                        const res = await fetch('/api/users/has-password', {
+                          headers: { Authorization: `Bearer ${user.token}` }
+                        });
+                        const data = await res.json();
+                        if (data.hasPassword === false) path = '/user/accountnew';
+                      } catch (e) {
+                        // fallback: go to /user/account
+                      }
+                    }
                     window.location.href = path;
                   }}
                 >
