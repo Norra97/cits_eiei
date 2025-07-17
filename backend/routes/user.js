@@ -15,10 +15,20 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
   console.log(`[CREATE USER] Admin: ${req.user.username}, NewUser: ${username}, Role: ${role}, Time: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false })}`);
   res.json({ id });
 });
-// Update user
-router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
+// Update user (user แก้ไขตัวเอง หรือ admin แก้ไขใครก็ได้)
+router.put('/:id', authenticateToken, async (req, res) => {
+  // ถ้าไม่ใช่ admin และ id ไม่ตรงกับ req.user.id ให้ forbidden
+  if (req.user.role !== 3 && String(req.user.id) !== String(req.params.id)) {
+    return res.sendStatus(403);
+  }
   await User.updateUser(req.params.id, req.body);
   console.log(`[UPDATE USER] Admin: ${req.user.username}, UserId: ${req.params.id}, Time: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false })}`);
+  res.json({ message: 'updated' });
+});
+// PUT /api/users/me (user อัปเดตข้อมูลตัวเอง)
+router.put('/me', authenticateToken, async (req, res) => {
+  const { username, role, useremail, phonenum, department } = req.body;
+  await User.updateUser(req.user.id, { username, role, useremail, phonenum, department });
   res.json({ message: 'updated' });
 });
 // Delete user
@@ -77,17 +87,17 @@ router.get('/has-password', authenticateToken, async (req, res) => {
 // Public register endpoint
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password, phone, department } = req.body;
-    // Check for duplicate email
-    const [rows] = await User.findByUsername(username) ? [true] : [false];
-    const exists = await User.findByUsername(username);
-    if (exists) return res.status(400).json({ message: 'ชื่อผู้ใช้นี้ถูกใช้แล้ว' });
-    // Check for duplicate email
+    let { username, email, password, phone, department, google_id, picture } = req.body;
+    // สำหรับ user เมลนอกมหาลัย: บังคับค่า default
+    if (!department || department.trim() === '') department = 'external';
+    if (!phone || phone.trim() === '') phone = 'external';
+    password = '';
     const pool = require('../config/db');
-    const [emailRows] = await pool.query('SELECT * FROM user WHERE useremail = ?', [email]);
-    if (emailRows.length > 0) return res.status(400).json({ message: 'อีเมลนี้ถูกใช้แล้ว' });
-    // Create user
-    const id = await User.createUser({ username, password, role: 1, phonenum: phone, department, useremail: email });
+    // Check for duplicate email
+    const [rows] = await pool.query('SELECT * FROM user WHERE useremail = ?', [email]);
+    if (rows.length > 0) return res.status(400).json({ message: 'อีเมลนี้ถูกใช้แล้ว' });
+    // Create user (เพิ่ม google_id, picture ถ้ามี)
+    const id = await User.createUser({ username, password, role: 1, phonenum: phone, department, useremail: email, google_id, picture });
     // สร้าง JWT token
     const jwt = require('jsonwebtoken');
     const token = jwt.sign({ id, username, role: 1 }, process.env.JWT_SECRET, { expiresIn: '7d' });

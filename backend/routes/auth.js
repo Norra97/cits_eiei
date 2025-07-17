@@ -11,9 +11,9 @@ router.post('/login', async (req, res) => {
   if (!user) return res.status(400).json({ message: 'Invalid credentials' });
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
-  const token = jwt.sign({ id: user.userid, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '8h' });
+  const token = jwt.sign({ id: user.userid, username: user.username, role: user.role, email: user.useremail }, process.env.JWT_SECRET, { expiresIn: '8h' });
   console.log(`[LOGIN] Username: ${user.username}, Role: ${user.role}, Time: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false })}`);
-  res.json({ token, role: user.role, userId: user.userid, username: user.username });
+  res.json({ token, role: user.role, userId: user.userid, username: user.username, useremail: user.useremail, department: user.department });
 });
 
 router.post('/register', async (req, res) => {
@@ -103,7 +103,7 @@ router.post('/link-google', async (req, res) => {
     await require('../config/db').query('UPDATE user SET google_id = ?, picture = ? WHERE userid = ?', [google_id, picture, user.userid]);
     // สร้าง token ใหม่
     const token = jwt.sign({ id: user.userid, username: user.username, role: user.role, email: user.useremail, picture }, process.env.JWT_SECRET, { expiresIn: '8h' });
-    res.json({ message: 'ผูกบัญชีสำเร็จ', userId: user.userid, role: user.role, token });
+    res.json({ message: 'ผูกบัญชีสำเร็จ', userId: user.userid, role: user.role, token, useremail: user.useremail, department: user.department });
   } catch (e) {
     res.status(500).json({ message: 'เกิดข้อผิดพลาด', error: e.message });
   }
@@ -126,6 +126,41 @@ router.post('/unlink-google', async (req, res) => {
   } catch (err) {
     console.error('Unlink Google error:', err);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการยกเลิกผูกบัญชี Google' });
+  }
+});
+
+// POST /api/auth/register-google-external
+router.post('/register-google-external', async (req, res) => {
+  const { username, email, google_id, picture } = req.body;
+  if (!username || !email || !google_id) {
+    return res.status(400).json({ message: 'ข้อมูลไม่ครบถ้วน' });
+  }
+  try {
+    // ตรวจสอบว่า email หรือ google_id นี้มีในระบบหรือยัง
+    let [rows] = await require('../config/db').query('SELECT * FROM user WHERE useremail = ? OR google_id = ?', [email, google_id]);
+    if (rows.length > 0) {
+      return res.status(400).json({ message: 'มีผู้ใช้นี้ในระบบแล้ว' });
+    }
+    // สร้าง user ใหม่
+    const User = require('../models/user');
+    const insertId = await User.createUser({
+      username,
+      password: '', // ไม่มีรหัสผ่าน
+      role: 1, // user
+      phonenum: 'external',
+      department: 'external',
+      useremail: email,
+      google_id,
+      picture
+    });
+    // ดึง user กลับมาเพื่อสร้าง token
+    const [userRows] = await require('../config/db').query('SELECT * FROM user WHERE userid = ?', [insertId]);
+    const user = userRows[0];
+    const token = jwt.sign({ id: user.userid, username: user.username, role: user.role, email: user.useremail, picture: user.picture }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    res.status(201).json({ message: 'สร้างบัญชีผู้ใช้ external สำเร็จ', token, role: user.role, userId: user.userid, username: user.username, useremail: user.useremail, department: user.department });
+  } catch (err) {
+    console.error('[REGISTER GOOGLE EXTERNAL ERROR]', err.message, err.stack);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการสร้างบัญชี external', error: err.message });
   }
 });
 

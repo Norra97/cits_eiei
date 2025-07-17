@@ -6,12 +6,24 @@ const User = {
     const [rows] = await pool.query('SELECT * FROM user WHERE username = ?', [username]);
     return rows[0];
   },
-  async createUser({ username, password, role, phonenum, department, useremail }) {
+  async createUser({ username, password, role, phonenum, department, useremail, google_id, picture }) {
     let hash = '';
     if (password) {
       hash = await bcrypt.hash(password, 10);
     }
-    const [result] = await pool.query('INSERT INTO user (username, password, role, phonenum, department, useremail) VALUES (?, ?, ?, ?, ?, ?)', [username, hash, role, phonenum, department, useremail]);
+    // เพิ่ม google_id, picture ถ้ามี
+    const fields = ['username', 'password', 'role', 'phonenum', 'department', 'useremail'];
+    const values = [username, hash, role, phonenum, department, useremail];
+    if (google_id) {
+      fields.push('google_id');
+      values.push(google_id);
+    }
+    if (picture) {
+      fields.push('picture');
+      values.push(picture);
+    }
+    const sql = `INSERT INTO user (${fields.join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`;
+    const [result] = await pool.query(sql, values);
     return result.insertId;
   },
   async getAllUsers() {
@@ -19,14 +31,25 @@ const User = {
     return rows;
   },
   async updateUser(id, { username, role, phonenum, department, useremail, password, picture }) {
+    // สร้าง dynamic fields และ values
+    const fields = ['username = ?', 'role = ?', 'phonenum = ?', 'department = ?'];
+    const values = [username, role, phonenum, department];
+    if (useremail) {
+      fields.push('useremail = ?');
+      values.push(useremail);
+    }
     if (password) {
       const hash = await bcrypt.hash(password, 10);
-      await pool.query('UPDATE user SET username = ?, role = ?, phonenum = ?, department = ?, useremail = ?, password = ?, picture = ? WHERE userid = ?', [username, role, phonenum, department, useremail, hash, picture, id]);
-    } else if (picture !== undefined) {
-      await pool.query('UPDATE user SET username = ?, role = ?, phonenum = ?, department = ?, useremail = ?, picture = ? WHERE userid = ?', [username, role, phonenum, department, useremail, picture, id]);
-    } else {
-      await pool.query('UPDATE user SET username = ?, role = ?, phonenum = ?, department = ?, useremail = ? WHERE userid = ?', [username, role, phonenum, department, useremail, id]);
+      fields.push('password = ?');
+      values.push(hash);
     }
+    if (picture !== undefined) {
+      fields.push('picture = ?');
+      values.push(picture);
+    }
+    values.push(id);
+    const sql = `UPDATE user SET ${fields.join(', ')} WHERE userid = ?`;
+    await pool.query(sql, values);
   },
   async updateProfileImage(userid, picturePath) {
     await pool.query('UPDATE user SET picture = ? WHERE userid = ?', [picturePath, userid]);
@@ -71,13 +94,33 @@ const User = {
         return rows[0];
       }
       // END NEW
+      // ถ้าเป็น email มหาวิทยาลัยและยังไม่มีในระบบ ให้สร้าง user ใหม่อัตโนมัติ
+      if (
+        (useremail.endsWith('@mfu.ac.th') || useremail.endsWith('@lamduan.mfu.ac.th'))
+      ) {
+        const picture = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
+        const [result] = await pool.query(
+          'INSERT INTO user (username, role, phonenum, department, useremail, google_id, picture) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [
+            profile.displayName,
+            1, // role user
+            '', // phonenum
+            '', // department (เว้นว่าง)
+            useremail,
+            profile.id,
+            picture
+          ]
+        );
+        const [rows2] = await pool.query('SELECT * FROM user WHERE userid = ?', [result.insertId]);
+        return rows2[0];
+      }
       // If no match, return a special object to trigger link-account flow
       return {
         need_link: true,
-        google_id: profile.id,
+        google_id: profile.id || (profile.google_id ? profile.google_id : null),
         username: profile.displayName,
         useremail: useremail,
-        picture: profile.photos && profile.photos[0] ? profile.photos[0].value : null
+        picture: (profile.photos && profile.photos[0] && profile.photos[0].value) ? profile.photos[0].value : null
       };
     } catch (err) {
       console.error('findOrCreateGoogle error:', err);

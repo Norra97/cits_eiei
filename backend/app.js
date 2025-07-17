@@ -42,6 +42,8 @@ app.get('/api/auth/google/callback',
     }
     // NEW: If user is flagged as "need_link", redirect to link-account page
     if (req.user.need_link) {
+      // LOG for debug
+      console.log('[GOOGLE CALLBACK] need_link:', req.user);
       // สร้าง JWT ชั่วคราวสำหรับการผูกบัญชี
       const jwt = require('jsonwebtoken');
       const tempToken = jwt.sign({

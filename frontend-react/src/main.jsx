@@ -15,8 +15,8 @@ import LinkAccount from './pages/LinkAccount';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/link-account" element={<LinkAccount />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 ); 

@@ -17,6 +17,26 @@ export default function LinkAccount() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        // เพิ่มตรงนี้: ถ้า email เป็นของมหาวิทยาลัย ให้ข้ามหน้าผูกบัญชี
+        if (
+          decoded.email?.endsWith('@mfu.ac.th') ||
+          decoded.email?.endsWith('@lamduan.mfu.ac.th')
+        ) {
+          // login context (ถ้ามีข้อมูลพอ)
+          login({
+            userId: decoded.id,
+            username: decoded.username,
+            role: decoded.role || 1,
+            token,
+            picture: decoded.picture,
+            useremail: decoded.email // set useremail จาก JWT
+          });
+          let dash = '/user';
+          if (decoded.role === 3) dash = '/admin';
+          else if (decoded.role === 2) dash = '/staff';
+          navigate(dash, { replace: true });
+          return;
+        }
         setGoogleInfo(decoded);
       } catch (e) {
         Swal.fire({ icon: 'error', title: 'Token ไม่ถูกต้อง', text: 'กรุณาลองใหม่' });
@@ -49,6 +69,15 @@ export default function LinkAccount() {
         let dash = '/user';
         if (role === 3) dash = '/admin';
         else if (role === 2) dash = '/staff';
+        // set user context ด้วย useremail ที่ได้จาก backend
+        login({
+          userId: data.userId,
+          username: googleInfo.username,
+          role: data.role,
+          token: data.token,
+          picture: googleInfo.picture,
+          useremail: data.useremail
+        });
         console.log('[LinkAccount] Redirecting to:', dash, 'with role:', role, 'data:', data);
         window.location.href = dash;
       } else {
@@ -95,15 +124,21 @@ export default function LinkAccount() {
           onClick={async () => {
             if (!googleInfo) return;
             try {
-              const res = await fetch('http://localhost:3001/api/auth/register', {
+              const email = googleInfo.email || googleInfo.useremail;
+              console.log('REGISTER DEBUG', {
+                username: googleInfo.username,
+                email,
+                google_id: googleInfo.google_id,
+                picture: googleInfo.picture
+              });
+              const res = await fetch('http://localhost:3001/api/auth/register-google-external', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   username: googleInfo.username,
-                  email: googleInfo.email,
-                  phone: 'external',
-                  department: 'external',
-                  password: '' // ส่ง password ว่าง
+                  email,
+                  google_id: googleInfo.google_id,
+                  picture: googleInfo.picture
                 })
               });
               const data = await res.json();
@@ -112,18 +147,20 @@ export default function LinkAccount() {
                 // save user info to localStorage (simulate login) ถ้ามี token/role
                 if (data.token && data.role) {
                   localStorage.setItem('user', JSON.stringify({
-                    userId: data.userId,
+                    userId: data.userId || data.id || data.userid,
                     username: googleInfo.username,
                     role: data.role,
                     token: data.token,
-                    picture: googleInfo.picture
+                    picture: googleInfo.picture,
+                    useremail: data.useremail
                   }));
                   login({
-                    userId: data.userId,
+                    userId: data.userId || data.id || data.userid,
                     username: googleInfo.username,
                     role: data.role,
                     token: data.token,
-                    picture: googleInfo.picture
+                    picture: googleInfo.picture,
+                    useremail: data.useremail
                   });
                 }
                 let role = data.role;

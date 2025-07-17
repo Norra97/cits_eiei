@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-export default function Navbar({ onLogout }) {
+export default function Navbar({ onLogout, disableAll }) {
   const [showProfile, setShowProfile] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function Navbar({ onLogout }) {
 
         {/* User menu links (role 1) */}
         {user?.role === 1 && (
-          <div className="flex space-x-4 ml-8">
+          <div className="flex space-x-4 ml-8" style={disableAll ? { pointerEvents: 'none', opacity: 0.5 } : {}}>
             <a href="/user" className="text-white hover:text-mfu-gold font-semibold">แดชบอร์ด</a>
             <a href="/user/request" className="text-white hover:text-mfu-gold font-semibold">ส่งคำขอยืม</a>
             <a href="/user/return" className="text-white hover:text-mfu-gold font-semibold">แจ้งคืน</a>
@@ -33,7 +33,7 @@ export default function Navbar({ onLogout }) {
 
         {/* Staff menu links (role 2) */}
         {user?.role === 2 && (
-          <div className="flex space-x-4 ml-8">
+          <div className="flex space-x-4 ml-8" style={disableAll ? { pointerEvents: 'none', opacity: 0.5 } : {}}>
             <a href="/staff" className="text-white hover:text-mfu-gold font-semibold">แดชบอร์ด</a>
             <a href="/staff/approve" className="text-white hover:text-mfu-gold font-semibold">อนุมัติคำขอยืม</a>
             <a href="/staff/return" className="text-white hover:text-mfu-gold font-semibold">ยืนยันการคืน</a>
@@ -41,7 +41,7 @@ export default function Navbar({ onLogout }) {
         )}
 
         {user?.role === 3 && (
-          <div className="flex space-x-4 ml-8">
+          <div className="flex space-x-4 ml-8" style={disableAll ? { pointerEvents: 'none', opacity: 0.5 } : {}}>
             <a href="/admin" className="text-white hover:text-mfu-gold font-semibold">แดชบอร์ด</a>
             <a href="/admin/users" className="text-white hover:text-mfu-gold font-semibold">จัดการผู้ใช้</a>
             <a href="/admin/items" className="text-white hover:text-mfu-gold font-semibold">จัดการอุปกรณ์</a>
@@ -54,16 +54,17 @@ export default function Navbar({ onLogout }) {
           {/* Profile dropdown */}
           <div className="relative">
             <img
-              src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')}
+              src={user?.picture || '/images/placeholder.jpg'}
               alt="profile"
               className="h-9 w-9 rounded-full cursor-pointer border-2 border-mfu-gold"
               onClick={() => setShowProfile(v => !v)}
+              onError={e => { e.target.onerror = null; e.target.src = '/images/placeholder.png'; }}
             />
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
                 <div className="flex flex-col items-center p-4 border-b">
                   <img src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
-                  <p className="font-semibold text-nowrap overflow-ellipsis overflow-hidden max-w-xs">{user?.username || 'Guest'}</p>
+                  <p className="font-semibold text-base text-center truncate max-w-[160px]">{user?.username || 'Guest'}</p>
                 </div>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
@@ -73,13 +74,27 @@ export default function Navbar({ onLogout }) {
                     else if (user?.role === 3) path = '/admin/account';
                     else if (user?.role === 1) {
                       try {
-                        const res = await fetch('/api/users/has-password', {
-                          headers: { Authorization: `Bearer ${user.token}` }
-                        });
-                        const data = await res.json();
-                        if (data.hasPassword === false) path = '/user/accountnew';
+                        // ใช้ user context ไม่ต้อง fetch user list
+                        if (
+                          user.useremail &&
+                          !(
+                            user.useremail.endsWith('@mfu.ac.th') ||
+                            user.useremail.endsWith('@lamduan.mfu.ac.th')
+                          )
+                        ) {
+                          // เมลนอกมหาลัย: เช็ค password
+                          const pwRes = await fetch('/api/users/has-password', {
+                            headers: { Authorization: `Bearer ${user.token}` }
+                          });
+                          const pwData = await pwRes.json();
+                          if (pwData.hasPassword === false) {
+                            path = '/user/accountnew';
+                          } else {
+                            path = '/user/account';
+                          }
+                        }
                       } catch (e) {
-                        // fallback: go to /user/account
+                        path = '/user/account';
                       }
                     }
                     window.location.href = path;

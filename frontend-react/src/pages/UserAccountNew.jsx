@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserAccountNew() {
   const [newPassword, setNewPassword] = useState('');
@@ -11,6 +12,7 @@ export default function UserAccountNew() {
   const [showConfirm, setShowConfirm] = useState(false);
   const { user } = useAuth();
   const [phone, setPhone] = useState(user?.phonenum || '');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,6 +31,36 @@ export default function UserAccountNew() {
       return;
     }
     try {
+      // เพิ่มข้อมูล user หลัก
+      let useremail = user?.useremail;
+      let username = user?.username;
+      let role = user?.role;
+      let department = user?.department; // ดึง department เดิม
+      if (!useremail || !username || !role || !department) {
+        try {
+          const stored = localStorage.getItem('user');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (!useremail) useremail = parsed.useremail;
+            if (!username) username = parsed.username;
+            if (!role) role = parsed.role;
+            if (!department) department = parsed.department;
+          }
+        } catch {}
+      }
+      if (!department) department = 'external'; // fallback กัน null
+      await axios.put(`/api/users/${user.userId}`,
+        {
+          username: username,
+          role: role,
+          useremail: useremail,
+          phonenum: phone,
+          department: department // ส่ง department เดิมหรือ external
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` }
+        }
+      );
       await axios.post('/api/users/set-password', {
         newPassword,
         phone
@@ -36,7 +68,7 @@ export default function UserAccountNew() {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       await Swal.fire({ icon: 'success', title: 'ตั้งรหัสผ่านสำเร็จ', timer: 1200, showConfirmButton: false });
-      window.location.href = '/user/account';
+      navigate('/user', { replace: true });
     } catch (err) {
       Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.response?.data?.message || 'ตั้งรหัสผ่านไม่สำเร็จ' });
     }
@@ -56,7 +88,7 @@ export default function UserAccountNew() {
         </ul>
       </div>
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-mfu-red">ตั้งรหัสผ่านใหม่ (User)</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-mfu-red">กรุณากรอกข้อมูลให้ครบถ้วน (User)</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block mb-1 font-semibold">เบอร์โทรศัพท์</label>

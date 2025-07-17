@@ -29,7 +29,8 @@ export default function LoginPage() {
           username: payload.username,
           role: payload.role,
           token,
-          picture: payload.picture // รองรับรูปจาก Google
+          picture: payload.picture,
+          useremail: payload.email // ดึง email จาก JWT
         });
         setHasProcessedToken(true); // ป้องกัน loop
         // redirect ทันทีตาม role
@@ -53,7 +54,8 @@ export default function LoginPage() {
         userId: res.data.userId,
         username: res.data.username,
         role: res.data.role,
-        token: res.data.token
+        token: res.data.token,
+        useremail: res.data.useremail // set useremail จาก backend
       });
       let dash = '/user';
       if (res.data.role === 3) dash = '/admin';

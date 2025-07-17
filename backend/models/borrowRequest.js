@@ -43,7 +43,7 @@ const BorrowRequest = {
     return rows;
   },
   async getReturnPending() {
-    const [rows] = await pool.query('SELECT * FROM borrowreq WHERE Status = ?', ['ReturnPending']);
+    const [rows] = await pool.query('SELECT * FROM borrowreq WHERE Status = ? OR Status = ?', ['ReturnPending', 'RePending']);
     return rows;
   },
   async confirmReturn(Reqid, lectname) {

@@ -1,6 +1,6 @@
 // นำเข้า React และ dependencies ที่จำเป็น
 import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
@@ -13,6 +13,7 @@ import ReturnItem from '../components/UserFunction/ReturnItem';
 import ViewHistory from '../components/UserFunction/ViewHistory';
 import UserAccount from './UserAccount';
 import UserAccountNew from './UserAccountNew';
+import UserAccountNewInt from './UserAccountNewInt';
 import Swal from 'sweetalert2';
 
 // -----------------------------
@@ -35,8 +36,63 @@ export default function UserDashboard() {
   const [items, setItems] = React.useState([]);
   // ใช้สำหรับตรวจสอบ path ปัจจุบัน
   const location = useLocation();
+  const navigate = useNavigate();
   // ตรวจสอบว่าอยู่หน้า dashboard หลักหรือไม่
   const isMainDashboard = location.pathname === '/user' || location.pathname === '/user/';
+
+  // --- เพิ่ม useEffect สำหรับ redirect user เมลนอกมหาลัยที่ยังไม่มี password ---
+  React.useEffect(() => {
+    if (!user || user.role !== 1) return;
+    // เฉพาะเมลนอกมหาลัย
+    if (
+      user.useremail &&
+      !user.useremail.endsWith('@mfu.ac.th') &&
+      !user.useremail.endsWith('@lamduan.mfu.ac.th')
+    ) {
+      // เช็ค password
+      fetch('/api/users/has-password', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.hasPassword === false) {
+            // ถ้าอยู่หน้า /user หรือ /user/account ให้ redirect ไป /user/accountnew
+            if (
+              location.pathname === '/user' ||
+              location.pathname === '/user/' ||
+              location.pathname === '/user/account'
+            ) {
+              navigate('/user/accountnew', { replace: true });
+            }
+          }
+        });
+    }
+  }, [user, location.pathname, navigate]);
+  // --- เพิ่ม useEffect สำหรับ redirect user เมลมหาลัยที่ยังไม่มี password ---
+  React.useEffect(() => {
+    if (!user || user.role !== 1) return;
+    if (
+      user.useremail &&
+      (user.useremail.endsWith('@mfu.ac.th') || user.useremail.endsWith('@lamduan.mfu.ac.th'))
+    ) {
+      // เช็ค password
+      fetch('/api/users/has-password', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.hasPassword === false) {
+            if (
+              location.pathname === '/user' ||
+              location.pathname === '/user/' ||
+              location.pathname === '/user/account'
+            ) {
+              navigate('/user/accountnewint', { replace: true });
+            }
+          }
+        });
+    }
+  }, [user, location.pathname, navigate]);
   // โหลดรายการที่ยืมอยู่เมื่อ user เปลี่ยน
   React.useEffect(() => {
     if (!user) return;
@@ -67,7 +123,7 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar ด้านบน */}
-      <Navbar title="MFU User" links={links} onLogout={logout} />
+      <Navbar title="MFU User" links={links} onLogout={logout} disableAll={location.pathname === '/user/accountnewint' || location.pathname === '/user/accountnew'} />
       <div className="max-w-5xl mx-auto pt-24 px-2">
         {/* แถบประกาศข่าวสาร */}
         <AnnouncementBar />
@@ -99,6 +155,7 @@ export default function UserDashboard() {
                 <Route path="history" element={<ViewHistory />} />
                 <Route path="account" element={null} />
                 <Route path="accountnew" element={<UserAccountNew />} />
+                <Route path="accountnewint" element={<UserAccountNewInt />} />
                 <Route path="*" element={<Navigate to="." />} />
               </Routes>
             </div>

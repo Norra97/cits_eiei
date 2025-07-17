@@ -3,6 +3,8 @@ import Swal from 'sweetalert2';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function UserAccount() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -12,6 +14,27 @@ export default function UserAccount() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // --- เพิ่ม useEffect สำหรับ redirect user เมลนอกมหาลัยที่ยังไม่มี password ---
+  useEffect(() => {
+    if (!user || user.role !== 1) return;
+    if (
+      user.useremail &&
+      !user.useremail.endsWith('@mfu.ac.th') &&
+      !user.useremail.endsWith('@lamduan.mfu.ac.th')
+    ) {
+      fetch('/api/users/has-password', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.hasPassword === false) {
+            navigate('/user/accountnew', { replace: true });
+          }
+        });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +53,32 @@ export default function UserAccount() {
       return;
     }
     try {
+      // เพิ่มการอัปเดตข้อมูล user หลัก (username, role, useremail) ก่อนเปลี่ยนรหัสผ่าน
+      let useremail = user?.useremail;
+      let username = user?.username;
+      let role = user?.role;
+      if (!useremail || !username || !role) {
+        try {
+          const stored = localStorage.getItem('user');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (!useremail) useremail = parsed.useremail;
+            if (!username) username = parsed.username;
+            if (!role) role = parsed.role;
+          }
+        } catch {}
+      }
+      await axios.put(`/api/users/${user.userId}`,
+        {
+          username: username,
+          role: role,
+          useremail: useremail,
+          phonenum: user?.phonenum
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` }
+        }
+      );
       await axios.post('/api/users/change-password', {
         currentPassword,
         newPassword
