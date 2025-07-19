@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jul 16, 2025 at 05:42 PM
+-- Host: localhost
+-- Generation Time: Jul 19, 2025 at 03:50 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -187,13 +187,13 @@ INSERT INTO `borrowreq` (`Reqid`, `Assetid`, `Borrowname`, `Borrowdate`, `Return
 CREATE TABLE `user` (
   `userid` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL DEFAULT '',
   `role` int(11) NOT NULL,
   `phonenum` varchar(20) DEFAULT NULL,
   `department` varchar(255) DEFAULT NULL,
   `useremail` varchar(255) NOT NULL,
   `google_id` varchar(64) DEFAULT NULL,
-  `picture` varchar(255) DEFAULT NULL
+  `picture` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -203,13 +203,13 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`userid`, `username`, `password`, `role`, `phonenum`, `department`, `useremail`, `google_id`, `picture`) VALUES
 (14, 'Norra97', '$2b$10$mi9U/yqATUaVmC7tyoMgQuMHK2tbw.o0li7ARCFbopN5Z8kgeYqqm', 2, '0647424652', 'สำนักวิชาเทคโนโลยีดิจิทัลประยุกต์', '6531501064@lamduan.mfu.ac.th', '101908288636754790514', '/images/google_14.jpg'),
 (15, 'Kt', '$2b$10$Cf3MR/4If4Bo6oLQPxe2VuI60R3P9sZkr0OzPRDd3NQhyNGbyWf5q', 1, '0886072800', 'สำนักวิชานิติศาสตร์', '6531205025@lamduan.mfu.ac.th', NULL, NULL),
-(17, 'Nat', '$2b$10$NwS5RMMMqZwOye3XWgVRS.V2nahpS9gsC9O0e8yR00zNXVIch/DIu', 1, '0910070761', 'สำนักวิชาอุตสาหกรรมเกษตร', '6531501146@lamduan.mfu.ac.th', NULL, NULL),
 (18, 'adm1', '$2b$10$p3iAZj7iVqs7q7b8BM3xM.W0eNp7S2WhYg9wVSCSoHcwx4DtVjCpG', 2, '0878788891', 'ศูนย์เทคโนโลยีสารสนเทศ', '9931501064@lamduan.mfu.ac.th', NULL, NULL),
 (19, 'Norrax', '$2b$10$/W576T0Mt0UMF/Khf9ymQeW4tixvMzUv9w8KP2VvEZ7zYB6iauQFS', 1, '0888888888', 'ศูนย์เทคโนโลยีสารสนเทศ', '6987654321@lamduan.mfu.ac.th', NULL, NULL),
 (24, 'Ssella', '$2b$10$4oKvXOk9IfRH0YZAZykmPOPxEEbORyfgcoRBXyAQrYaIGjRgxWgHq', 1, '0932744094', 'สำนักวิชาการจัดการ', '6531205024@lamduan.mfu.ac.th', NULL, NULL),
 (25, 'awm', '$2b$10$I6Kp2Qe1NojncpDkWnuVLOKfSi9Edc..Nbbi/7mGs7aB/FLS4kO5i', 3, '0888899988', 'ส่วนการเงินและบัญชี', '6631501064@lamduan.mfu.ac.th', NULL, NULL),
 (27, 'Naruto', '$2b$10$dW5Utdpj8ecYIzr7K9Qei.93psPyYhLKidVgrOBuPa7T0Boy1S6A2', 3, '0909854765', 'ศูนย์เทคโนโลยีสารสนเทศ', '6731501064@lamduan.mfu.ac.th', NULL, NULL),
-(54, 'Norraphat Jantawong', '', 1, 'external', 'external', 'norraphat1196@gmail.com', '110077719172909518902', '/images/google_54.jpg');
+(54, 'Norraphat Jantawong', '', 1, 'external', 'external', 'norraphat1196@gmail.com', '110077719172909518902', '/images/google_54.jpg'),
+(55, 'NAT MAICHOMPHU', '$2b$10$ycNJ7TIICgJwNCoUO7hqeeK.hJQUxJVpR83rSp9687/.bVJ59N1n2', 1, '0910070761', 'ศูนย์เทคโนโลยีสารสนเทศ', '6531501146@lamduan.mfu.ac.th', '108224553020274441401', 'https://lh3.googleusercontent.com/a-/ALV-UjWTKk-BZtWDXITA6IydFBJwM3LBIUiRQpzINOAF7ZNCiGho4iTIcpxEc0Tl5gpx-X3txtSzIfcFyUST16CdCookgGmuCTJH5l8mEa6ix84NZj9ofX-ta44J0AvfRvHDS-n_OLKMjRybGLovrxxSsRul9RymDZZzUVRfAm5alH_iBSAgY6MI1E0F4pSqBC7p5bu_IK2Lfzh8_Ml3qvwqZdwGGEcV_yL-EGKVzFCSqaAL2XsTWNTcmd0nmOm5Fa-cIUn-kptGJSSeBoxh-vMXucpkosuFzAaBCSph11oy3FlCVYuksFSejNdMR_EyMFAV4rD-olXTgw44jwmLwEJyGpfzatkeyuSEeoGZPzZjUAz-wvDnwx_uVmthq7yODIsA1bx1YoGmfV_hHZfJarZdT1M-5PjgMLlei5JQnYyeSbkBnQsqGZsxk2G1Ji7LMhz2iLROijNiQOoqgWWmln3LNzOa3vj1JpCO6hi-Y-DZ-GyhDiSu3Ergc0y1Yy6OYfaU_9S5Qb9j1ZimbsH_1Y-pNdNZPmdgnxMsiCtaRdqL7axCbKxEU8ro_8ECHH2puiCAJ4hBQHl8A0SWvBU5-zikMHmP_Z9eUb7w_Lumc9fqIhUX-vVeaJOqGSfmdP-0CDixnBq4iSXSUtAsa9Y58DKJhtuhfbdv50mmCoZvr8fnKajqUbXm24Gil4GacFksWnuBdwp2HCWFmVBW2kgmU-K03g_0u9S1wSV0EzMqrU7LyAIa59vDMNRwxOl3gSVEAX-7DzTstF9mZYO6fzLproFpUbPnaGaFV8k-M-wieYCBUK-FyJSTXcYczt_FpcZ7nO1tfSicICkR7veosignMw43aFupiZMHxzA0ua5_GymgxQX-KMGNdS2R9jg1oT6vEyyvOSLA1Ik3O8KgPi8HenMz2WHm-7fw_rkO9rmghUfY7z1cfUwuzhLwrz8njfIw8qv3H-sQWioWazDSnB3zlkxa9jwThaS-sP_yqQ=s96-c');
 
 --
 -- Indexes for dumped tables
@@ -280,7 +280,7 @@ ALTER TABLE `borrowreq`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- Constraints for dumped tables

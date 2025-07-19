@@ -63,7 +63,9 @@ export default function Navbar({ onLogout, disableAll }) {
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
                 <div className="flex flex-col items-center p-4 border-b">
-                  <img src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')} alt="Profile" className="h-12 w-12 rounded-full mb-2" />
+                  <img src={user?.picture && user.picture.startsWith('/images/') ? `${BACKEND_URL}${user.picture}` : (user?.picture || '/images/profile.webp')} alt="Profile" className="h-12 w-12 rounded-full mb-2"
+                    onError={e => { e.target.onerror = null; e.target.src = '/images/placeholder.png'; }}
+                  />
                   <p className="font-semibold text-base text-center truncate max-w-[160px]">{user?.username || 'Guest'}</p>
                 </div>
                 <button
